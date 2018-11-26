@@ -7,9 +7,9 @@
 using namespace Eigen;
 using namespace std;
 
-void KalmanFilter::KalmanFilter() {}
-
-void KalmanFilter::~KalmanFilter() {}
+//void KalmanFilter::KalmanFilter() {}
+//
+//void KalmanFilter::~KalmanFilter() {}
 
 void KalmanFilter::Init(VectorXd &state, MatrixXd &covMat, MatrixXd &tranMat, MatrixXd &measMat, MatrixXd &mCovMat, MatrixXd &eCovMat) {
     x = state;
