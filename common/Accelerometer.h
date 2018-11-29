@@ -14,10 +14,11 @@ class Accelerometer {
     Accelerometer(double x, double y, double z);
     virtual ~Accelerometer();
 
-    // rotate the accelerate data into .
-    void Rotate(const Quaternion &quaternion, const Quaternion &quaternion_inv);
+    // rotate the accelerate data into Geo coordinates.
+    Accelerometer Rotate(const Quaternion &quaternion, const Quaternion &quaternion_inv) const;
 
-
+    // format the Accelerate data, correct the error and unit.
+    void Format();
 };
 
 
