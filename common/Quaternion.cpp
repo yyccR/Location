@@ -6,7 +6,18 @@
 #include "Quaternion.h"
 
 #define TOLERANCE 0.00001
-#define PIOVER180 1.0
+#define PIOVER180 0.0174532925
+
+Quaternion::Quaternion(double w, double x, double y, double z) {
+    this->w = w;
+    this->x = x;
+    this->y = y;
+    this->z = z;
+
+    this->Normalise();
+}
+
+Quaternion::~Quaternion() {}
 
 void Quaternion::Normalise() {
 
@@ -35,16 +46,12 @@ Quaternion Quaternion::operator*(const Quaternion &quaternion) const {
     );
 }
 
-void Quaternion::FromAxis(const Vector3 &v, double angle) {
-
-}
-
 
 void Quaternion::FromEuler(double pitch, double yaw, double roll) {
 
-    double p = pitch * PIOVER180 / 2.0;
-    double y = yaw * PIOVER180 / 2.0;
-    double r = roll * PIOVER180 / 2.0;
+    double p = pitch / 2.0;
+    double y = yaw / 2.0;
+    double r = roll / 2.0;
 
     double sinp = sin(p);
     double siny = sin(y);

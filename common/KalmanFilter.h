@@ -53,5 +53,4 @@ public:
 };
 
 
-
 #endif //LOCATION_KALMANFILTER_H
