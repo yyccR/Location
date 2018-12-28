@@ -16,7 +16,7 @@ using namespace Eigen;
  *
  * @param err: 误差积分指针
  * @param gyro: 陀螺仪数据, 欧拉角
- * @param acc: 加速计数据, 加速度
+ * @param acc: 加速计数据, 该数据需为重力传感器数据 或者 静止时的加速计数据。
  * @param mag: 地磁感应数据, 注意手机获取到的磁力计数据单位为 nT, 需乘上 10^-6 转成 mT 单位。
  * @param ki: 比例参数
  * @param kp: 积分参数
