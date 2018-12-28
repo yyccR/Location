@@ -4,7 +4,7 @@
 
 手机传感器数据如下：
 
-<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/Location/sensordata1.png" width="200" height="400" />
+<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/Location/sensordata1.png" width="300" height="600" />
 
 
 
