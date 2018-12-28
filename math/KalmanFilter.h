@@ -6,7 +6,7 @@
 #define LOCATION_KALMANFILTER_H
 
 
-#include <Eigen\Dense>
+#include <Eigen/Dense>
 #include <vector>
 #include <iostream>
 
