@@ -13,14 +13,15 @@ using namespace Eigen;
 class Optimizer {
 public:
 
-    void LevenbergMarquardt(MatrixXd &input_data, VectorXd *coef);
+    void LevenbergMarquardt(MatrixXd &input_data, VectorXd *coef, double &mu, double &epsilon, double &max_iter);
 
-    void GaussNewton(MatrixXd &input_data, VectorXd *coef);
+    void GaussNewton(MatrixXd &input_data, VectorXd *coef, double &epsilon, double &max_iter);
 
 private:
 
     MatrixXd EllipticalCaliJacobi(MatrixXd &input_data, VectorXd *coef);
 
+    VectorXd EllipticalFx(MatrixXd &input_data, VectorXd *coef);
 };
 
 
