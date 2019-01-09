@@ -8,6 +8,11 @@
 
 
 
+## 流程
+
+<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/INS.png" width="600" height="370" />
+
+
 ## Test case
 
 ### AHRS算法测试
@@ -17,7 +22,7 @@
 -0.104817
  -2.34649
 
- 姿态角转四元数 
+ 姿态角转四元数
  -0.245287
  0.302739
 -0.623407
