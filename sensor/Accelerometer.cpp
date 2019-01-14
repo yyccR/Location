@@ -41,43 +41,29 @@ Vector3d Accelerometer::GetAccError(Vector3d &originA, Vector3d &rotatedG) const
     return accErr;
 }
 
-void Accelerometer::AccCalibration(MatrixXd &input_data, Parameters parameters) {
-    double gamma = parameters.gamma;
-    double epsilon = parameters.epsilon;
-    int max_step = parameters.max_step;
-    VectorXd *coef = &parameters.acc_coef;
+void Accelerometer::AccCalibration(MatrixXd &input_data, Status *status) {
+    double gamma = (*status).parameters.gamma;
+    double epsilon = (*status).parameters.epsilon;
+    int max_step = (*status).parameters.max_step;
+    VectorXd *coef = &(*status).parameters.acc_coef;
     Optimizer optimizer;
     optimizer.LevenbergMarquardt(input_data, coef, gamma, epsilon, max_step);
 }
 
-//Accelerometer::Accelerometer(double &x, double &y, double &z, Velocity &velocity) {
-//    this->x = x;
-//    this->y = y;
-//    this->z = z;
-//    this->velocity.vx = velocity.vx;
-//    this->velocity.vy = velocity.vy;
-//    this->velocity.vz = velocity.vz;
-//}
+
+void Accelerometer::PositionIntegral(Status *status, double t) const {
+
+    // 更新位置
+    (*status).position.x = (*status).velocity.v_x * t + 0.5 * (*status).velocity.a_x * t * t;
+    (*status).position.y = (*status).velocity.v_y * t + 0.5 * (*status).velocity.a_y * t * t;
+    (*status).position.z = (*status).velocity.v_z * t + 0.5 * (*status).velocity.a_z * t * t;
+    // 更新速度
+    (*status).velocity.v_x = (*status).velocity.v_x + (*status).velocity.a_x * t;
+    (*status).velocity.v_y = (*status).velocity.v_y + (*status).velocity.a_y * t;
+    (*status).velocity.v_z = (*status).velocity.v_z + (*status).velocity.a_z * t;
+
+}
 
 Accelerometer::Accelerometer() {}
 
 Accelerometer::~Accelerometer() = default;
-
-//Accelerometer Accelerometer::Rotate(const Quaternions &quaternions, const Quaternions &quaternion_inv) const {
-//    Quaternions QA(0, this->x, this->y, this->z);
-//    Quaternions qleft = quaternions * QA;
-//    Quaternions qright = qleft * quaternion_inv;
-//    return Accelerometer(qright.x, qright.y, qright.z, this->velocity);
-//}
-//
-//Point3D Accelerometer::PositionIntegral(Point3D &initPoint, double t) const {
-//    Point3D outPosition;
-//    double deltaX = this->velocity.vx * t + 0.5 * this->x * t * t;
-//    double deltaY = this->velocity.vy * t + 0.5 * this->y * t * t;
-//    double deltaZ = this->velocity.vz * t + 0.5 * this->z * t * t;
-//
-//    outPosition.lng = initPoint.lng + deltaX;
-//    outPosition.lat = initPoint.lat + deltaY;
-//    outPosition.altitude = initPoint.altitude + deltaZ;
-//    return outPosition;
-//}

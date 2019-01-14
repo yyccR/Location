@@ -3,7 +3,7 @@
 //
 
 #include <eigen/Dense>
-#include "../system/Parameters.h"
+#include "../system/Status.h"
 
 #ifndef LOCATION_GYROSCOPE_H
 #define LOCATION_GYROSCOPE_H
@@ -17,7 +17,7 @@ public:
     Matrix3d GetDCM(Vector3d &gyro, double &deltaT);
 
     // 陀螺仪标定
-    void GyroCalibration(MatrixXd &input_data, Parameters parameters);
+    void GyroCalibration(MatrixXd &input_data, Status *status);
 
 };
 

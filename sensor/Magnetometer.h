@@ -2,7 +2,7 @@
 // Created by yangcheng on 2018/12/24.
 //
 
-#include "../system/Parameters.h"
+#include "../system/Status.h"
 #include "Eigen/Dense"
 
 #ifndef LOCATION_MAGNETOMETER_H
@@ -20,7 +20,7 @@ public:
     Vector3d GetMagError(Matrix3d &b2n, Vector3d &originMag) const;
 
     // 地磁计标定
-    void MagCalibration(MatrixXd &input_data, Parameters parameters);
+    void MagCalibration(MatrixXd &input_data, Status *status);
 };
 
 

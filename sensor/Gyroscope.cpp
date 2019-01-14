@@ -4,7 +4,7 @@
 
 #include "Gyroscope.h"
 #include <Eigen/Dense>
-#include <math.h>
+#include <cmath>
 
 using namespace Eigen;
 
@@ -50,7 +50,7 @@ Matrix3d Gyroscope::GetDCM(Vector3d &gyro, double &deltaT) {
  * @param input_data, 静止时的陀螺仪数据(建议,n=200);
  * @param parameters , 陀螺仪标定参数 coef(offset_x,offset_y,offset_z);
  */
-void Gyroscope::GyroCalibration(MatrixXd &input_data, Parameters parameters) {
+void Gyroscope::GyroCalibration(MatrixXd &input_data, Status *status) {
 
     int data_nums = static_cast<int>(input_data.rows());
     double offset_x = 0;
@@ -88,7 +88,7 @@ void Gyroscope::GyroCalibration(MatrixXd &input_data, Parameters parameters) {
         gyro_coef(1) = offset_y / data_nums;
         gyro_coef(2) = offset_z / data_nums;
 
-        parameters.gyro_coef = gyro_coef;
+        (*status).parameters.gyro_coef = gyro_coef;
     }
 }
 

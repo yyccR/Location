@@ -49,11 +49,11 @@ Vector3d Magnetometer::GetMagError(Matrix3d &b2n, Vector3d &originMag) const {
 }
 
 
-void Magnetometer::MagCalibration(MatrixXd &input_data, Parameters parameters) {
-    double gamma = parameters.gamma;
-    double epsilon = parameters.epsilon;
-    int max_step = parameters.max_step;
-    VectorXd *coef = &parameters.mag_coef;
+void Magnetometer::MagCalibration(MatrixXd &input_data, Status *status) {
+    double gamma = (*status).parameters.gamma;
+    double epsilon = (*status).parameters.epsilon;
+    int max_step = (*status).parameters.max_step;
+    VectorXd *coef = &(*status).parameters.mag_coef;
     Optimizer optimizer;
     optimizer.LevenbergMarquardt(input_data, coef, gamma, epsilon, max_step);
 }

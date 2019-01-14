@@ -2,19 +2,11 @@
 // Created by yangcheng on 2018/11/28.
 //
 #include "../math/Quaternions.h"
-#include "../math/Coordinate.h"
-#include "../system/Parameters.h"
+#include "../system/Status.h"
 
 
 #ifndef LOCATION_ACCELEROMETER_H
 #define LOCATION_ACCELEROMETER_H
-
-
-//struct Velocity {
-//    double vx;
-//    double vy;
-//    double vz;
-//};
 
 
 class Accelerometer {
@@ -39,7 +31,7 @@ public:
     Vector3d GetAccError(Vector3d &originA, Vector3d &rotatedG) const;
 
     // 加速计标定
-    void AccCalibration(MatrixXd &input_data, Parameters parameters);
+    void AccCalibration(MatrixXd &input_data, Status *status);
 
     // rotate the accelerate data into Geo coordinates.
 //    Accelerometer Rotate(const Quaternions &quaternions, const Quaternions &quaternion_inv) const;
@@ -51,7 +43,7 @@ public:
 //    void DeleteGravity();
 
     // position integral.
-//    Point3D PositionIntegral(Point3D &initPoint, double t) const;
+    void PositionIntegral(Status *status, double t) const;
 };
 
 
