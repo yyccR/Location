@@ -3,6 +3,7 @@
 //
 #include "../math/Quaternions.h"
 #include "../math/Coordinate.h"
+#include "../system/Parameters.h"
 
 
 #ifndef LOCATION_ACCELEROMETER_H
@@ -36,6 +37,9 @@ public:
 
     // 加速计向量(originA)叉乘地理重力转b系(rotatedG)误差，用于较正陀螺仪
     Vector3d GetAccError(Vector3d &originA, Vector3d &rotatedG) const;
+
+    // 加速计标定
+    void AccCalibration(MatrixXd &input_data, Parameters parameters);
 
     // rotate the accelerate data into Geo coordinates.
 //    Accelerometer Rotate(const Quaternions &quaternions, const Quaternions &quaternion_inv) const;

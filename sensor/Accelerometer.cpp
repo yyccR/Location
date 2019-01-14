@@ -3,7 +3,7 @@
 //
 
 #include "Accelerometer.h"
-#include "../math/Quaternions.h"
+#include "../math/Optimizer.h"
 
 Vector3d Accelerometer::Normalise(Vector3d &a) const {
     Vector3d normA;
@@ -39,6 +39,15 @@ Vector3d Accelerometer::GetAccError(Vector3d &originA, Vector3d &rotatedG) const
     accErr(2) = originA(0) * rotatedG(1) - originA(1) * rotatedG(0);
 
     return accErr;
+}
+
+void Accelerometer::AccCalibration(MatrixXd &input_data, Parameters parameters) {
+    double gamma = parameters.gamma;
+    double epsilon = parameters.epsilon;
+    int max_step = parameters.max_step;
+    VectorXd *coef = &parameters.acc_coef;
+    Optimizer optimizer;
+    optimizer.LevenbergMarquardt(input_data, coef, gamma, epsilon, max_step);
 }
 
 //Accelerometer::Accelerometer(double &x, double &y, double &z, Velocity &velocity) {

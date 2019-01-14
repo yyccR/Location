@@ -8,7 +8,13 @@
 
 using namespace Eigen;
 
-// 从陀螺仪获取姿态旋转矩阵(方向余弦矩阵DCM), b系坐标转g系
+/**
+ * 从陀螺仪获取姿态旋转矩阵(方向余弦矩阵DCM), b系坐标转g系
+ *
+ * @param gyro, 陀螺仪欧拉角w(x,y,z);
+ * @param deltaT
+ * @return 方向余弦矩阵DCM
+ */
 Matrix3d Gyroscope::GetDCM(Vector3d &gyro, double &deltaT) {
 
     // 计算deltaT时间内角度变化值，deltaT越小越精确。
@@ -37,6 +43,56 @@ Matrix3d Gyroscope::GetDCM(Vector3d &gyro, double &deltaT) {
 
     return DCM;
 }
+
+/**
+ * 陀螺仪标定,测量零飘误差.
+ *
+ * @param input_data, 静止时的陀螺仪数据(建议,n=200);
+ * @param parameters , 陀螺仪标定参数 coef(offset_x,offset_y,offset_z);
+ */
+void Gyroscope::GyroCalibration(MatrixXd &input_data, Parameters parameters) {
+
+    int data_nums = static_cast<int>(input_data.rows());
+    double offset_x = 0;
+    double offset_y = 0;
+    double offset_z = 0;
+
+    // 用于判断陀螺仪是否静止, 若非静止, 标定将会产生较大误差.
+    double x_diff = 0;
+    double y_diff = 0;
+    double z_diff = 0;
+    double gyro_x_init = input_data(0, 0);
+    double gyro_y_init = input_data(0, 1);
+    double gyro_z_init = input_data(0, 2);
+
+    for (int i = 0; i < data_nums; i++) {
+
+        // 计算前后偏差,用以判断是否处于静止.
+        x_diff += input_data(i, 0) - gyro_x_init;
+        y_diff += input_data(i, 1) - gyro_y_init;
+        z_diff += input_data(i, 2) - gyro_z_init;
+        // 重赋x,y,z, 用于计算两两样本前后差
+        gyro_x_init = input_data(i, 0);
+        gyro_y_init = input_data(i, 1);
+        gyro_z_init = input_data(i, 2);
+        // 计算offset
+        offset_x += input_data(i, 0);
+        offset_y += input_data(i, 1);
+        offset_z += input_data(i, 2);
+    }
+
+    // 判断是否静止
+    if (x_diff < data_nums * 0.5 && y_diff < data_nums * 0.5 && z_diff < data_nums * 0.5) {
+        VectorXd gyro_coef;
+        gyro_coef(0) = offset_x / data_nums;
+        gyro_coef(1) = offset_y / data_nums;
+        gyro_coef(2) = offset_z / data_nums;
+
+        parameters.gyro_coef = gyro_coef;
+    }
+}
+
+
 //
 //// 姿态更新。
 //Vector3d Gyroscope::UpdateAttitude(Matrix3d &dcm, Vector3d &state) {

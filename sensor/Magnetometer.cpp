@@ -4,7 +4,7 @@
 
 #include "cmath"
 #include "Magnetometer.h"
-
+#include "../math/Optimizer.h"
 
 Vector3d Magnetometer::Normalise(Vector3d &m) const {
     Vector3d normM;
@@ -37,10 +37,23 @@ Vector3d Magnetometer::GetMagError(Matrix3d &b2n, Vector3d &originMag) const {
     Vector3d realMag = b2n.transpose() * formatMag;
 
     // 计算误差.
-    magErr(0) = realMag(1) * originMag(2) - realMag(2) * originMag(1);
-    magErr(1) = realMag(2) * originMag(0) - realMag(0) * originMag(2);
-    magErr(2) = realMag(0) * originMag(1) - realMag(1) * originMag(0);
-    
-    
+//    magErr(0) = realMag(1) * originMag(2) - realMag(2) * originMag(1);
+//    magErr(1) = realMag(2) * originMag(0) - realMag(0) * originMag(2);
+//    magErr(2) = realMag(0) * originMag(1) - realMag(1) * originMag(0);
+
+    magErr(0) = realMag(2) * originMag(1) - realMag(1) * originMag(2);
+    magErr(1) = realMag(0) * originMag(2) - realMag(2) * originMag(0);
+    magErr(2) = realMag(1) * originMag(0) - realMag(0) * originMag(1);
+
     return magErr;
+}
+
+
+void Magnetometer::MagCalibration(MatrixXd &input_data, Parameters parameters) {
+    double gamma = parameters.gamma;
+    double epsilon = parameters.epsilon;
+    int max_step = parameters.max_step;
+    VectorXd *coef = &parameters.mag_coef;
+    Optimizer optimizer;
+    optimizer.LevenbergMarquardt(input_data, coef, gamma, epsilon, max_step);
 }
