@@ -7,8 +7,9 @@ set(INC_DIR ./include/eigen3/)
 
 include_directories(${INC_DIR})
 
-#link_libraries(eigen3)
+add_library(lib ./models/AHRS.cpp ./sensor/Accelerometer.cpp ./sensor/Gyroscope.cpp ./sensor/Magnetometer.cpp ./math/Quaternions.cpp math/Optimizer.cpp math/Optimizer.h system/Parameters.cpp system/Parameters.h sensor/Sensor.cpp sensor/Sensor.h)
+link_libraries(lib)
 
-add_executable(Location main.cpp)
+add_executable(Location main.cpp ${lib})
 
-#target_link_libraries(Location eigen3)
+#target_link_libraries(Location lib)
