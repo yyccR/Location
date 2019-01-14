@@ -3,14 +3,13 @@
 //
 
 #include "Optimizer.h"
-#include "iostream"
 /**
  * LM(Levenberg-Marquardt)算法, 简化了牛顿法中Hessian矩阵的二阶项, 同时加入了阻尼因子
  *
  * @param input_data, n*3, n组数据,每组3维
- * @param coef 椭圆6参数，用于标定(加速计/地磁计/陀螺仪)传感器
+ * @param coef 椭圆6参数，用于标定(加速计/地磁计)传感器
  * @param gamma, 初始化阻尼因子用, mu = gamma * max(A), A = Jacobi_t * Jacobi;
- * @param epsilon 迭代退出步长
+ * @param epsilon 迭代精度
  * @param max_iter 最高迭代次数
  */
 void
@@ -32,7 +31,7 @@ Optimizer::LevenbergMarquardt(MatrixXd &input_data, VectorXd *coef, double &gamm
     MatrixXd jacobi(data_nums, 6);
 
     // 初始化算法迭代参数
-    double epsilon_temp = 10.0;
+//    double epsilon_temp = 10.0;
     int iter = 0;
     int v = 2;
     double mu = 0;
@@ -111,14 +110,14 @@ Optimizer::LevenbergMarquardt(MatrixXd &input_data, VectorXd *coef, double &gamm
 }
 
 /**
- * 高斯牛顿法, 简化了牛顿法中Hessian矩阵的二阶项
+ * 高斯牛顿法, 简化了牛顿法中Hessian矩阵的二阶项, 在某些情况下不收敛，待验证中。
  *
  * @param input_data, n*3, n组数据,每组3维
- * @param coef 椭圆6参数，用于标定(加速计/地磁计/陀螺仪)传感器
- * @param epsilon 迭代退出步长
+ * @param coef 椭圆6参数，用于标定(加速计/地磁计)传感器
+ * @param epsilon 迭代精度
  * @param max_iter 最高迭代次数
  */
-void Optimizer::GaussNewton(MatrixXd &input_data, VectorXd *coef, double &epsilon, double &max_iter) {
+void Optimizer::GaussNewton(MatrixXd &input_data, VectorXd *coef, double &epsilon, int &max_iter) {
 
     int data_nums = static_cast<int>(input_data.rows());
     // delta, coef的梯度
@@ -133,7 +132,7 @@ void Optimizer::GaussNewton(MatrixXd &input_data, VectorXd *coef, double &epsilo
     double epsilon_temp = 10.0;
     int iter = 0;
 
-    while (epsilon_temp < epsilon || iter > max_iter) {
+    while (epsilon_temp > epsilon && iter <= max_iter) {
         // e_k 计算
         e_k = EllipticalFx(input_data, coef);
 
@@ -152,8 +151,10 @@ void Optimizer::GaussNewton(MatrixXd &input_data, VectorXd *coef, double &epsilo
         (*coef)(4) -= delta(4);
         (*coef)(5) -= delta(5);
 
-        epsilon_temp = e_k.cwiseAbs().sum();//delta.sum();
+        epsilon_temp = delta.norm();//e_k.cwiseAbs().sum();//delta.sum();
         iter += 1;
+//        std::cout << " iter " << iter << "\n jacobi \n" << jacobi  << "\n hessian \n" << hessian  << "\n hessian inverse \n" << hessian.inverse() << std::endl;
+//        std::cout << "epsilon " << epsilon_temp << std::endl;
     }
 }
 
@@ -162,7 +163,7 @@ void Optimizer::GaussNewton(MatrixXd &input_data, VectorXd *coef, double &epsilo
  * e_k = 1 - (x_k - coef(0))² * coef(3)² - (y_k - coef(1))² * coef(4)² - (z_k - coef(2))² * coef(5)²
  *
  * @param input_data n*3, n组数据,每组3维
- * @param coef 椭圆6参数，用于标定(加速计/地磁计/陀螺仪)传感器
+ * @param coef 椭圆6参数，用于标定(加速计/地磁计)传感器
  * @return n*6 的雅可比矩阵
  */
 MatrixXd Optimizer::EllipticalCaliJacobi(MatrixXd &input_data, VectorXd *coef) {
@@ -194,7 +195,7 @@ MatrixXd Optimizer::EllipticalCaliJacobi(MatrixXd &input_data, VectorXd *coef) {
  * e_k = 1 - (x_k - coef(0))² * coef(3)² - (y_k - coef(1))² * coef(4)² - (z_k - coef(2))² * coef(5)²
  *
  * @param input_data n*3, n组数据,每组3维
- * @param coef 椭圆6参数，用于标定(加速计/地磁计/陀螺仪)传感器
+ * @param coef 椭圆6参数，用于标定(加速计/地磁计)传感器
  * @return e_k 向量
  */
 VectorXd Optimizer::EllipticalFx(MatrixXd &input_data, VectorXd *coef) {
@@ -204,7 +205,6 @@ VectorXd Optimizer::EllipticalFx(MatrixXd &input_data, VectorXd *coef) {
     VectorXd e_k(data_nums);
 
     for (int i = 0; i < data_nums; i++) {
-        e_k;
         double ex = (input_data(i, 0) - (*coef)(0));
         double ey = (input_data(i, 1) - (*coef)(1));
         double ez = (input_data(i, 2) - (*coef)(2));
