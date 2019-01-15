@@ -6,7 +6,7 @@
 #ifndef LOCATION_STATUS_H
 #define LOCATION_STATUS_H
 
-#endif //LOCATION_STATUS_H
+
 
 using namespace Eigen;
 
@@ -86,3 +86,5 @@ public:
     Parameters GetParameters() const;
 
 };
+
+#endif //LOCATION_STATUS_H
