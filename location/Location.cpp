@@ -6,6 +6,15 @@
 #include "../models/AHRS.h"
 #include "Location.h"
 
+/**
+ * 定位,计算当前位置
+ *
+ * @param gyro_data, 陀螺仪原始数据, w(x,y,z)
+ * @param acc_data, 加速计原始数据, a(x,y,z)
+ * @param mag_data, 地磁计原始数据, m(x,y,z)
+ * @param status, 状态容器, 包含位置,姿态,速度,参数等信息
+ * @param t, 采样时间,(1/采样频率)
+ */
 void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, Vector3d &mag_data, Status *status,
                                       double t) {
 
