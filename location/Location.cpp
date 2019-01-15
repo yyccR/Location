@@ -38,7 +38,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     mag_data_cali(1) = (mag_data(1) - parameters.mag_coef(1)) / parameters.mag_coef(4);
     mag_data_cali(2) = (mag_data(2) - parameters.mag_coef(2)) / parameters.mag_coef(5);
 
-    // 欧拉角累计
+    // 姿态更新
     (*status).attitude.roll += mag_data_cali(0) * t;
     (*status).attitude.pitch += mag_data_cali(1) * t;
     (*status).attitude.yaw += mag_data_cali(2) * t;
@@ -64,7 +64,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     Vector3d v(0,0,1);
     Vector3d final_acc = (acc_n - v) * (*status).parameters.g;
 
-    // 更新位置
+    // 更新位置,速度
     Accelerometer accelerometer;
     accelerometer.PositionIntegral(status, final_acc, t);
 
