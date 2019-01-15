@@ -27,15 +27,10 @@ struct Velocity {
     double v_x;
     double v_y;
     double v_z;
-
-    // x,y,z轴的加速度
-    double a_x;
-    double a_y;
-    double a_z;
 };
 
 struct Attitude {
-    // 姿态角
+    // 姿态角, 弧度
     double roll;
     double pitch;
     double yaw;
@@ -60,6 +55,18 @@ struct Parameters{
     // 最高迭代次数
     int max_step;
 
+    // AHRS算法参数
+    // 误差积分
+    Vector3d err;
+    // PID控制算法参数, 比例参数
+    double ki;
+    // PID控制算法参数, 积分参数
+    double kp;
+    // 采样频率的一半
+    double halfT;
+
+    // 当地重力加速度值
+    double g;
 };
 
 class Status {
