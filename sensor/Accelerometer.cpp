@@ -47,20 +47,21 @@ void Accelerometer::AccCalibration(MatrixXd &input_data, Status *status) {
     int max_step = (*status).parameters.max_step;
     VectorXd *coef = &(*status).parameters.acc_coef;
     Optimizer optimizer;
-    optimizer.LevenbergMarquardt(input_data, coef, gamma, epsilon, max_step);
+    MatrixXd input_data_format = input_data / (*status).parameters.g;
+    optimizer.LevenbergMarquardt(input_data_format, coef, gamma, epsilon, max_step);
 }
 
 
-void Accelerometer::PositionIntegral(Status *status, double t) const {
+void Accelerometer::PositionIntegral(Status *status, Vector3d &acc, double t) const {
 
     // 更新位置
-    (*status).position.x = (*status).velocity.v_x * t + 0.5 * (*status).velocity.a_x * t * t;
-    (*status).position.y = (*status).velocity.v_y * t + 0.5 * (*status).velocity.a_y * t * t;
-    (*status).position.z = (*status).velocity.v_z * t + 0.5 * (*status).velocity.a_z * t * t;
+    (*status).position.x = (*status).velocity.v_x * t + 0.5 * acc(0) * t * t;
+    (*status).position.y = (*status).velocity.v_y * t + 0.5 * acc(1) * t * t;
+    (*status).position.z = (*status).velocity.v_z * t + 0.5 * acc(2) * t * t;
     // 更新速度
-    (*status).velocity.v_x = (*status).velocity.v_x + (*status).velocity.a_x * t;
-    (*status).velocity.v_y = (*status).velocity.v_y + (*status).velocity.a_y * t;
-    (*status).velocity.v_z = (*status).velocity.v_z + (*status).velocity.a_z * t;
+    (*status).velocity.v_x = (*status).velocity.v_x + acc(0) * t;
+    (*status).velocity.v_y = (*status).velocity.v_y + acc(1) * t;
+    (*status).velocity.v_z = (*status).velocity.v_z + acc(2) * t;
 
 }
 

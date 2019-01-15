@@ -43,7 +43,7 @@ public:
 //    void DeleteGravity();
 
     // position integral.
-    void PositionIntegral(Status *status, double t) const;
+    void PositionIntegral(Status *status, Vector3d &acc, double t) const;
 };
 
 
