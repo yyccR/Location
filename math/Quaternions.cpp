@@ -100,18 +100,18 @@ Vector4d Quaternions::GetQFromEuler(Vector3d &euler_angle) const {
 
 // 从四元数获取余弦矩阵DCM
 Matrix3d Quaternions::GetDCMFromQ(Vector4d &q) {
-    // b系到地理系g系
-    Matrix3d dcm_b2g;
+    // b系到地理系n系
+    Matrix3d dcm_b2n;
 
-    dcm_b2g(0, 0) = q(0) * q(0) + q(1) * q(1) - q(2) * q(2) - q(3) * q(3);
-    dcm_b2g(0, 1) = 2 * (q(1) * q(2) - q(0) * q(3));
-    dcm_b2g(0, 2) = 2 * (q(1) * q(3) + q(0) * q(2));
-    dcm_b2g(1, 0) = 2 * (q(1) * q(2) + q(0) * q(3));
-    dcm_b2g(1, 1) = q(0) * q(0) - q(1) * q(1) + q(2) * q(2) - q(3) * q(3);
-    dcm_b2g(1, 2) = 2 * (q(2) * q(3) - q(0) * q(1));
-    dcm_b2g(2, 0) = 2 * (q(1) * q(3) - q(0) * q(2));
-    dcm_b2g(2, 1) = 2 * (q(2) * q(3) + q(0) * q(1));
-    dcm_b2g(2, 2) = q(0) * q(0) - q(1) * q(1) - q(2) * q(2) + q(3) * q(3);
+    dcm_b2n(0, 0) = q(0) * q(0) + q(1) * q(1) - q(2) * q(2) - q(3) * q(3);
+    dcm_b2n(0, 1) = 2 * (q(1) * q(2) - q(0) * q(3));
+    dcm_b2n(0, 2) = 2 * (q(1) * q(3) + q(0) * q(2));
+    dcm_b2n(1, 0) = 2 * (q(1) * q(2) + q(0) * q(3));
+    dcm_b2n(1, 1) = q(0) * q(0) - q(1) * q(1) + q(2) * q(2) - q(3) * q(3);
+    dcm_b2n(1, 2) = 2 * (q(2) * q(3) - q(0) * q(1));
+    dcm_b2n(2, 0) = 2 * (q(1) * q(3) - q(0) * q(2));
+    dcm_b2n(2, 1) = 2 * (q(2) * q(3) + q(0) * q(1));
+    dcm_b2n(2, 2) = q(0) * q(0) - q(1) * q(1) - q(2) * q(2) + q(3) * q(3);
 
-    return dcm_b2g;
+    return dcm_b2n;
 }
