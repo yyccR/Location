@@ -17,9 +17,9 @@
 
 ### GPS轨迹
 
-<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/GPS.png" width="450" height="190" />
+<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/GPS.png" width="400" height="190" />
 
-<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/GPS2.png" width="450" height="190" />
+<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/GPS2.png" width="400" height="190" />
 
 ### IMU轨迹
 
