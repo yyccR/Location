@@ -15,6 +15,14 @@
 
 ## Test case
 
+### GPS轨迹
+
+<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/GPS.png" width="450" height="190" />
+
+<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/GPS2.png" width="450" height="190" />
+
+### IMU轨迹
+
 ### AHRS算法测试
 ```
  初始姿态(欧拉角):
