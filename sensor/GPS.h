@@ -5,9 +5,12 @@
 #ifndef LOCATION_GPS_H
 #define LOCATION_GPS_H
 
+#include "Eigen/Dense"
 
 class GPS {
+public:
 
+    Eigen::Vector2d CalDestination(double &startLng, double &startLat, double distance, double heading);
 };
 
 
