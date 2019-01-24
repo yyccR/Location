@@ -115,3 +115,12 @@ Matrix3d Quaternions::GetDCMFromQ(Vector4d &q) {
 
     return dcm_b2n;
 }
+
+Vector3d Quaternions::GetEulerFromQ(Vector4d &q) {
+    Vector3d euler;
+
+    euler(0) = atan2(2.0 * (q(0) * q(1) + q(2) * q(3)), 1 - 2 * (q(1) * q(1) + q(2) * q(2)));
+    euler(1) = asin(2 * (q(0) * q(2) - q(3) * q(1)));
+    euler(2) = atan2(2 * (q(0) * q(3) + q(1) * q(2)), 1 - 2 * (q(2) * q(2) + q(3) * q(3)));
+    return euler;
+}

@@ -35,6 +35,9 @@ public:
     // 从四元数获取余弦矩阵DCM
     Matrix3d GetDCMFromQ(Vector4d &q);
 
+    // 从四元数获取欧拉角
+    Vector3d GetEulerFromQ(Vector4d &q);
+
 };
 
 
