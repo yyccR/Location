@@ -7,10 +7,12 @@
 
 #include "../location/Location.h"
 
+
 class TestLocation {
 public:
 
-    void testLocation(MatrixXd &gyro_data, MatrixXd &acc_data, MatrixXd &mag_data);
+    void testLocation(Eigen::MatrixXd &gyro_data, Eigen::MatrixXd &acc_data, Eigen::MatrixXd &mag_data,
+                      Eigen::MatrixXd &gps_data, Eigen::MatrixXd &g_data, Eigen::VectorXd &heading);
 };
 
 
