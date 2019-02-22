@@ -17,9 +17,17 @@
 
 ### GPS轨迹
 
+- 融合
+
 <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/GPS.png" width="370" height="170" /> <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/GPS2.png" width="370" height="170" />
 
 <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/GPSandIMU.png" width="370" height="170" /> <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/GPSandIMU2.png" width="370" height="170" />
+
+- 未融合
+
+<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/gps5.png" width="370" height="170" /> <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/gps7.png" width="370" height="170" />
+
+<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/gps6.png" width="370" height="170" /> <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/gps8.png" width="370" height="170" />
 
 ### IMU轨迹
 
