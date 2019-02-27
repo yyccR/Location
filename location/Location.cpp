@@ -50,21 +50,6 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
 
     Vector3d g(0, 0, 1.0);
 
-    // 姿态更新
-//    (*status).attitude.roll += gyro_data_cali(0) * t;
-//    (*status).attitude.pitch += gyro_data_cali(1) * t;
-//    (*status).attitude.yaw += gyro_data_cali(2) * t;
-//    (*status).attitude.roll = gyro_data_cali(0);
-//    (*status).attitude.pitch = gyro_data_cali(1);
-//    (*status).attitude.yaw = gyro_data_cali(2);
-
-    //std::cout << "roll pitch yaw " << (*status).attitude.roll << " " << (*status).attitude.pitch << " " << (*status).attitude.yaw << std::endl;
-    // 欧拉角
-//    Vector3d euler_angle;
-//    euler_angle(0) = (*status).attitude.pitch;
-//    euler_angle(1) = (*status).attitude.roll;
-//    euler_angle(2) = (*status).attitude.yaw;
-
     // 获取姿态
     AHRS ahrs;
     Vector4d q_attitude = (*status).attitude.q_attitude;
@@ -81,11 +66,6 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     Matrix3d newRotated_b2n = quaternions.GetDCMFromQ(attitude);
     Vector3d acc_b = acc_data_cali - g_data_format;
     Vector3d final_acc = newRotated_b2n * acc_b * (*status).parameters.g;
-//    std::cout << final_acc.transpose() << std::endl;
-//    Vector3d acc_n = acc_data_cali.transpose() * newRotated_b2n;
-    // 减去地心重力影响
-//    Vector3d v(0, 0, 1);
-//    Vector3d final_acc = (acc_n - g_data_format) * (*status).parameters.g;
 
     // 记录起始位置和当前位置
     double start_x = (*status).position.x;
@@ -104,23 +84,13 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
         // 计算距离
         double end_x = (*status).position.x;
         double end_y = (*status).position.y;
-//        double end_z = (*status).position.z;
         double distance = sqrt((end_x - start_x) * (end_x - start_x) + (end_y - start_y) * (end_y - start_y));
         // 计算航向角
         Vector3d euler = quaternions.GetEulerFromQ(attitude);
         double heading = ornt_data(2);
-//        double heading = euler(2);
         // 计算航向角
         Vector2d gps_new = gps.CalDestination(start_lng, start_lat, distance, heading);
-//        std::cout << start_x << " " << start_y <<  std::endl;
-//        std::cout.precision(9);
-//          std::cout << heading * 180 / M_PI << std::endl;
-//        std::cout //<< " acc cali " << acc_data_cali.transpose()
-//                << " acc n " << acc_n.transpose()
-//                << " final acc " << final_acc.transpose()
-////                  << " distance " << distance << " heading " << heading / M_PI * 180.0 << " gps_new " << gps_new.transpose()
-//                  << " v = " << (*status).velocity.v_x << " " << (*status).velocity.v_y << " " << (*status).velocity.v_z
-//                  << std::endl;
+
         // 更新经纬度
         (*status).position.lng = gps_new(0);
         (*status).position.lat = gps_new(1);
@@ -135,17 +105,6 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
         (*status).position.y = 0.0;
         (*status).position.z = 0.0;
     }
-
-//    std::cout.precision(9);
-//          std::cout << heading * 180 / M_PI << std::endl;
-//        std::cout //<< " acc cali " << acc_data_cali.transpose()
-//                << " acc n " << acc_n.transpose()
-//                << " final acc " << final_acc.transpose()
-////                  << " distance " << distance << " heading " << heading / M_PI * 180.0 << " gps_new " << gps_new.transpose()
-//                  << " v = " << (*status).velocity.v_x << " " << (*status).velocity.v_y << " " << (*status).velocity.v_z
-//                  << " " << gps_accuracy
-//                  << std::endl;
-
 
 }
 
