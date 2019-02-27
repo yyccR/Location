@@ -22,18 +22,18 @@ public:
     virtual ~Accelerometer();
 
     // 归一化.
-    Vector3d Normalise(Vector3d &a) const;
+    Eigen::Vector3d Normalise(Eigen::Vector3d &a) const;
 
     // 通过旋转获取 地理坐标系下重力加速度 转 机体坐标系下的重力加速度.
-    Vector3d RotateG(Matrix3d &n2b) const;
+    Eigen::Vector3d RotateG(Eigen::Matrix3d &n2b) const;
 
     // 加速计向量(originA)叉乘地理重力转b系(rotatedG)误差，用于较正陀螺仪
-    Vector3d GetAccError(Vector3d &originA, Vector3d &rotatedG) const;
+    Eigen::Vector3d GetAccError(Eigen::Vector3d &originA, Eigen::Vector3d &rotatedG) const;
 
-    Vector3d GetAccError(Vector3d &originA, Vector4d &q) const;
+    Eigen::Vector3d GetAccError(Eigen::Vector3d &originA, Eigen::Vector4d &q) const;
 
     // 加速计标定
-    void AccCalibration(MatrixXd &input_data, Status *status);
+    void AccCalibration(Eigen::MatrixXd &input_data, Status *status);
 
     // rotate the accelerate data into Geo coordinates.
 //    Accelerometer Rotate(const Quaternions &quaternions, const Quaternions &quaternion_inv) const;
@@ -45,7 +45,7 @@ public:
 //    void DeleteGravity();
 
     // position integral.
-    void PositionIntegral(Status *status, Vector3d &acc, double t) const;
+    void PositionIntegral(Status *status, Eigen::Vector3d &acc, double t) const;
 };
 
 

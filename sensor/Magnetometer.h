@@ -18,7 +18,7 @@ public:
     // 地磁感应误差计算
     Eigen::Vector3d GetMagError(Eigen::Matrix3d &b2n, Eigen::Vector3d &originMag) const;
 
-    Eigen::Vector3d GetMagError(Vector4d &q, Eigen::Vector3d &originMag);
+    Eigen::Vector3d GetMagError(Eigen::Vector4d &q, Eigen::Vector3d &originMag);
 
     // 地磁计标定
     void MagCalibration(Eigen::MatrixXd &input_data, Status *status);

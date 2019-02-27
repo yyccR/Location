@@ -20,6 +20,7 @@ public:
                                 Eigen::VectorXd &gps_data, Eigen::Vector3d &g_data, Eigen::Vector3d &ornt_data, Status *status);
 
     Position GetCurrentPosition();
+    
 };
 
 
