@@ -12,7 +12,7 @@ class AHRS {
 public:
 
     // 姿态更新.
-    Vector4d UpdateAttitude(Vector3d *err, Vector3d &gyro, Vector3d &acc, Vector3d &mag, double &ki, double &kp, double &halfT) const ;
+    Vector4d UpdateAttitude(Vector3d *err, Vector4d &q_attitude, Vector3d &gyro, Vector3d &acc, Vector3d &mag, double &ki, double &kp, double &halfT) const ;
 
 
 

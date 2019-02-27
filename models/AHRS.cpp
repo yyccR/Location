@@ -5,9 +5,9 @@
 #include "Eigen/Dense"
 #include "../math/Quaternions.h"
 #include "../sensor/Accelerometer.h"
-#include "../sensor/Gyroscope.h"
 #include "../sensor/Magnetometer.h"
 #include "AHRS.h"
+#include "iostream"
 
 using namespace Eigen;
 
@@ -23,17 +23,18 @@ using namespace Eigen;
  * @param halfT: 采样周期的一半
  * @return 返回更新完的四元数数据
  */
-Vector4d AHRS::UpdateAttitude(Vector3d *err, Vector3d &gyro, Vector3d &acc, Vector3d &mag, double &ki, double &kp,
+Vector4d AHRS::UpdateAttitude(Vector3d *err, Vector4d &q_attitude, Vector3d &gyro, Vector3d &acc, Vector3d &mag, double &ki, double &kp,
                               double &halfT) const {
 
     Quaternions quaternions;
     Accelerometer accelerometer;
-    Gyroscope gyroscope;
     Magnetometer magnetometer;
     Vector4d newAttitude;
 
     // 从欧拉角获取四元数
-    Vector4d euler_q = quaternions.GetQFromEuler(gyro);
+//    Vector4d euler_q = quaternions.GetQFromEuler(orientation);
+    Vector4d euler_q = q_attitude;
+
     // 计算旋转矩阵(b系到n系)
     Matrix3d b2n = quaternions.GetDCMFromQ(euler_q);
     Matrix3d n2b = b2n.transpose();
@@ -43,11 +44,14 @@ Vector4d AHRS::UpdateAttitude(Vector3d *err, Vector3d &gyro, Vector3d &acc, Vect
     Vector3d norm_mag = magnetometer.Normalise(mag);
 
     // 计算加速计误差
-    Vector3d rotate_g = accelerometer.RotateG(n2b);
-    Vector3d acc_error = accelerometer.GetAccError(norm_acc, rotate_g);
+//    Vector3d rotate_g = accelerometer.RotateG(n2b);
+//    std::cout << rotate_g.transpose() << std::endl;
+//    Vector3d acc_error = accelerometer.GetAccError(norm_acc, rotate_g);
+    Vector3d acc_error = accelerometer.GetAccError(norm_acc, euler_q);
 
     // 计算地磁感应误差
-    Vector3d mag_error = magnetometer.GetMagError(b2n, mag);
+//    Vector3d mag_error = magnetometer.GetMagError(b2n, mag);
+    Vector3d mag_error = magnetometer.GetMagError(euler_q, mag);
 
     // 计算总误差
     Vector3d e;
@@ -64,11 +68,23 @@ Vector4d AHRS::UpdateAttitude(Vector3d *err, Vector3d &gyro, Vector3d &acc, Vect
     gyro(1) += e(1) * kp + (*err)(1);
     gyro(2) += e(2) * kp + (*err)(2);
 
+    // Integrate rate of change of quaternion
+    gyro(0) *= halfT;		// pre-multiply common factors
+    gyro(1) *= halfT;
+    gyro(2) *= halfT;
+    double qa = euler_q(0);
+    double qb = euler_q(1);
+    double qc = euler_q(2);
+    euler_q(0) += (-qb * gyro(0) - qc * gyro(1) - euler_q(3) * gyro(2));
+    euler_q(1) += (qa * gyro(0) + qc * gyro(2) - euler_q(3) * gyro(1));
+    euler_q(2) += (qa * gyro(1) - qb * gyro(2) + euler_q(3) * gyro(0));
+    euler_q(3) += (qa * gyro(2) + qb * gyro(1) - qc * gyro(0));
+
     // 重新调整旋转四元数, 一阶龙格库塔法更新四元数
-    euler_q(0) = euler_q(0) + (-euler_q(1) * gyro(0) - euler_q(2) * gyro(1) - euler_q(3) * gyro(2)) * halfT;
-    euler_q(1) = euler_q(1) + (euler_q(0) * gyro(0) + euler_q(2) * gyro(2) - euler_q(3) * gyro(1)) * halfT;
-    euler_q(2) = euler_q(2) + (euler_q(0) * gyro(1) - euler_q(1) * gyro(2) + euler_q(3) * gyro(0)) * halfT;
-    euler_q(3) = euler_q(3) + (euler_q(0) * gyro(2) + euler_q(1) * gyro(1) - euler_q(2) * gyro(0)) * halfT;
+//    euler_q(0) = euler_q(0) + (-euler_q(1) * gyro(0) - euler_q(2) * gyro(1) - euler_q(3) * gyro(2)) * halfT;
+//    euler_q(1) = euler_q(1) + (euler_q(0) * gyro(0) + euler_q(2) * gyro(2) - euler_q(3) * gyro(1)) * halfT;
+//    euler_q(2) = euler_q(2) + (euler_q(0) * gyro(1) - euler_q(1) * gyro(2) + euler_q(3) * gyro(0)) * halfT;
+//    euler_q(3) = euler_q(3) + (euler_q(0) * gyro(2) + euler_q(1) * gyro(1) - euler_q(2) * gyro(0)) * halfT;
 
     newAttitude = quaternions.Normalise(euler_q);
     return newAttitude;
