@@ -15,6 +15,8 @@
  * @param acc_data, 加速计原始数据, a(x,y,z)
  * @param mag_data, 地磁计原始数据, m(x,y,z)
  * @param gps_data, GPS原始数据, gps(lng,lat,alt,accuracy,speed,bearing)
+ * @param g_data, 重力感应数据, g(x,y,z)
+ * @param ornt_data, 方向传感器数据, o(roll,pitch,yaw)
  * @param status, 状态容器, 包含位置,姿态,速度,参数等信息
  */
 void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, Vector3d &mag_data, VectorXd &gps_data,
