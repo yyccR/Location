@@ -6,7 +6,11 @@
 #include "../sensor/Accelerometer.h"
 #include "../models/AHRS.h"
 #include "Location.h"
-#include "iostream"
+
+
+Location::Location() {
+    this->status.Init();
+}
 
 /**
  * 定位,计算当前位置
@@ -44,7 +48,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     mag_data_cali(1) = (mag_data(1) / 1000.0 - parameters.mag_coef(1)) * parameters.mag_coef(4);
     mag_data_cali(2) = (mag_data(2) / 1000.0 - parameters.mag_coef(2)) * parameters.mag_coef(5);
 
-    Vector3d g(0,0,1.0);
+    Vector3d g(0, 0, 1.0);
 
     // 姿态更新
 //    (*status).attitude.roll += gyro_data_cali(0) * t;
@@ -101,7 +105,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
         double end_x = (*status).position.x;
         double end_y = (*status).position.y;
 //        double end_z = (*status).position.z;
-        double distance = sqrt((end_x - start_x) * (end_x - start_x) + (end_y - start_y) * (end_y - start_y) );
+        double distance = sqrt((end_x - start_x) * (end_x - start_x) + (end_y - start_y) * (end_y - start_y));
         // 计算航向角
         Vector3d euler = quaternions.GetEulerFromQ(attitude);
         double heading = ornt_data(2);
@@ -126,7 +130,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
         (*status).position.altitude = gps_data(2);
         double gps_speed = gps_data(4);
         double gps_bearing = gps_data(5);
-        gps.UpdateVelocity(status,gps_speed,gps_bearing);
+        gps.UpdateVelocity(status, gps_speed, gps_bearing);
         (*status).position.x = 0.0;
         (*status).position.y = 0.0;
         (*status).position.z = 0.0;
@@ -143,4 +147,8 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
 //                  << std::endl;
 
 
+}
+
+Position Location::GetCurrentPosition() {
+    return  this->status.position;
 }
