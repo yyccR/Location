@@ -10,28 +10,26 @@
 #include <vector>
 #include <iostream>
 
-using namespace std;
-using namespace Eigen;
 
 class KalmanFilter {
 
 public:
     // state vecotr
-    VectorXd x;
+    Eigen::VectorXd x;
     // priori state vector
-    VectorXd x_priori;
+    Eigen::VectorXd x_priori;
     // covariance matrix
-    MatrixXd P;
+    Eigen::MatrixXd P;
     // priori covariance matrix
-    MatrixXd p_priori;
+    Eigen::MatrixXd p_priori;
     // transistion matrix
-    MatrixXd F;
+    Eigen::MatrixXd F;
     // measurement matrix
-    MatrixXd H;
+    Eigen::MatrixXd H;
     // measurement covariance matrix
-    MatrixXd R;
+    Eigen::MatrixXd R;
     // error covariance matrix
-    MatrixXd Q;
+    Eigen::MatrixXd Q;
     // input size;
     Index s;
 
@@ -45,9 +43,10 @@ public:
     */
     virtual ~KalmanFilter();
 
-    void Init(VectorXd &state, MatrixXd &covMat, MatrixXd &tranMat, MatrixXd &measMat, MatrixXd &mCovMat, MatrixXd &eCovMat);
+    void Init(Eigen::VectorXd &state, Eigen::MatrixXd &covMat, Eigen::MatrixXd &tranMat, Eigen::MatrixXd &measMat,
+              Eigen::MatrixXd &mCovMat, Eigen::MatrixXd &eCovMat);
 
-    void Correct(const VectorXd &measState);
+    void Correct(const Eigen::VectorXd &measState);
 
     void Predict();
 };

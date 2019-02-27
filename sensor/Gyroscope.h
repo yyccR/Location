@@ -8,7 +8,6 @@
 #ifndef LOCATION_GYROSCOPE_H
 #define LOCATION_GYROSCOPE_H
 
-using namespace Eigen;
 
 class Gyroscope {
 public:
@@ -17,7 +16,7 @@ public:
 //    Matrix3d GetDCM(Vector3d &gyro, double &deltaT);
 
     // 陀螺仪标定
-    void GyroCalibration(MatrixXd &input_data, Status *status);
+    void GyroCalibration(Eigen::MatrixXd &input_data, Status *status);
 
 };
 

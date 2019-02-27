@@ -11,10 +11,14 @@
 class GPS {
 public:
 
+    // 给定起点经度,纬度,距离,方向, 计算终点的经纬度.
     Eigen::Vector2d CalDestination(double &startLng, double &startLat, double &distance, double &heading);
 
-    // 利用GPS速度作为加速计初始速度
+    // 利用GPS速度作为加速计初始速度,根据GPS速度,方向 计算正北,正东方向速度.
     void UpdateVelocity(Status *status, double &velocity, double &bearing);
+
+    // 计算两个经纬度点之间的距离
+    double CalDistance(double &startLng, double &startLat, double &endLng, double &endLat);
 };
 
 

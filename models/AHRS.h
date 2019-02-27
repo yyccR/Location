@@ -6,15 +6,14 @@
 #ifndef LOCATION_ARHS_H
 #define LOCATION_ARHS_H
 
-using namespace Eigen;
 
 class AHRS {
 public:
 
     // 姿态更新.
-    Vector4d UpdateAttitude(Vector3d *err, Vector4d &q_attitude, Vector3d &gyro, Vector3d &acc, Vector3d &mag, double &ki, double &kp, double &halfT) const ;
-
-
+    Eigen::Vector4d UpdateAttitude(Eigen::Vector3d *err, Eigen::Vector4d &q_attitude, Eigen::Vector3d &gyro,
+                                   Eigen::Vector3d &acc, Eigen::Vector3d &mag,
+                                   double &ki, double &kp, double &halfT) const ;
 
 };
 

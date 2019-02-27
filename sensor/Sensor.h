@@ -8,12 +8,11 @@
 #ifndef LOCATION_SENSOR_H
 #define LOCATION_SENSOR_H
 
-using namespace Eigen;
 
 class Sensor {
 public:
 
-    void Calibrate(MatrixXd &gyro_data,MatrixXd &acc_data,MatrixXd &mag_data, Status *status);
+    void Calibrate(Eigen::MatrixXd &gyro_data,Eigen::MatrixXd &acc_data,Eigen::MatrixXd &mag_data, Status *status);
 
 };
 
