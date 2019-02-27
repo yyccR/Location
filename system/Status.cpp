@@ -65,4 +65,6 @@ void Status::Init() {
     this->parameters.g = 9.805567;
     this->parameters.mag = 157.44;
     this->parameters.t = 1 / 2.5;
+    this->parameters.move_distance_threshod = 50.0;
+    this->parameters.ins_count = 1;
 }

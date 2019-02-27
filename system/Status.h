@@ -69,6 +69,10 @@ struct Parameters{
     double halfT;
     // 采样时间间隔
     double t;
+    // 等间隔时间内GPS的运动距离阈值,用于判断高精度但是漂移的点
+    double move_distance_threshod;
+    // 利用惯导计算位置的次数;
+    int ins_count;
 
     // 当地重力加速度值
     double g;
