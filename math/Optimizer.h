@@ -2,26 +2,33 @@
 // Created by yangcheng on 2019/1/7.
 //
 
-#include "Eigen/Dense"
-
 #ifndef LOCATION_OPTIMIZER_H
 #define LOCATION_OPTIMIZER_H
 
-using namespace Eigen;
+#include "Eigen/Dense"
+#include "../system/Status.h"
 
 // 优化器, 解决标定参数求解问题
 class Optimizer {
 public:
 
-    void LevenbergMarquardt(MatrixXd &input_data, VectorXd *coef, double &gamma, double &epsilon, int &max_iter);
+    void LevenbergMarquardt(Eigen::MatrixXd &input_data, double &R, Eigen::VectorXd *coef, double &gamma, double &epsilon, int &max_iter);
 
-    void GaussNewton(MatrixXd &input_data, VectorXd *coef, double &epsilon, int &max_iter);
+//    void LevenbergMarquardt(Eigen::MatrixXd &input_data, Parameters *parameters);
+
+    void GaussNewton(Eigen::MatrixXd &input_data, double &R, Eigen::VectorXd *coef, double &epsilon, int &max_iter);
+
+//    void GaussNewton(Eigen::MatrixXd &input_data, Parameters *parameters);
 
 //private:
 
-    MatrixXd EllipticalCaliJacobi(MatrixXd &input_data, VectorXd *coef);
+    Eigen::MatrixXd EllipticalCaliJacobi(Eigen::MatrixXd &input_data, Eigen::VectorXd *coef, double &R);
 
-    VectorXd EllipticalFx(MatrixXd &input_data, VectorXd *coef);
+//    Eigen::MatrixXd EllipticalCaliJacobi(Eigen::MatrixXd &input_data, Parameters *parameters);
+
+    Eigen::VectorXd EllipticalFx(Eigen::MatrixXd &input_data, Eigen::VectorXd *coef, double &R);
+
+//    Eigen::VectorXd EllipticalFx(Eigen::MatrixXd &input_data, Parameters *parameters);
 };
 
 
