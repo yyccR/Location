@@ -82,7 +82,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     // 更新地理坐标位置
     GPS gps;
     double gps_accuracy = gps_data(3);
-    if (gps_accuracy > (*status).parameters.weak_gps) {
+    if (gps_accuracy > (*status).parameters.weak_gps || ((*status).position.lng == 0.0 && ((*status).position.lat == 0.0))) {
         // 计算距离
         double end_x = (*status).position.x;
         double end_y = (*status).position.y;
