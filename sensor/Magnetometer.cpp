@@ -21,6 +21,29 @@ Vector3d Magnetometer::Normalise(Vector3d &m) const {
     return normM;
 }
 
+
+Vector3d Magnetometer::GetMagError(Vector4d &q, Vector3d &originMag) {
+    double hx = 2.0 * (originMag(0) * (0.5 - q(2) * q(2) - q(3) * q(3)) + originMag(1) * (q(1) * q(2) - q(0) * q(3)) +
+                       originMag(2) * (q(1) * q(3) + q(0) * q(2)));
+    double hy = 2.0 * (originMag(0) * (q(1) * q(2) + q(0) * q(3)) + originMag(1) * (0.5 - q(1) * q(1) - q(3) * q(3)) +
+                       originMag(2) * (q(2) * q(3) - q(0) * q(1)));
+    double bx = sqrt(hx * hx + hy * hy);
+    double bz = 2.0f * (originMag(0) * (q(1) * q(3) - q(0) * q(2)) + originMag(1) * (q(2) * q(3) + q(0) * q(1)) +
+                        originMag(2) * (0.5 - q(1) * q(1) - q(2) * q(2)));
+
+
+    double halfwx = bx * (0.5 - q(2) * q(2) - q(3) * q(3)) + bz * (q(1) * q(3) - q(0) * q(2));
+    double halfwy = bx * (q(1) * q(2) - q(0) * q(3)) + bz * (q(0) * q(1) + q(2) * q(3));
+    double halfwz = bx * (q(0) * q(2) + q(1) * q(3)) + bz * (0.5f - q(1) * q(1) - q(2) * q(2));
+
+    double ex = originMag(1) * halfwz - originMag(2) * halfwy;
+    double ey = originMag(2) * halfwx - originMag(0) * halfwz;
+    double ez = originMag(0) * halfwy - originMag(1) * halfwx;
+    Vector3d e(ex, ey, ez);
+
+    return e;
+}
+
 // 地磁感应误差计算
 Vector3d Magnetometer::GetMagError(Matrix3d &b2n, Vector3d &originMag) const {
 
@@ -48,12 +71,12 @@ Vector3d Magnetometer::GetMagError(Matrix3d &b2n, Vector3d &originMag) const {
     return magErr;
 }
 
-
 void Magnetometer::MagCalibration(MatrixXd &input_data, Status *status) {
+    double mag = (*status).parameters.mag;
     double gamma = (*status).parameters.gamma;
     double epsilon = (*status).parameters.epsilon;
     int max_step = (*status).parameters.max_step;
     VectorXd *coef = &(*status).parameters.mag_coef;
     Optimizer optimizer;
-    optimizer.LevenbergMarquardt(input_data, coef, gamma, epsilon, max_step);
+    optimizer.LevenbergMarquardt(input_data, mag, coef, gamma, epsilon, max_step);
 }

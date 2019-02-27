@@ -14,7 +14,7 @@ class Gyroscope {
 public:
 
     // 从陀螺仪获取姿态旋转矩阵(方向余弦矩阵DCM), b系坐标转g系
-    Matrix3d GetDCM(Vector3d &gyro, double &deltaT);
+//    Matrix3d GetDCM(Vector3d &gyro, double &deltaT);
 
     // 陀螺仪标定
     void GyroCalibration(MatrixXd &input_data, Status *status);

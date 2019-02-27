@@ -83,7 +83,7 @@ void Gyroscope::GyroCalibration(MatrixXd &input_data, Status *status) {
 
     // 判断是否静止
     if (x_diff < data_nums * 0.5 && y_diff < data_nums * 0.5 && z_diff < data_nums * 0.5) {
-        VectorXd gyro_coef;
+        VectorXd gyro_coef(3);
         gyro_coef(0) = offset_x / data_nums;
         gyro_coef(1) = offset_y / data_nums;
         gyro_coef(2) = offset_z / data_nums;

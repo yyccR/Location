@@ -4,7 +4,9 @@
 
 #include "Accelerometer.h"
 #include "../math/Optimizer.h"
+#include "iostream"
 
+using namespace std;
 Vector3d Accelerometer::Normalise(Vector3d &a) const {
     Vector3d normA;
     double norm2 = a(0) * a(0) + a(1) * a(1) + a(2) * a(2);
@@ -30,6 +32,18 @@ Vector3d Accelerometer::RotateG(Matrix3d &n2b) const {
     return bg;
 }
 
+Vector3d Accelerometer::GetAccError(Vector3d &originA, Vector4d &q) const {
+    double halfvx = q(1) * q(3) - q(0) * q(2);
+    double halfvy = q(0) * q(1) + q(2) * q(3);
+    double halfvz = q(0) * q(0) - 0.5 + q(3) * q(3);
+
+    double halfex = originA(1) * halfvz - originA(2) * halfvy;
+    double halfey = originA(2) * halfvx - originA(0) * halfvz;
+    double halfez = originA(0) * halfvy - originA(1) * halfvx;
+    Vector3d e(halfex,halfey,halfez);
+    return e;
+}
+
 // 加速计向量(originA)叉乘地理重力转b系(rotatedG)误差，用于较正陀螺仪.
 Vector3d Accelerometer::GetAccError(Vector3d &originA, Vector3d &rotatedG) const {
     Vector3d accErr;
@@ -42,13 +56,14 @@ Vector3d Accelerometer::GetAccError(Vector3d &originA, Vector3d &rotatedG) const
 }
 
 void Accelerometer::AccCalibration(MatrixXd &input_data, Status *status) {
+    double R = 1.0;
     double gamma = (*status).parameters.gamma;
     double epsilon = (*status).parameters.epsilon;
     int max_step = (*status).parameters.max_step;
     VectorXd *coef = &(*status).parameters.acc_coef;
-    Optimizer optimizer;
     MatrixXd input_data_format = input_data / (*status).parameters.g;
-    optimizer.LevenbergMarquardt(input_data_format, coef, gamma, epsilon, max_step);
+    Optimizer optimizer;
+    optimizer.LevenbergMarquardt(input_data_format, R, coef, gamma, epsilon, max_step);
 }
 
 

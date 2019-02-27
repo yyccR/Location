@@ -16,7 +16,7 @@
  * @param mag_data, 地磁计数据, 采样建议: 静止时采集6个轴转向180°各1组数据, 共6组数据
  * @param status
  */
-void Sensor::Calibrate(MatrixXd &gyro_data,MatrixXd &acc_data,MatrixXd &mag_data, Status *status) {
+void Sensor::Calibrate(MatrixXd &gyro_data, MatrixXd &acc_data, MatrixXd &mag_data, Status *status) {
 
     // 标定陀螺仪
     Gyroscope gyroscope;

@@ -30,6 +30,8 @@ public:
     // 加速计向量(originA)叉乘地理重力转b系(rotatedG)误差，用于较正陀螺仪
     Vector3d GetAccError(Vector3d &originA, Vector3d &rotatedG) const;
 
+    Vector3d GetAccError(Vector3d &originA, Vector4d &q) const;
+
     // 加速计标定
     void AccCalibration(MatrixXd &input_data, Status *status);
 

@@ -19,6 +19,8 @@ public:
     // 地磁感应误差计算
     Vector3d GetMagError(Matrix3d &b2n, Vector3d &originMag) const;
 
+    Vector3d GetMagError(Vector4d &q, Vector3d &originMag);
+
     // 地磁计标定
     void MagCalibration(MatrixXd &input_data, Status *status);
 };
