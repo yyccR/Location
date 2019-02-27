@@ -81,30 +81,41 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     // 更新惯性位置,速度
     Accelerometer accelerometer;
     accelerometer.PositionIntegral(status, final_acc, (*status).parameters.t);
-    // 更新地理坐标位置
+
+    // 获取GPS精度
     GPS gps;
     double gps_accuracy = gps_data(3);
-    if (gps_accuracy > (*status).parameters.weak_gps || (gps_data(0) == 0.0 && gps_data(1) == 0.0)) {
-        // 计算距离
-        double end_x = (*status).position.x;
-        double end_y = (*status).position.y;
-        double distance = sqrt((end_x - start_x) * (end_x - start_x) + (end_y - start_y) * (end_y - start_y));
-        // 计算航向角
-        Vector3d euler = quaternions.GetEulerFromQ(attitude);
+    // 计算传感器运动距离
+    double end_x = (*status).position.x;
+    double end_y = (*status).position.y;
+    double distance = sqrt((end_x - start_x) * (end_x - start_x) + (end_y - start_y) * (end_y - start_y));
+    // 计算GPS运动距离
+    double end_Lng = gps_data(0);
+    double end_Lat = gps_data(1);
+    double gps_move_dist = gps.CalDistance(start_lng, start_lat, end_Lng, end_Lat);
+    // 判断是否相同时间间隔GPS移动与惯导相差不大,用于判断该点是否被采用
+    bool is_gps_move_not_accpetted =  ceil((*status).parameters.ins_count / 10.0) * gps_move_dist <
+            (*status).parameters.move_distance_threshod * (*status).parameters.ins_count;
+
+    // 判断是否采用GPS数据
+    if (gps_accuracy > (*status).parameters.weak_gps || (gps_data(0) == 0.0 && gps_data(1) == 0.0) || is_gps_move_not_accpetted) {
+        // 采用惯导更新经纬度
+        // 获取航向角
         double heading = ornt_data(2);
         // 计算航向角
         Vector2d gps_new = gps.CalDestination(start_lng, start_lat, distance, heading);
-
         // 更新经纬度
         (*status).position.lng = gps_new(0);
         (*status).position.lat = gps_new(1);
     } else {
+        // 采用GPS数据更新经纬度
         (*status).position.lng = gps_data(0);
         (*status).position.lat = gps_data(1);
         (*status).position.altitude = gps_data(2);
         double gps_speed = gps_data(4);
         double gps_bearing = gps_data(5);
         gps.UpdateVelocity(status, gps_speed, gps_bearing);
+        // 每个x,y,z都是相对与上一个准确的GPS数据。
         (*status).position.x = 0.0;
         (*status).position.y = 0.0;
         (*status).position.z = 0.0;
