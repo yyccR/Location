@@ -13,12 +13,13 @@ using namespace Eigen;
 
 void TestLocation::testLocation(MatrixXd &gyro_data, MatrixXd &acc_data, MatrixXd &mag_data, MatrixXd &gps_data, MatrixXd &g_data, MatrixXd &ornt_data) {
 
-    // 初始状态
-    Quaternions quaternions;
-    Status status{};
-    status.Init();
+//    // 初始状态
+//    Quaternions quaternions;
+//    Status status{};
+//    status.Init();
 
 
+    // 包括初始化状态
     Location location;
     for(int i = 0; i < gyro_data.rows(); i++){
 
@@ -30,11 +31,11 @@ void TestLocation::testLocation(MatrixXd &gyro_data, MatrixXd &acc_data, MatrixX
         Vector3d ornt_data_v = ornt_data.row(i);
 
 
-        location.PredictCurrentPosition(gyro_data_v, acc_data_v, mag_data_v, gps_data_v, g_data_v, ornt_data_v,&status);
-        Position position  = status.GetPosition();
+        location.PredictCurrentPosition(gyro_data_v, acc_data_v, mag_data_v, gps_data_v, g_data_v, ornt_data_v,&location.status);
+        Position position = location.GetCurrentPosition();
 
         std::cout.precision(9);
-        std::cout << status.position.lng << " " << status.position.lat << std::endl;
+//        std::cout << status.position.lng << " " << status.position.lat << std::endl;
     }
 
 }
