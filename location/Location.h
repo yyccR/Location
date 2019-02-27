@@ -9,12 +9,11 @@
 #ifndef LOCATION_LOCATION_H
 #define LOCATION_LOCATION_H
 
-using namespace Eigen;
-
 class Location {
 public:
 
-    void PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, Vector3d &mag_data, Status *status, double t);
+    void PredictCurrentPosition(Eigen::Vector3d &gyro_data, Eigen::Vector3d &acc_data, Eigen::Vector3d &mag_data,
+                                Eigen::VectorXd &gps_data, Eigen::Vector3d &g_data, Eigen::Vector3d &ornt_data, Status *status);
 
 };
 

@@ -2,9 +2,11 @@
 // Created by yangcheng on 2019/1/14.
 //
 
+#include "../sensor/GPS.h"
 #include "../sensor/Accelerometer.h"
 #include "../models/AHRS.h"
 #include "Location.h"
+#include "iostream"
 
 /**
  * 定位,计算当前位置
@@ -12,11 +14,11 @@
  * @param gyro_data, 陀螺仪原始数据, w(x,y,z)
  * @param acc_data, 加速计原始数据, a(x,y,z)
  * @param mag_data, 地磁计原始数据, m(x,y,z)
+ * @param gps_data, GPS原始数据, gps(lng,lat,alt,accuracy,speed,bearing)
  * @param status, 状态容器, 包含位置,姿态,速度,参数等信息
- * @param t, 采样时间,(1/采样频率)
  */
-void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, Vector3d &mag_data, Status *status,
-                                      double t) {
+void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, Vector3d &mag_data, VectorXd &gps_data,
+                                      Vector3d &g_data, Vector3d &ornt_data, Status *status) {
 
     // 传感器参数
     Parameters parameters = (*status).parameters;
@@ -24,48 +26,119 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     Vector3d gyro_data_cali;
     Vector3d acc_data_cali;
     Vector3d mag_data_cali;
-    // 较正陀螺仪
+    Vector3d g_data_format;
+    // 较正陀螺仪, 单位rad
     gyro_data_cali(0) = gyro_data(0) - parameters.gyro_coef(0);
     gyro_data_cali(1) = gyro_data(1) - parameters.gyro_coef(1);
     gyro_data_cali(2) = gyro_data(2) - parameters.gyro_coef(2);
     // 较正加速计, 单位为g
-    Vector3d acc_data_format = acc_data / (*status).parameters.g;
-    acc_data_cali(0) = (acc_data_format(0) - parameters.acc_coef(0)) / parameters.acc_coef(3);
-    acc_data_cali(1) = (acc_data_format(1) - parameters.acc_coef(1)) / parameters.acc_coef(4);
-    acc_data_cali(2) = (acc_data_format(2) - parameters.acc_coef(2)) / parameters.acc_coef(5);
-    // 较正地磁计
-    mag_data_cali(0) = (mag_data(0) - parameters.mag_coef(0)) / parameters.mag_coef(3);
-    mag_data_cali(1) = (mag_data(1) - parameters.mag_coef(1)) / parameters.mag_coef(4);
-    mag_data_cali(2) = (mag_data(2) - parameters.mag_coef(2)) / parameters.mag_coef(5);
+    acc_data_cali(0) = (acc_data(0) / (*status).parameters.g - parameters.acc_coef(0)) * parameters.acc_coef(3);
+    acc_data_cali(1) = (acc_data(1) / (*status).parameters.g - parameters.acc_coef(1)) * parameters.acc_coef(4);
+    acc_data_cali(2) = (acc_data(2) / (*status).parameters.g - parameters.acc_coef(2)) * parameters.acc_coef(5);
+    // 重力数据归一
+    g_data_format = g_data / (*status).parameters.g;
+    // 较正地磁计, 单位μt
+    mag_data_cali(0) = (mag_data(0) / 1000.0 - parameters.mag_coef(0)) * parameters.mag_coef(3);
+    mag_data_cali(1) = (mag_data(1) / 1000.0 - parameters.mag_coef(1)) * parameters.mag_coef(4);
+    mag_data_cali(2) = (mag_data(2) / 1000.0 - parameters.mag_coef(2)) * parameters.mag_coef(5);
+
+    Vector3d g(0,0,1.0);
 
     // 姿态更新
-    (*status).attitude.roll += mag_data_cali(0) * t;
-    (*status).attitude.pitch += mag_data_cali(1) * t;
-    (*status).attitude.yaw += mag_data_cali(2) * t;
+//    (*status).attitude.roll += gyro_data_cali(0) * t;
+//    (*status).attitude.pitch += gyro_data_cali(1) * t;
+//    (*status).attitude.yaw += gyro_data_cali(2) * t;
+//    (*status).attitude.roll = gyro_data_cali(0);
+//    (*status).attitude.pitch = gyro_data_cali(1);
+//    (*status).attitude.yaw = gyro_data_cali(2);
+
+    //std::cout << "roll pitch yaw " << (*status).attitude.roll << " " << (*status).attitude.pitch << " " << (*status).attitude.yaw << std::endl;
     // 欧拉角
-    Vector3d euler_angle;
-    euler_angle(0) = (*status).attitude.roll;
-    euler_angle(1) = (*status).attitude.pitch;
-    euler_angle(2) = (*status).attitude.yaw;
+//    Vector3d euler_angle;
+//    euler_angle(0) = (*status).attitude.pitch;
+//    euler_angle(1) = (*status).attitude.roll;
+//    euler_angle(2) = (*status).attitude.yaw;
 
     // 获取姿态
     AHRS ahrs;
+    Vector4d q_attitude = (*status).attitude.q_attitude;
     Vector3d *err = &(*status).parameters.err;
     double ki = (*status).parameters.ki;
     double kp = (*status).parameters.kp;
     double halfT = (*status).parameters.halfT;
-    Vector4d attitude = ahrs.UpdateAttitude(err, euler_angle, acc_data_cali, mag_data_cali, ki, kp, halfT);
+    Vector4d attitude = ahrs.UpdateAttitude(err, q_attitude, gyro_data_cali, g_data, mag_data_cali, ki, kp, halfT);
+    // 更新姿态
+    (*status).attitude.q_attitude = attitude;
 
     // 加速计从b系转到n系
     Quaternions quaternions;
     Matrix3d newRotated_b2n = quaternions.GetDCMFromQ(attitude);
-    Vector3d acc_n = newRotated_b2n * acc_data_cali;
+    Vector3d acc_b = acc_data_cali - g_data_format;
+    Vector3d final_acc = newRotated_b2n * acc_b * (*status).parameters.g;
+//    std::cout << final_acc.transpose() << std::endl;
+//    Vector3d acc_n = acc_data_cali.transpose() * newRotated_b2n;
     // 减去地心重力影响
-    Vector3d v(0,0,1);
-    Vector3d final_acc = (acc_n - v) * (*status).parameters.g;
+//    Vector3d v(0, 0, 1);
+//    Vector3d final_acc = (acc_n - g_data_format) * (*status).parameters.g;
 
-    // 更新位置,速度
+    // 记录起始位置和当前位置
+    double start_x = (*status).position.x;
+    double start_y = (*status).position.y;
+//    double start_z = (*status).position.z;
+    double start_lng = (*status).position.lng;
+    double start_lat = (*status).position.lat;
+
+    // 更新惯性位置,速度
     Accelerometer accelerometer;
-    accelerometer.PositionIntegral(status, final_acc, t);
+    accelerometer.PositionIntegral(status, final_acc, (*status).parameters.t);
+    // 更新地理坐标位置
+    GPS gps;
+    double gps_accuracy = gps_data(3);
+    if (gps_accuracy > (*status).parameters.weak_gps) {
+        // 计算距离
+        double end_x = (*status).position.x;
+        double end_y = (*status).position.y;
+//        double end_z = (*status).position.z;
+        double distance = sqrt((end_x - start_x) * (end_x - start_x) + (end_y - start_y) * (end_y - start_y) );
+        // 计算航向角
+        Vector3d euler = quaternions.GetEulerFromQ(attitude);
+        double heading = ornt_data(2);
+//        double heading = euler(2);
+        // 计算航向角
+        Vector2d gps_new = gps.CalDestination(start_lng, start_lat, distance, heading);
+//        std::cout << start_x << " " << start_y <<  std::endl;
+//        std::cout.precision(9);
+//          std::cout << heading * 180 / M_PI << std::endl;
+//        std::cout //<< " acc cali " << acc_data_cali.transpose()
+//                << " acc n " << acc_n.transpose()
+//                << " final acc " << final_acc.transpose()
+////                  << " distance " << distance << " heading " << heading / M_PI * 180.0 << " gps_new " << gps_new.transpose()
+//                  << " v = " << (*status).velocity.v_x << " " << (*status).velocity.v_y << " " << (*status).velocity.v_z
+//                  << std::endl;
+        // 更新经纬度
+        (*status).position.lng = gps_new(0);
+        (*status).position.lat = gps_new(1);
+    } else {
+        (*status).position.lng = gps_data(0);
+        (*status).position.lat = gps_data(1);
+        (*status).position.altitude = gps_data(2);
+        double gps_speed = gps_data(4);
+        double gps_bearing = gps_data(5);
+        gps.UpdateVelocity(status,gps_speed,gps_bearing);
+        (*status).position.x = 0.0;
+        (*status).position.y = 0.0;
+        (*status).position.z = 0.0;
+    }
+
+//    std::cout.precision(9);
+//          std::cout << heading * 180 / M_PI << std::endl;
+//        std::cout //<< " acc cali " << acc_data_cali.transpose()
+//                << " acc n " << acc_n.transpose()
+//                << " final acc " << final_acc.transpose()
+////                  << " distance " << distance << " heading " << heading / M_PI * 180.0 << " gps_new " << gps_new.transpose()
+//                  << " v = " << (*status).velocity.v_x << " " << (*status).velocity.v_y << " " << (*status).velocity.v_z
+//                  << " " << gps_accuracy
+//                  << std::endl;
+
 
 }
