@@ -7,7 +7,9 @@
 #include "../models/AHRS.h"
 #include "Location.h"
 
-
+/**
+ * Location 初始化。
+ */
 Location::Location() {
     this->status.Init();
 }
@@ -108,6 +110,10 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
 
 }
 
+/**
+ * 获取当前位置
+ * @return
+ */
 Position Location::GetCurrentPosition() {
     return  this->status.position;
 }
