@@ -6,6 +6,7 @@
 #include "Eigen/Dense"
 #include "Quaternions.h"
 
+using namespace Eigen;
 
 Quaternions::Quaternions() {};
 

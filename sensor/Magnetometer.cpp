@@ -6,6 +6,8 @@
 #include "Magnetometer.h"
 #include "../math/Optimizer.h"
 
+using namespace Eigen;
+
 Vector3d Magnetometer::Normalise(Vector3d &m) const {
     Vector3d normM;
     double norm2 = m(0) * m(0) + m(1) * m(1) + m(2) * m(2);

@@ -6,7 +6,8 @@
 #include "../math/Optimizer.h"
 #include "iostream"
 
-using namespace std;
+using namespace Eigen;
+
 Vector3d Accelerometer::Normalise(Vector3d &a) const {
     Vector3d normA;
     double norm2 = a(0) * a(0) + a(1) * a(1) + a(2) * a(2);

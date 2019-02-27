@@ -7,6 +7,8 @@
 #include "../models/AHRS.h"
 #include "Location.h"
 
+using namespace Eigen;
+
 /**
  * Location 初始化。
  */

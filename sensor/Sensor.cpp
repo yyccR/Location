@@ -7,6 +7,7 @@
 #include "../sensor/Accelerometer.h"
 #include "../sensor/Magnetometer.h"
 
+using namespace Eigen;
 
 /**
  * 传感器标定入口, 目前包含陀螺仪,地磁计,加速计
