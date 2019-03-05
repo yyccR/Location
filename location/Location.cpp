@@ -2,6 +2,7 @@
 // Created by yangcheng on 2019/1/14.
 //
 
+#include <cmath>
 #include "../sensor/GPS.h"
 #include "../sensor/Accelerometer.h"
 #include "../models/AHRS.h"
