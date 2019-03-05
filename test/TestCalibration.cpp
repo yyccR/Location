@@ -7,7 +7,7 @@
 #include "iostream"
 
 using namespace Eigen;
-using namespace std;
+using namespace routing;
 
 void TestCalibration::testCalibration(MatrixXd &gyro_data, MatrixXd &acc_data, MatrixXd &mag_data, Status *status) {
 

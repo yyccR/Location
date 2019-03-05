@@ -11,9 +11,9 @@
 using namespace std;
 using namespace Eigen;
 
-void DataFormat::readCSV(MatrixXd &gyro, MatrixXd &acc, MatrixXd &mag, MatrixXd &gps_data, MatrixXd &g_data, VectorXd &heading) {
+void DataFormat::readCSV(MatrixXd &gyro, MatrixXd &acc, MatrixXd &mag, MatrixXd &gps_data, MatrixXd &g_data, MatrixXd &ornt_data) {
     ifstream infile;
-    infile.open("D:/worksheet/clion/Location/test/data/EEWalk2.csv",
+    infile.open("D:/worksheet/clion/Location/test/data/McLaneWalk.csv",
                 ios::in);
     assert(infile.is_open());
 
@@ -48,18 +48,29 @@ void DataFormat::readCSV(MatrixXd &gyro, MatrixXd &acc, MatrixXd &mag, MatrixXd 
         // gps data
         double lng = atof(s_split[16].c_str());
         double lat = atof(s_split[15].c_str());
-        if (i != 0 && lat == gps_data(i - 1, 1) && lng == gps_data(i - 1, 0)) {
+        if (i != 0) {
+//        if (i != 0 && lat == gps_data(i - 1, 1) && lng == gps_data(i - 1, 0)) {
             gps_data(i, 0) = lng;
             gps_data(i, 1) = lat;
             gps_data(i, 2) = atof(s_split[17].c_str());
             gps_data(i, 3) = 200.0;
+            gps_data(i, 4) = atof(s_split[19].c_str()) * 1000.0 / 3600.0;
+            gps_data(i, 5) = atof(s_split[21].c_str());
         } else {
             gps_data(i, 0) = lng;
             gps_data(i, 1) = lat;
             gps_data(i, 2) = atof(s_split[17].c_str());
             gps_data(i, 3) = 10.0;
+            gps_data(i, 4) = atof(s_split[19].c_str()) * 1000.0 / 3600.0;
+            gps_data(i, 5) = atof(s_split[21].c_str());
         }
-        heading(i) = atof(s_split[12].c_str());
+
+        ornt_data(i, 2) = atof(s_split[12].c_str());
+        ornt_data(i, 0) = 0.0;//atof(s_split[13].c_str());
+        ornt_data(i, 1) = 0.0;//atof(s_split[14].c_str());
+
+//        heading(i) = atof(s_split[12].c_str());
+//        std::cout << gps_data <<
 
 
 

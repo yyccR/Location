@@ -9,6 +9,7 @@
 #include "../sensor/GPS.h"
 #include "../math/Quaternions.h"
 using namespace Eigen;
+using namespace routing;
 //using namespace std;
 
 void TestLocation::testLocation(MatrixXd &gyro_data, MatrixXd &acc_data, MatrixXd &mag_data, MatrixXd &gps_data, MatrixXd &g_data, MatrixXd &ornt_data) {
@@ -35,7 +36,7 @@ void TestLocation::testLocation(MatrixXd &gyro_data, MatrixXd &acc_data, MatrixX
         Position position = location.GetCurrentPosition();
 
         std::cout.precision(9);
-//        std::cout << status.position.lng << " " << status.position.lat << std::endl;
+        std::cout << location.status.position.lng << " " << location.status.position.lat << std::endl;
     }
 
 }

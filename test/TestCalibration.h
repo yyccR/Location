@@ -8,11 +8,10 @@
 #include "Eigen/Dense"
 #include "../system/Status.h"
 
-using namespace Eigen;
 
 class TestCalibration {
 public:
-    void testCalibration(MatrixXd &gyro_data, MatrixXd &acc_data, MatrixXd &mag_data, Status *status);
+    void testCalibration(Eigen::MatrixXd &gyro_data, Eigen::MatrixXd &acc_data, Eigen::MatrixXd &mag_data, routing::Status *status);
 };
 
 
