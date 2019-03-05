@@ -14,7 +14,7 @@ using namespace routing;
  * @param startLng 起点经度
  * @param startLat 起点纬度
  * @param distance 距离
- * @param heading 方向（与正北夹角）
+ * @param heading 方向（与正北夹角）,角度
  * @return
  */
 Eigen::Vector2d GPS::CalDestination(double &startLng, double &startLat, double &distance, double &heading) {
@@ -22,8 +22,9 @@ Eigen::Vector2d GPS::CalDestination(double &startLng, double &startLat, double &
     double R = 6378.137 * 1000.0;
     double rad_lng = startLng / 180.0 * M_PI;
     double rad_lat = startLat / 180.0 * M_PI;
-    double lat = asin(sin(rad_lat) * cos(distance / R) + cos(rad_lat) * sin(distance / R) * cos(heading));
-    double lng = rad_lng + atan2(sin(heading) * sin(distance / R) * cos(rad_lat), cos(distance / R) - sin(rad_lat) * sin(lat));
+    double heading_rad = heading / 180.0 * M_PI;
+    double lat = asin(sin(rad_lat) * cos(distance / R) + cos(rad_lat) * sin(distance / R) * cos(heading_rad));
+    double lng = rad_lng + atan2(sin(heading_rad) * sin(distance / R) * cos(rad_lat), cos(distance / R) - sin(rad_lat) * sin(lat));
     nextLngLat(0) = lng / M_PI * 180.0;
     nextLngLat(1) = lat / M_PI * 180.0;
     return nextLngLat;
