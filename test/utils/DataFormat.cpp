@@ -6,6 +6,7 @@
 #include "fstream"
 #include "cassert"
 #include "iostream"
+#include <cmath>
 
 
 using namespace std;
@@ -65,7 +66,7 @@ void DataFormat::readCSV(MatrixXd &gyro, MatrixXd &acc, MatrixXd &mag, MatrixXd 
             gps_data(i, 5) = atof(s_split[21].c_str());
         }
 
-        ornt_data(i, 2) = atof(s_split[12].c_str());
+        ornt_data(i, 2) = atof(s_split[12].c_str()) / M_PI * 180.0;
         ornt_data(i, 0) = 0.0;//atof(s_split[13].c_str());
         ornt_data(i, 1) = 0.0;//atof(s_split[14].c_str());
 
