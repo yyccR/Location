@@ -8,6 +8,7 @@
 #include "Location.h"
 
 using namespace Eigen;
+using namespace routing;
 
 /**
  * Location 初始化。
@@ -15,6 +16,8 @@ using namespace Eigen;
 Location::Location() {
     this->status.Init();
 }
+
+Location::~Location() {}
 
 /**
  * 定位,计算当前位置
@@ -129,4 +132,12 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
  */
 Position Location::GetCurrentPosition() {
     return  this->status.position;
+}
+
+/**
+ * 获取当前方位角
+ * @return
+ */
+double Location::GetCurrentBearing() {
+    return this->status.attitude.yaw;
 }

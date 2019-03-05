@@ -12,7 +12,7 @@
 class Sensor {
 public:
 
-    void Calibrate(Eigen::MatrixXd &gyro_data,Eigen::MatrixXd &acc_data,Eigen::MatrixXd &mag_data, Status *status);
+    void Calibrate(Eigen::MatrixXd &gyro_data,Eigen::MatrixXd &acc_data,Eigen::MatrixXd &mag_data, routing::Status *status);
 
 };
 

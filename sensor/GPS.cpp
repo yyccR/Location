@@ -6,6 +6,7 @@
 #include "cmath"
 
 using namespace Eigen;
+using namespace routing;
 
 /**
  * 给定起点经度,纬度,距离,方向, 计算终点的经纬度.

@@ -7,6 +7,7 @@
 #include "iostream"
 
 using namespace Eigen;
+using namespace routing;
 
 Vector3d Accelerometer::Normalise(Vector3d &a) const {
     Vector3d normA;

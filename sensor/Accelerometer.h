@@ -33,7 +33,7 @@ public:
     Eigen::Vector3d GetAccError(Eigen::Vector3d &originA, Eigen::Vector4d &q) const;
 
     // 加速计标定
-    void AccCalibration(Eigen::MatrixXd &input_data, Status *status);
+    void AccCalibration(Eigen::MatrixXd &input_data, routing::Status *status);
 
     // rotate the accelerate data into Geo coordinates.
 //    Accelerometer Rotate(const Quaternions &quaternions, const Quaternions &quaternion_inv) const;
@@ -45,7 +45,7 @@ public:
 //    void DeleteGravity();
 
     // position integral.
-    void PositionIntegral(Status *status, Eigen::Vector3d &acc, double t) const;
+    void PositionIntegral(routing::Status *status, Eigen::Vector3d &acc, double t) const;
 };
 
 

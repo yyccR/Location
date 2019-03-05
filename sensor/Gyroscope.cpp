@@ -7,6 +7,7 @@
 #include <cmath>
 
 using namespace Eigen;
+using namespace routing;
 
 ///**
 // * 从陀螺仪获取姿态旋转矩阵(方向余弦矩阵DCM), b系坐标转g系

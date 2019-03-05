@@ -21,7 +21,7 @@ public:
     Eigen::Vector3d GetMagError(Eigen::Vector4d &q, Eigen::Vector3d &originMag);
 
     // 地磁计标定
-    void MagCalibration(Eigen::MatrixXd &input_data, Status *status);
+    void MagCalibration(Eigen::MatrixXd &input_data, routing::Status *status);
 };
 
 

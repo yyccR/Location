@@ -7,6 +7,7 @@
 #include "../math/Optimizer.h"
 
 using namespace Eigen;
+using namespace routing;
 
 Vector3d Magnetometer::Normalise(Vector3d &m) const {
     Vector3d normM;

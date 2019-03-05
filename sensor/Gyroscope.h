@@ -16,7 +16,7 @@ public:
 //    Matrix3d GetDCM(Vector3d &gyro, double &deltaT);
 
     // 陀螺仪标定
-    void GyroCalibration(Eigen::MatrixXd &input_data, Status *status);
+    void GyroCalibration(Eigen::MatrixXd &input_data, routing::Status *status);
 
 };
 

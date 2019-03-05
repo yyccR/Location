@@ -10,6 +10,7 @@
 #include "Eigen/Dense"
 
 using namespace Eigen;
+using namespace routing;
 
 Position Status::GetPosition() const {
     return this->position;
