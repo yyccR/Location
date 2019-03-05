@@ -111,10 +111,11 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
         (*status).position.lng = gps_new(0);
         (*status).position.lat = gps_new(1);
     } else {
-        // 采用GPS数据更新经纬度
+        // 采用GPS数据更新经纬度和方位角
         (*status).position.lng = gps_data(0);
         (*status).position.lat = gps_data(1);
         (*status).position.altitude = gps_data(2);
+        (*status).attitude.yaw = gps_data(5);
         double gps_speed = gps_data(4);
         double gps_bearing = gps_data(5);
         gps.UpdateVelocity(status, gps_speed, gps_bearing);
