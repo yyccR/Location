@@ -31,7 +31,7 @@ public:
     // error covariance matrix
     Eigen::MatrixXd Q;
     // input size;
-    Index s;
+    Eigen::Index s;
 
     /**
     * Constructor
