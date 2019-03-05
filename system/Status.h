@@ -5,7 +5,7 @@
 #ifndef LOCATION_STATUS_H
 #define LOCATION_STATUS_H
 
-#include "Eigen/Dense"
+#include "../include/eigen3/Eigen/Dense"
 
 namespace routing {
 

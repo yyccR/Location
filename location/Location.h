@@ -4,7 +4,7 @@
 
 
 #include "../system/Status.h"
-#include "Eigen/Dense"
+#include "../include/eigen3/Eigen/Dense"
 
 #ifndef LOCATION_LOCATION_H
 #define LOCATION_LOCATION_H
