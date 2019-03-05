@@ -9,6 +9,7 @@
 #ifndef LOCATION_LOCATION_H
 #define LOCATION_LOCATION_H
 
+
 class Location {
 public:
 
@@ -22,6 +23,10 @@ public:
     void PredictCurrentPosition(Eigen::Vector3d &gyro_data, Eigen::Vector3d &acc_data, Eigen::Vector3d &mag_data,
                                 Eigen::VectorXd &gps_data, Eigen::Vector3d &g_data, Eigen::Vector3d &ornt_data,
                                 routing::Status *status);
+
+
+    // 获取当前融合定位的输出
+    routing::GNSSINS GetGNSSINS();
 
     // 获取当前位置
     routing::Position GetCurrentPosition();

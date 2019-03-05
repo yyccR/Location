@@ -9,6 +9,16 @@
 
 namespace routing {
 
+    // 用于最终输出
+    struct GNSSINS {
+        double lng;
+        double lat;
+        double altitude;
+        double accuracy;
+        double speed;
+        double bearing;
+    };
+
     struct Position {
         // x,y,z轴的平面位置坐标
         double x;
@@ -85,6 +95,7 @@ namespace routing {
     class Status {
     public:
 
+        GNSSINS gnssins;
         Position position;
         Velocity velocity;
         Attitude attitude;

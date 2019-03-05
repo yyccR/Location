@@ -29,6 +29,14 @@ Parameters Status::GetParameters() const {
 }
 
 void Status::Init() {
+
+    this->gnssins.lng = 0.0;
+    this->gnssins.lat = 0.0;
+    this->gnssins.altitude = 0.0;
+    this->gnssins.accuracy = 0.0;
+    this->gnssins.speed = 0.0;
+    this->gnssins.bearing = 0.0;
+
     this->velocity.v_x = 0.0;
     this->velocity.v_y = 0.0;
     this->velocity.v_z = 0.0;

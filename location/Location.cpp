@@ -77,7 +77,6 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     // 记录起始位置和当前位置
     double start_x = (*status).position.x;
     double start_y = (*status).position.y;
-//    double start_z = (*status).position.z;
     double start_lng = (*status).position.lng;
     double start_lat = (*status).position.lat;
 
@@ -105,6 +104,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
         // 采用惯导更新经纬度
         // 获取航向角
         double heading = ornt_data(2);
+        (*status).attitude.yaw = heading;
         // 计算航向角
         Vector2d gps_new = gps.CalDestination(start_lng, start_lat, distance, heading);
         // 更新经纬度
@@ -112,20 +112,38 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
         (*status).position.lat = gps_new(1);
     } else {
         // 采用GPS数据更新经纬度和方位角
+        double gps_speed = gps_data(4);
+        double gps_bearing = gps_data(5);
         (*status).position.lng = gps_data(0);
         (*status).position.lat = gps_data(1);
         (*status).position.altitude = gps_data(2);
-        (*status).attitude.yaw = gps_data(5);
-        double gps_speed = gps_data(4);
-        double gps_bearing = gps_data(5);
+        (*status).attitude.yaw = gps_bearing;
         gps.UpdateVelocity(status, gps_speed, gps_bearing);
+        // 更新融合定位结果输出
+        (*status).gnssins.accuracy = gps_accuracy;
+        (*status).gnssins.speed = gps_speed;
         // 每个x,y,z都是相对与上一个准确的GPS数据。
         (*status).position.x = 0.0;
         (*status).position.y = 0.0;
         (*status).position.z = 0.0;
     }
 
+    // 更新融合定位的结果，精度沿用GPS信号好时的精度,速度由于加速计计算的是三个方位的速度，故速度还是沿用GPS的速度
+    (*status).gnssins.lng = (*status).position.lng;
+    (*status).gnssins.lat = (*status).position.lat;
+    (*status).gnssins.altitude = (*status).position.altitude;
+    (*status).gnssins.bearing = (*status).attitude.yaw;
 }
+
+
+/**
+ * 获取当前融合定位结果作为输出
+ * @return
+ */
+GNSSINS Location::GetGNSSINS() {
+    return this->status.gnssins;
+}
+
 
 /**
  * 获取当前位置

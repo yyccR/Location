@@ -33,7 +33,7 @@ void TestLocation::testLocation(MatrixXd &gyro_data, MatrixXd &acc_data, MatrixX
 
 
         location.PredictCurrentPosition(gyro_data_v, acc_data_v, mag_data_v, gps_data_v, g_data_v, ornt_data_v,&location.status);
-        Position position = location.GetCurrentPosition();
+        GNSSINS gnssins = location.GetGNSSINS();
 
         std::cout.precision(9);
         std::cout << location.status.position.lng << " " << location.status.position.lat << std::endl;
