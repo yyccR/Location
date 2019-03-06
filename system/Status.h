@@ -85,6 +85,12 @@ namespace routing {
         double move_distance_threshod;
         // 利用惯导计算位置的次数;
         int ins_count;
+        // GPS初始状态计数
+        int gps_count;
+        // 导航GPS初始化后，记录多久后接入ins
+        int gps_init_threshold;
+        // gps上一个点的时间戳
+        double gps_pre_t;
 
         // 当地重力加速度值
         double g;

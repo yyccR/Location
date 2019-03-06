@@ -74,6 +74,9 @@ void Status::Init() {
     this->parameters.g = 9.805567;
     this->parameters.mag = 157.44;
     this->parameters.t = 1 / 2.5;
-    this->parameters.move_distance_threshod = 50.0;
-    this->parameters.ins_count = 1;
+    this->parameters.move_distance_threshod = 100.0;
+    this->parameters.ins_count = 0;
+    this->parameters.gps_count = 0;
+    this->parameters.gps_init_threshold = 180;
+    this->parameters.gps_pre_t = 0.0;
 }
