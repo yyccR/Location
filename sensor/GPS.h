@@ -19,6 +19,9 @@ public:
 
     // 计算两个经纬度点之间的距离
     double CalDistance(double &startLng, double &startLat, double &endLng, double &endLat);
+
+    // 根据当前输入以及状态判断采用GPS还是INS
+    bool IsGPSValid(routing::Status *status,  Eigen::VectorXd &gps_data);
 };
 
 

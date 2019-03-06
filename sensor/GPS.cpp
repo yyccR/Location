@@ -3,7 +3,7 @@
 //
 
 #include "GPS.h"
-#include "cmath"
+#include <cmath>
 
 using namespace Eigen;
 using namespace routing;
@@ -66,4 +66,38 @@ double GPS::CalDistance(double &startLng, double &startLat, double &endLng, doub
                 cos(startLat_rad) * cos(endLat_rad) * pow(sin((endLng_rad - startLng_rad) / 2.0), 2.0);
     double c = 2 * asin(sqrt(a));
     return c * 6378.137 * 1000.0;
+}
+
+/**
+ * 根据当前输入以及状态判断采用GPS还是INS
+ *
+ * @param status
+ * @param gps_data, GPS原始数据, gps(lng,lat,alt,accuracy,speed,bearing,t)
+ * @return gps是否有效
+ */
+bool GPS::IsGPSValid(Status *status, VectorXd &gps_data) {
+
+    // 精度是否足够
+    bool is_gps_accuracy = gps_data(3) <= (*status).parameters.weak_gps;
+
+    // gps是否为空
+    bool is_gps_not_null = (gps_data(0) != 0.0 && gps_data(1) != 0.0);
+
+    // gps运动距离是否过大,判断是否相同时间间隔GPS移动与惯导相差不大,用于判断该点是否被采用
+    double start_lng = (*status).position.lng;
+    double start_lat = (*status).position.lat;
+    double end_Lng = gps_data(0);
+    double end_Lat = gps_data(1);
+    double gps_move_dist = CalDistance(start_lng, start_lat, end_Lng, end_Lat);
+    bool is_gps_move_accepted = ceil((*status).parameters.ins_count / 10.0 + 1.0) * gps_move_dist <
+                                ceil((*status).parameters.ins_count / 10.0 + 1.0) *
+                                (*status).parameters.move_distance_threshod;
+
+    // 判断是否当前是导航初始状态
+    bool is_gps_initializing = (*status).parameters.gps_count < (*status).parameters.gps_init_threshold;
+
+    // 判断当前GPS是否与上个GPS点同个时间戳
+    bool is_gps_not_duplicated = gps_data(6) != (*status).parameters.gps_pre_t;
+
+    return (is_gps_accuracy && is_gps_not_null && is_gps_move_accepted && is_gps_not_duplicated) || is_gps_initializing;
 }

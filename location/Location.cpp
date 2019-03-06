@@ -26,7 +26,7 @@ Location::~Location() {}
  * @param gyro_data, 陀螺仪原始数据, w(x,y,z)
  * @param acc_data, 加速计原始数据, a(x,y,z)
  * @param mag_data, 地磁计原始数据, m(x,y,z)
- * @param gps_data, GPS原始数据, gps(lng,lat,alt,accuracy,speed,bearing)
+ * @param gps_data, GPS原始数据, gps(lng,lat,alt,accuracy,speed,bearing,t)
  * @param g_data, 重力感应数据, g(x,y,z)
  * @param ornt_data, 方向传感器数据, o(roll,pitch,yaw)
  * @param status, 状态容器, 包含位置,姿态,速度,参数等信息
@@ -87,21 +87,15 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
 
     // 获取GPS精度
     GPS gps;
-    double gps_accuracy = gps_data(3);
     // 计算传感器运动距离
     double end_x = (*status).position.x;
     double end_y = (*status).position.y;
     double distance = sqrt((end_x - start_x) * (end_x - start_x) + (end_y - start_y) * (end_y - start_y));
-    // 计算GPS运动距离
-    double end_Lng = gps_data(0);
-    double end_Lat = gps_data(1);
-    double gps_move_dist = gps.CalDistance(start_lng, start_lat, end_Lng, end_Lat);
-    // 判断是否相同时间间隔GPS移动与惯导相差不大,用于判断该点是否被采用
-    bool is_gps_move_not_accpetted =  ceil((*status).parameters.ins_count / 10.0) * gps_move_dist <
-            (*status).parameters.move_distance_threshod * (*status).parameters.ins_count;
+
 
     // 判断是否采用GPS数据
-    if (gps_accuracy > (*status).parameters.weak_gps || (gps_data(0) == 0.0 && gps_data(1) == 0.0) || is_gps_move_not_accpetted) {
+    bool is_gps_valid = gps.IsGPSValid(status, gps_data);
+    if (!is_gps_valid) {
         // 采用惯导更新经纬度
         // 获取航向角
         double heading = ornt_data(2);
@@ -111,6 +105,8 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
         // 更新经纬度
         (*status).position.lng = gps_new(0);
         (*status).position.lat = gps_new(1);
+        // 更新相关参数
+        (*status).parameters.ins_count += 1;
     } else {
         // 采用GPS数据更新经纬度和方位角
         double gps_speed = gps_data(4);
@@ -120,8 +116,12 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
         (*status).position.altitude = gps_data(2);
         (*status).attitude.yaw = gps_bearing;
         gps.UpdateVelocity(status, gps_speed, gps_bearing);
+        // 更新相关参数值
+        (*status).parameters.gps_pre_t = gps_data(6);
+        (*status).parameters.gps_count += 1;
+        (*status).parameters.ins_count = 0;
         // 更新融合定位结果输出
-        (*status).gnssins.accuracy = gps_accuracy;
+        (*status).gnssins.accuracy =  gps_data(3);
         (*status).gnssins.speed = gps_speed;
         // 每个x,y,z都是相对与上一个准确的GPS数据。
         (*status).position.x = 0.0;
@@ -135,6 +135,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     (*status).gnssins.altitude = (*status).position.altitude;
     (*status).gnssins.bearing = (*status).attitude.yaw;
 }
+
 
 
 /**
@@ -151,7 +152,7 @@ GNSSINS Location::GetGNSSINS() {
  * @return
  */
 Position Location::GetCurrentPosition() {
-    return  this->status.position;
+    return this->status.position;
 }
 
 /**

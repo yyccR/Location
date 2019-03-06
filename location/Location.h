@@ -24,7 +24,6 @@ public:
                                 Eigen::VectorXd &gps_data, Eigen::Vector3d &g_data, Eigen::Vector3d &ornt_data,
                                 routing::Status *status);
 
-
     // 获取当前融合定位的输出
     routing::GNSSINS GetGNSSINS();
 
