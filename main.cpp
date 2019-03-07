@@ -34,9 +34,9 @@ int main() {
 //    cout << "mag coef " << status.parameters.mag_coef << endl;
 
 
-    MatrixXd gyro2(3388,3),acc2(3388,3),mag2(3388,3), gps2(3388,6), g2(3388,3), ornt2(3388,3);
+    MatrixXd gyro2(3388,3),acc2(3388,3),mag2(3388,3), gps2(3388,7), g2(3388,3), ornt2(3388,3);
     VectorXd h(3388);
-//    MatrixXd gyro2(3544,3),acc2(3544,3),mag2(3544,3), gps2(3544,6), g2(3544,3), ornt2(3544,3);
+//    MatrixXd gyro2(3544,3),acc2(3544,3),mag2(3544,3), gps2(3544,7), g2(3544,3), ornt2(3544,3);
 //    VectorXd h(3544);
     DataFormat dataFormat;
     dataFormat.readCSV(gyro2,acc2,mag2, gps2, g2, ornt2);

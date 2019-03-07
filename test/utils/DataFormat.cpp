@@ -57,6 +57,7 @@ void DataFormat::readCSV(MatrixXd &gyro, MatrixXd &acc, MatrixXd &mag, MatrixXd 
             gps_data(i, 3) = 200.0;
             gps_data(i, 4) = atof(s_split[19].c_str()) * 1000.0 / 3600.0;
             gps_data(i, 5) = atof(s_split[21].c_str());
+            gps_data(i, 6) = i;
         } else {
             gps_data(i, 0) = lng;
             gps_data(i, 1) = lat;
@@ -64,6 +65,7 @@ void DataFormat::readCSV(MatrixXd &gyro, MatrixXd &acc, MatrixXd &mag, MatrixXd 
             gps_data(i, 3) = 10.0;
             gps_data(i, 4) = atof(s_split[19].c_str()) * 1000.0 / 3600.0;
             gps_data(i, 5) = atof(s_split[21].c_str());
+            gps_data(i, 6) = i;
         }
 
         ornt_data(i, 2) = atof(s_split[12].c_str()) / M_PI * 180.0;

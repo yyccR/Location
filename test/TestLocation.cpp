@@ -32,11 +32,12 @@ void TestLocation::testLocation(MatrixXd &gyro_data, MatrixXd &acc_data, MatrixX
         Vector3d ornt_data_v = ornt_data.row(i);
 
 
-        location.PredictCurrentPosition(gyro_data_v, acc_data_v, mag_data_v, gps_data_v, g_data_v, ornt_data_v,&location.status);
+        location.PredictCurrentPosition(gyro_data_v, acc_data_v, mag_data_v, gps_data_v, g_data_v, ornt_data_v);
         GNSSINS gnssins = location.GetGNSSINS();
 
         std::cout.precision(9);
-        std::cout << location.status.position.lng << " " << location.status.position.lat << std::endl;
+//        std::cout << location.status.position.lng << " " << location.status.position.lat << std::endl;
+        std::cout << gnssins.lng << " " << gnssins.lat << std::endl;
     }
 
 }
