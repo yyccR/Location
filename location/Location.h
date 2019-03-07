@@ -21,8 +21,7 @@ public:
 
     // 定位,计算当前位置
     void PredictCurrentPosition(Eigen::Vector3d &gyro_data, Eigen::Vector3d &acc_data, Eigen::Vector3d &mag_data,
-                                Eigen::VectorXd &gps_data, Eigen::Vector3d &g_data, Eigen::Vector3d &ornt_data,
-                                routing::Status *status);
+                                Eigen::VectorXd &gps_data, Eigen::Vector3d &g_data, Eigen::Vector3d &ornt_data);
 
     // 获取当前融合定位的输出
     routing::GNSSINS GetGNSSINS();
