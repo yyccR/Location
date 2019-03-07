@@ -89,7 +89,9 @@ namespace routing {
         int gps_count;
         // 导航GPS初始化后，记录多久后接入ins
         int gps_init_threshold;
-        // gps上一个点的时间戳
+        // gps上一个点,经纬度,时间戳
+        double gps_pre_lng;
+        double gps_pre_lat;
         double gps_pre_t;
 
         // 当地重力加速度值

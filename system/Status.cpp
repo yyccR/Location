@@ -78,5 +78,7 @@ void Status::Init() {
     this->parameters.ins_count = 0;
     this->parameters.gps_count = 0;
     this->parameters.gps_init_threshold = 180;
+    this->parameters.gps_pre_lng = 0.0;
+    this->parameters.gps_pre_lat = 0.0;
     this->parameters.gps_pre_t = 0.0;
 }
