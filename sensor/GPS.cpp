@@ -24,7 +24,8 @@ Eigen::Vector2d GPS::CalDestination(double &startLng, double &startLat, double &
     double rad_lat = startLat / 180.0 * M_PI;
     double heading_rad = heading / 180.0 * M_PI;
     double lat = asin(sin(rad_lat) * cos(distance / R) + cos(rad_lat) * sin(distance / R) * cos(heading_rad));
-    double lng = rad_lng + atan2(sin(heading_rad) * sin(distance / R) * cos(rad_lat), cos(distance / R) - sin(rad_lat) * sin(lat));
+    double lng = rad_lng + atan2(sin(heading_rad) * sin(distance / R) * cos(rad_lat),
+                                 cos(distance / R) - sin(rad_lat) * sin(lat));
     nextLngLat(0) = lng / M_PI * 180.0;
     nextLngLat(1) = lat / M_PI * 180.0;
     return nextLngLat;
@@ -62,8 +63,8 @@ double GPS::CalDistance(double &startLng, double &startLat, double &endLng, doub
     double endLat_rad = endLat / 180.0 * M_PI;
 
 
-    double a =  pow(sin((endLat_rad - startLat_rad) / 2.0), 2.0) +
-                cos(startLat_rad) * cos(endLat_rad) * pow(sin((endLng_rad - startLng_rad) / 2.0), 2.0);
+    double a = pow(sin((endLat_rad - startLat_rad) / 2.0), 2.0) +
+               cos(startLat_rad) * cos(endLat_rad) * pow(sin((endLng_rad - startLng_rad) / 2.0), 2.0);
     double c = 2 * asin(sqrt(a));
     return c * 6378.137 * 1000.0;
 }
@@ -75,19 +76,19 @@ double GPS::CalDistance(double &startLng, double &startLat, double &endLng, doub
  * @param gps_data, GPS原始数据, gps(lng,lat,alt,accuracy,speed,bearing,t)
  * @return gps是否有效
  */
-bool GPS::IsGPSValid(Status *status, VectorXd &gps_data) {
+bool GPS::IsGPSValid(Status *status, VectorXd *gps_data) {
 
     // 精度是否足够
-    bool is_gps_accuracy = gps_data(3) <= (*status).parameters.weak_gps;
+    bool is_gps_accuracy = (*gps_data)(3) <= (*status).parameters.weak_gps;
 
     // gps是否为空
-    bool is_gps_not_null = (gps_data(0) != 0.0 && gps_data(1) != 0.0);
+    bool is_gps_not_null = ((*gps_data)(0) != 0.0 && (*gps_data)(1) != 0.0);
 
     // gps运动距离是否过大,判断是否相同时间间隔GPS移动与惯导相差不大,用于判断该点是否被采用
     double start_lng = (*status).position.lng;
     double start_lat = (*status).position.lat;
-    double end_Lng = gps_data(0);
-    double end_Lat = gps_data(1);
+    double end_Lng = (*gps_data)(0);
+    double end_Lat = (*gps_data)(1);
     double gps_move_dist = CalDistance(start_lng, start_lat, end_Lng, end_Lat);
     bool is_gps_move_accepted = ceil((*status).parameters.ins_count / 10.0 + 1.0) * gps_move_dist <
                                 ceil((*status).parameters.ins_count / 10.0 + 1.0) *
@@ -97,7 +98,13 @@ bool GPS::IsGPSValid(Status *status, VectorXd &gps_data) {
     bool is_gps_initializing = (*status).parameters.gps_count < (*status).parameters.gps_init_threshold;
 
     // 判断当前GPS是否与上个GPS点同个时间戳
-    bool is_gps_not_duplicated = gps_data(6) != (*status).parameters.gps_pre_t;
+    bool is_gps_not_duplicated = (*gps_data)(6) != (*status).parameters.gps_pre_t;
+
+    // 当GPS在初始状态内时，处理为0.0的情况
+    if (is_gps_initializing && !is_gps_not_null) {
+        (*gps_data)(0) = (*status).parameters.gps_pre_lng;
+        (*gps_data)(1) = (*status).parameters.gps_pre_lat;
+    }
 
     return (is_gps_accuracy && is_gps_not_null && is_gps_move_accepted && is_gps_not_duplicated) || is_gps_initializing;
 }

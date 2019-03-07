@@ -94,7 +94,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
 
 
     // 判断是否采用GPS数据
-    bool is_gps_valid = gps.IsGPSValid(&status, gps_data);
+    bool is_gps_valid = gps.IsGPSValid(&status, &gps_data);
     if (!is_gps_valid) {
         // 采用惯导更新经纬度
         // 获取航向角
@@ -117,6 +117,8 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
         status.attitude.yaw = gps_bearing;
         gps.UpdateVelocity(&status, gps_speed, gps_bearing);
         // 更新相关参数值
+        status.parameters.gps_pre_lng = gps_data(0);
+        status.parameters.gps_pre_lat = gps_data(1);
         status.parameters.gps_pre_t = gps_data(6);
         status.parameters.gps_count += 1;
         status.parameters.ins_count = 0;
