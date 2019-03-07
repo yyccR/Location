@@ -33,7 +33,7 @@ Location::~Location() {}
  */
 void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, Vector3d &mag_data, VectorXd &gps_data,
                                       Vector3d &g_data, Vector3d &ornt_data) {
-
+    
     // 传感器参数
     Parameters parameters = status.parameters;
     // 利用标定参数较正当前传感器数据
