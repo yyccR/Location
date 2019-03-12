@@ -10,7 +10,7 @@
 
 ## 流程
 
-<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/INS2.png" width="800" height="500" />
+<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/INS2.png" width="1000" height="500" />
 
 ## Test case
 
