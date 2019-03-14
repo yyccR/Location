@@ -32,6 +32,9 @@ public:
     // 获取当前方位角
     double GetCurrentBearing();
 
+    // 设置采样频率
+    void SetHz(double &f);
+
 };
 
 
