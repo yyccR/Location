@@ -138,7 +138,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     status.gnssins.bearing = status.attitude.yaw;
 }
 
-void Location::SetHz(double &f) {
+void Location::SetHz(double f) {
     this->status.parameters.halfT = 1.0 / (f * 2.0);
     this->status.parameters.t = 1.0 / (f / 4.0);
 }

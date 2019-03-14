@@ -33,7 +33,7 @@ public:
     double GetCurrentBearing();
 
     // 设置采样频率
-    void SetHz(double &f);
+    void SetHz(double f);
 
 };
 
