@@ -46,6 +46,8 @@ public:
 
     // position integral.
     void PositionIntegral(routing::Status *status, Eigen::Vector3d &acc, double t) const;
+
+    void StrapdownUpdateVelocityPosition(routing::Status *status, Eigen::Vector3d &acc, Eigen::Vector4d &q_attitude) const;
 };
 
 
