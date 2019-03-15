@@ -98,6 +98,10 @@ namespace routing {
         double g;
         // 当地场强模值
         double mag;
+        // 地球自转角速度
+        double we;
+        // 地球半径
+        double R;
     };
 
     class Status {
