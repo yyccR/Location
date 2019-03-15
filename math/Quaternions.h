@@ -34,6 +34,9 @@ public:
     // 从四元数获取余弦矩阵DCM
     Eigen::Matrix3d GetDCMFromQ(Eigen::Vector4d &q);
 
+    // 从余弦矩阵DCM获取四元数
+    Eigen::Vector4d GetQfromDCM(Eigen::Matrix3d &dcm_b2n);
+
     // 从四元数获取欧拉角
     Eigen::Vector3d GetEulerFromQ(Eigen::Vector4d &q);
 

@@ -117,6 +117,18 @@ Matrix3d Quaternions::GetDCMFromQ(Vector4d &q) {
     return dcm_b2n;
 }
 
+// 从余弦矩阵DCM获取四元数
+Vector4d Quaternions::GetQfromDCM(Matrix3d &dcm_b2n) {
+
+    Vector4d q;
+    q(0) = 0.5 * sqrt(1.0 + dcm_b2n(0, 0) + dcm_b2n(1, 1) + dcm_b2n(2, 2));
+    double beta = 1.0 / (4.0 * q(0));
+    q(1) = beta * (dcm_b2n(2,1) - dcm_b2n(1,2));
+    q(2) = beta * (dcm_b2n(0,2) - dcm_b2n(2,0));
+    q(3) = beta * (dcm_b2n(1,0) - dcm_b2n(0,1));
+    return q;
+}
+
 Vector3d Quaternions::GetEulerFromQ(Vector4d &q) {
     Vector3d euler;
 
