@@ -72,14 +72,73 @@ void Accelerometer::AccCalibration(MatrixXd &input_data, Status *status) {
 void Accelerometer::PositionIntegral(Status *status, Vector3d &acc, double t) const {
 
     // 更新位置
-    (*status).position.x = (*status).velocity.v_x * t + 0.5 * acc(0) * t * t;
-    (*status).position.y = (*status).velocity.v_y * t + 0.5 * acc(1) * t * t;
-    (*status).position.z = (*status).velocity.v_z * t + 0.5 * acc(2) * t * t;
+    (*status).position.x += (*status).velocity.v_x * t + 0.5 * acc(0) * t * t;
+    (*status).position.y += (*status).velocity.v_y * t + 0.5 * acc(1) * t * t;
+    (*status).position.z += (*status).velocity.v_z * t + 0.5 * acc(2) * t * t;
     // 更新速度
     (*status).velocity.v_x = (*status).velocity.v_x + acc(0) * t;
     (*status).velocity.v_y = (*status).velocity.v_y + acc(1) * t;
     (*status).velocity.v_z = (*status).velocity.v_z + acc(2) * t;
 
+}
+
+/**
+ * 捷联更新位置速度
+ *
+ * @param status
+ * @param acc, 载体系加速度
+ * @param q_attitude, 上一时刻姿态四元数
+ */
+void Accelerometer::StrapdownUpdateVelocityPosition(Status *status, Vector3d &acc, Vector4d &q_attitude) const {
+
+    Quaternions quaternions;
+
+    /**
+     * ve_n_new = acc_n - (2*wi_n + we_n) X ve_n - gl_n;
+     */
+
+    // 计算导航系加速度
+    Matrix3d dcm_b2n = quaternions.GetDCMFromQ(q_attitude);
+    Vector3d acc_n = dcm_b2n * acc;
+
+    // 导航坐标系下的地球自转角速度
+    double cur_lat = (*status).position.lat * M_PI / 180.0;
+    Vector3d wi_n((*status).parameters.we * cos(cur_lat), 0.0, -(*status).parameters.we * sin(cur_lat));
+    // 导航坐标系下的旋转速率
+    double v_east = (*status).velocity.v_y;
+    double v_north = (*status).velocity.v_x;
+    double v_down = (*status).velocity.v_z;
+    Vector3d ve_n(v_north, v_east, v_down);
+    double Rh = (*status).parameters.R + (*status).position.altitude;
+    Vector3d we_n(v_east / Rh, -v_north / Rh, -v_east * tan(cur_lat) / Rh);
+
+    // 计算导航系下的重力加速计修正向量
+    Vector3d gn(0.0,0.0,(*status).parameters.g);
+    double beta = (*status).parameters.we * (*status).parameters.we * Rh / 2.0;
+    Vector3d wwR(beta * sin(2.0 * cur_lat), 0.0, beta * (1.0 + cos(2.0 * cur_lat)));
+    Vector3d gl_n = gn - wwR;
+
+    // 计算导航系下加速度减去地球旋转影响和重力影响
+    Vector3d acc_n_real = acc_n - (2.0 * wi_n + we_n).cross(ve_n) - gl_n;
+
+    // 速度和位置积分
+    double deltaT = (*status).parameters.t;
+    double v_x_new = v_north + acc_n_real(0) * deltaT;
+    double v_y_new = v_east + acc_n_real(1) * deltaT;
+    double v_z_new = v_down + acc_n_real(2) * deltaT;
+    double x_new = (*status).position.x + (v_north + v_x_new) * deltaT * 0.5;
+    double y_new = (*status).position.y + (v_east + v_y_new) * deltaT * 0.5;
+    double z_new = (*status).position.z + (v_down + v_z_new) * deltaT * 0.5;
+    std::cout << "acc " << acc_n_real.transpose() << std::endl;
+    std::cout << "v " << v_x_new << " " << v_y_new << " " << v_z_new << "\n" <<std::endl;
+
+    // 更新速度和位置
+    (*status).velocity.v_x = v_x_new;
+    (*status).velocity.v_y = v_y_new;
+    (*status).velocity.v_z = v_z_new;
+    (*status).position.x = x_new;
+    (*status).position.y = y_new;
+    (*status).position.z = z_new;
 }
 
 Accelerometer::Accelerometer() {}
