@@ -6,13 +6,15 @@
 #define LOCATION_STRAPDOWNAHRS_H
 
 #include "Eigen/Dense"
+#include "../system/Status.h"
+
 
 class StrapdownAHRS {
 public:
 
     // 捷联式姿态更新.
     Eigen::Vector4d
-    StrapdownUpdateAttitude(Eigen::Vector4d &q_attitude, Eigen::Vector3d &gyro, Eigen::Vector3d &acc);
+    StrapdownUpdateAttitude(Eigen::Vector4d &q_attitude, Eigen::Vector3d &gyro, routing::Status *status);
 };
 
 
