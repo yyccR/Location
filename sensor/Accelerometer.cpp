@@ -129,8 +129,8 @@ void Accelerometer::StrapdownUpdateVelocityPosition(Status *status, Vector3d &ac
     double x_new = (*status).position.x + (v_north + v_x_new) * deltaT * 0.5;
     double y_new = (*status).position.y + (v_east + v_y_new) * deltaT * 0.5;
     double z_new = (*status).position.z + (v_down + v_z_new) * deltaT * 0.5;
-    std::cout << "acc " << acc_n_real.transpose() << std::endl;
-    std::cout << "v " << v_x_new << " " << v_y_new << " " << v_z_new << "\n" <<std::endl;
+//    std::cout << "acc " << acc_n_real.transpose() << std::endl;
+//    std::cout << "v " << v_x_new << " " << v_y_new << " " << v_z_new << "\n" <<std::endl;
 
     // 更新速度和位置
     (*status).velocity.v_x = v_x_new;

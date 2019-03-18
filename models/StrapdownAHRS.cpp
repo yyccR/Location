@@ -24,8 +24,9 @@ Vector4d StrapdownAHRS::StrapdownUpdateAttitude(Vector4d &q_attitude, Vector3d &
 
 
     /**
-     * dcm_b2n(t+1) = dcm_b2n(t) * (wn_b X)
-     * wn_b = w_i_b - dcm_n2b(t) * (wi_n + we_n)
+     * dcm_b2n(t+1) = dcm_b2n(t) * σ
+     * //Ak = I + sinσ/σ * (σ X) + (1 - cosσ)/σ² * (σ X)²
+     * σ = wn_b * deltaT = (w_i_b - dcm_n2b(t) * (wi_n + we_n)) * deltaT
      */
 
     // 导航坐标系下的地球自转角速度
@@ -39,6 +40,7 @@ Vector4d StrapdownAHRS::StrapdownUpdateAttitude(Vector4d &q_attitude, Vector3d &
     // 计算载体相对导航系的角速度
     Matrix3d dcm_n2b = dcm_b2n.transpose();
     Vector3d wn_b = gyro - dcm_n2b * (wi_n + we_n);
+//    Vector3d wn_b = gyro;
 
     // 计算载体相对导航系角速率斜对称阵
     Matrix3d Ob_n;
@@ -51,6 +53,22 @@ Vector4d StrapdownAHRS::StrapdownUpdateAttitude(Vector4d &q_attitude, Vector3d &
     Ob_n(2,0) = -wn_b(1) * (*status).parameters.t;
     Ob_n(2,1) = wn_b(0) * (*status).parameters.t;
     Ob_n(2,2) = 0.0;
+    // 计算载体相对导航系角速率斜对称阵平方
+//    Matrix3d Ob_n2;
+//    Vector3d wn_bt = (*status).parameters.t * wn_b;
+//    Ob_n2(0,0) = - (wn_bt(1) * wn_bt(1) + wn_bt(2) * wn_bt(2));
+//    Ob_n2(0,1) = wn_bt(0) * wn_b(1);
+//    Ob_n2(0,2) = wn_bt(0) * wn_b(2);
+//    Ob_n2(1,0) = wn_bt(0) * wn_b(1);
+//    Ob_n2(1,1) = - (wn_bt(0) * wn_bt(0) + wn_bt(2) * wn_bt(2));
+//    Ob_n2(1,2) = wn_bt(1) * wn_b(2);
+//    Ob_n2(2,0) = wn_bt(0) * wn_b(2);
+//    Ob_n2(2,1) =  wn_bt(1) * wn_b(2);
+//    Ob_n2(2,2) =  - (wn_bt(0) * wn_bt(0) + wn_bt(1) * wn_bt(1));
+//    // 计算更新矩阵Ak
+//    double sigma = wn_bt.norm();
+//    Matrix3d Ak = MatrixXd::Identity(3,3) + sin(sigma)/sigma * Ob_n + (1 - cos(sigma)/(sigma*sigma)) * Ob_n2;
+
     // 更新姿态
     Matrix3d dcm_b2n_new = dcm_b2n * Ob_n;
     Vector4d q_attitude_new = quaternions.GetQfromDCM(dcm_b2n_new);
