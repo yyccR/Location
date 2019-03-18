@@ -121,11 +121,40 @@ Matrix3d Quaternions::GetDCMFromQ(Vector4d &q) {
 Vector4d Quaternions::GetQfromDCM(Matrix3d &dcm_b2n) {
 
     Vector4d q;
-    q(0) = 0.5 * sqrt(1.0 + dcm_b2n(0, 0) + dcm_b2n(1, 1) + dcm_b2n(2, 2));
-    double beta = 1.0 / (4.0 * q(0));
-    q(1) = beta * (dcm_b2n(2,1) - dcm_b2n(1,2));
-    q(2) = beta * (dcm_b2n(0,2) - dcm_b2n(2,0));
-    q(3) = beta * (dcm_b2n(1,0) - dcm_b2n(0,1));
+    double trace = dcm_b2n(0,0) + dcm_b2n(1,1) + dcm_b2n(2,2); // I removed + 1.0f; see discussion with Ethan
+    if( trace > 0 ) {// I changed M_EPSILON to 0
+        double s = 0.5 / sqrt(trace+ 1.0);
+        q(0) = 0.25 / s;
+        q(1) = ( dcm_b2n(2,1) - dcm_b2n(1,2) ) * s;
+        q(2) = ( dcm_b2n(0,2) - dcm_b2n(2,0) ) * s;
+        q(3) = ( dcm_b2n(1,0) - dcm_b2n(0,1) ) * s;
+    } else {
+        if ( dcm_b2n(0,0) > dcm_b2n(1,1) && dcm_b2n(0,0) > dcm_b2n(2,2) ) {
+            double s = 2.0 * sqrt( 1.0 + dcm_b2n(0,0) - dcm_b2n(1,1) - dcm_b2n(2,2));
+            q(0) = (dcm_b2n(2,1) - dcm_b2n(1,2) ) / s;
+            q(1) = 0.25 * s;
+            q(2) = (dcm_b2n(0,1) + dcm_b2n(1,0) ) / s;
+            q(3) = (dcm_b2n(0,2) + dcm_b2n(2,0) ) / s;
+        } else if (dcm_b2n(1,1) > dcm_b2n(2,2)) {
+            double s = 2.0 * sqrt( 1.0 + dcm_b2n(1,1) - dcm_b2n(0,0) - dcm_b2n(2,2));
+            q(0) = (dcm_b2n(0,2) - dcm_b2n(2,0) ) / s;
+            q(1) = (dcm_b2n(0,1) + dcm_b2n(1,0) ) / s;
+            q(2) = 0.25 * s;
+            q(3) = (dcm_b2n(1,2) + dcm_b2n(2,1)) / s;
+        } else {
+            double s = 2.0 * sqrt( 1.0 + dcm_b2n(2,2) - dcm_b2n(0,0) - dcm_b2n(1,1) );
+            q(0) = (dcm_b2n(1,0) - dcm_b2n(0,1) ) / s;
+            q(1) = (dcm_b2n(0,2) + dcm_b2n(2,0) ) / s;
+            q(2) = (dcm_b2n(1,2) + dcm_b2n(2,1) ) / s;
+            q(3) = 0.25 * s;
+        }
+    }
+
+//    q(0) = 0.5 * sqrt(1.0 + dcm_b2n(0, 0) + dcm_b2n(1, 1) + dcm_b2n(2, 2));
+//    double beta = 1.0 / (4.0 * q(0));
+//    q(1) = beta * (dcm_b2n(2,1) - dcm_b2n(1,2));
+//    q(2) = beta * (dcm_b2n(0,2) - dcm_b2n(2,0));
+//    q(3) = beta * (dcm_b2n(1,0) - dcm_b2n(0,1));
     return q;
 }
 
