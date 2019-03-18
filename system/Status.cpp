@@ -44,6 +44,9 @@ void Status::Init() {
     this->position.x = 0.0;
     this->position.y = 0.0;
     this->position.z = 0.0;
+    this->position.lng = 0.0;
+    this->position.lat = 0.0;
+    this->position.altitude = 0.0;
 
     this->attitude.roll = 0.0;
     this->attitude.pitch = 0.0;
@@ -70,12 +73,12 @@ void Status::Init() {
     this->parameters.err = err;
     this->parameters.ki = 0.05;
     this->parameters.kp = 10.0;
-    this->parameters.halfT = 1 / 20.0;
-    this->parameters.t = 1 / (10.0 * 1.5);
+    this->parameters.halfT = 1.0 / 20.0;
+    this->parameters.t = 1.0 / (10.0 * 1.2);
     this->parameters.move_distance_threshod = 5000.0;
     this->parameters.ins_count = 0;
     this->parameters.gps_count = 0;
-    this->parameters.gps_init_threshold = 10;
+    this->parameters.gps_init_threshold = 1;
     this->parameters.gps_pre_lng = 0.0;
     this->parameters.gps_pre_lat = 0.0;
     this->parameters.gps_pre_t = 0.0;
