@@ -6,6 +6,7 @@
 #include "../sensor/GPS.h"
 #include "../sensor/Accelerometer.h"
 #include "../models/AHRS.h"
+#include "../models/StrapdownAHRS.h"
 #include "Location.h"
 
 using namespace Eigen;
@@ -60,12 +61,20 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
 
     // 获取姿态
     AHRS ahrs;
-    Vector4d q_attitude = status.attitude.q_attitude;
+    Vector4d q_attitude;
+    if(this->status.parameters.ins_count == 0) {
+        Quaternions quaternions;
+        q_attitude = quaternions.GetQFromEuler(ornt_data);
+    } else {
+        q_attitude = status.attitude.q_attitude;
+    }
     Vector3d *err = &status.parameters.err;
     double ki = status.parameters.ki;
     double kp = status.parameters.kp;
     double halfT = status.parameters.halfT;
-    Vector4d attitude = ahrs.UpdateAttitude(err, q_attitude, gyro_data_cali, g_data, mag_data_cali, ki, kp, halfT);
+    StrapdownAHRS strapdownAHRS;
+    Vector4d attitude = strapdownAHRS.StrapdownUpdateAttitude(q_attitude, gyro_data, &status);
+//    Vector4d attitude = ahrs.UpdateAttitude(err, q_attitude, gyro_data_cali, g_data, mag_data_cali, ki, kp, halfT);
     // 更新姿态
     status.attitude.q_attitude = attitude;
 
@@ -83,7 +92,8 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
 
     // 更新惯性位置,速度
     Accelerometer accelerometer;
-    accelerometer.PositionIntegral(&status, final_acc, status.parameters.t);
+//    accelerometer.PositionIntegral(&status, final_acc, status.parameters.t);
+    accelerometer.StrapdownUpdateVelocityPosition(&status, acc_data, attitude);
 
     // 获取GPS精度
     GPS gps;
@@ -140,7 +150,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
 
 void Location::SetHz(double f) {
     this->status.parameters.halfT = 1.0 / (f * 2.0);
-    this->status.parameters.t = 1.0 / (f / 4.0);
+    this->status.parameters.t = 1.0 / (f * 1.2);
 }
 
 
