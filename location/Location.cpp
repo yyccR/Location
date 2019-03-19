@@ -8,6 +8,7 @@
 #include "../models/AHRS.h"
 #include "../models/StrapdownAHRS.h"
 #include "Location.h"
+#include "iostream"
 
 using namespace Eigen;
 using namespace routing;
@@ -80,9 +81,11 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
 
     // 加速计从b系转到n系
     Quaternions quaternions;
+    attitude = quaternions.GetQFromEuler(ornt_data);
     Matrix3d newRotated_b2n = quaternions.GetDCMFromQ(attitude);
     Vector3d acc_b = acc_data_cali - g_data_format;
     Vector3d final_acc = newRotated_b2n * acc_b * status.parameters.g;
+//    std::cout << "final acc " << final_acc.transpose() << std::endl;
 
     // 记录起始位置和当前位置
     double start_x = status.position.x;
