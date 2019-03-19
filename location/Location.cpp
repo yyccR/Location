@@ -79,10 +79,10 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     status.attitude.q_attitude = attitude;
 
     // 加速计从b系转到n系
-//    Quaternions quaternions;
-//    Matrix3d newRotated_b2n = quaternions.GetDCMFromQ(attitude);
-//    Vector3d acc_b = acc_data_cali - g_data_format;
-//    Vector3d final_acc = newRotated_b2n * acc_b * status.parameters.g;
+    Quaternions quaternions;
+    Matrix3d newRotated_b2n = quaternions.GetDCMFromQ(attitude);
+    Vector3d acc_b = acc_data_cali - g_data_format;
+    Vector3d final_acc = newRotated_b2n * acc_b * status.parameters.g;
 
     // 记录起始位置和当前位置
     double start_x = status.position.x;
@@ -92,8 +92,10 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
 
     // 更新惯性位置,速度
     Accelerometer accelerometer;
-//    accelerometer.PositionIntegral(&status, final_acc, status.parameters.t);
-    accelerometer.StrapdownUpdateVelocityPosition(&status, acc_data, attitude);
+    accelerometer.PositionIntegral(&status, final_acc, status.parameters.t);
+//    Quaternions quaternions;
+//    attitude = quaternions.GetQFromEuler(ornt_data);
+//    accelerometer.StrapdownUpdateVelocityPosition(&status, acc_data, attitude);
 
     // 获取GPS精度
     GPS gps;
@@ -150,7 +152,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
 
 void Location::SetHz(double f) {
     this->status.parameters.halfT = 1.0 / (f * 2.0);
-    this->status.parameters.t = 1.0 / (f * 1.8);
+    this->status.parameters.t = 1.0 / (f * 1.2);
 }
 
 
