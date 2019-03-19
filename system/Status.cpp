@@ -69,6 +69,15 @@ void Status::Init() {
     this->parameters.gamma = 1.0;
     this->parameters.epsilon = 0.000001;
     this->parameters.max_step = 200;
+
+    this->parameters.acc_a1 = 0.0;
+    this->parameters.acc_a2 = 0.0;
+    this->parameters.acc_b0 = 0.0;
+    this->parameters.acc_hz = 5.0;
+    Vector3d acc(0.0,0.0,0.0);
+    this->parameters.last_acc_data = acc;
+    this->parameters.sec_last_acc_data = acc;
+
     Vector3d err(0.0,0.0,0.0);
     this->parameters.err = err;
     this->parameters.ki = 0.05;
