@@ -72,9 +72,9 @@ void Accelerometer::AccCalibration(MatrixXd &input_data, Status *status) {
 void Accelerometer::PositionIntegral(Status *status, Vector3d &acc, double t) const {
 
     // 更新位置
-    (*status).position.x += (*status).velocity.v_x * t + 0.5 * acc(0) * t * t;
-    (*status).position.y += (*status).velocity.v_y * t + 0.5 * acc(1) * t * t;
-    (*status).position.z += (*status).velocity.v_z * t + 0.5 * acc(2) * t * t;
+    (*status).position.x = (*status).velocity.v_x * t + 0.5 * acc(0) * t * t;
+    (*status).position.y = (*status).velocity.v_y * t + 0.5 * acc(1) * t * t;
+    (*status).position.z = (*status).velocity.v_z * t + 0.5 * acc(2) * t * t;
     // 更新速度
     (*status).velocity.v_x = (*status).velocity.v_x + acc(0) * t;
     (*status).velocity.v_y = (*status).velocity.v_y + acc(1) * t;
@@ -140,6 +140,22 @@ void Accelerometer::StrapdownUpdateVelocityPosition(Status *status, Vector3d &ac
     (*status).position.y = y_new;
     (*status).position.z = z_new;
 }
+
+///**
+// * 加速计数据利用滤波修正
+// *
+// * @param status
+// * @param acc_data
+// * @return
+// */
+//Vector3d Accelerometer::FilterData(Status *status, Vector3d &acc_data) {
+//    Vector3d sec_last_acc_data = status->parameters.sec_last_acc_data;
+//    Vector3d last_acc_data = status->parameters.last_acc_data;
+//
+//    if(sec_last_acc_data(0) == 0.0 && sec_last_acc_data(2) == 0.0 && sec_last_acc_data(2) == 0.0){
+//
+//    }
+//}
 
 Accelerometer::Accelerometer() {}
 
