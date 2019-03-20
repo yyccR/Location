@@ -12,7 +12,7 @@
 class LPF {
 public:
 
-    LPF(routing::Status *status);
+    LPF();
     ~LPF();
 //    void LowPassFilter();
 

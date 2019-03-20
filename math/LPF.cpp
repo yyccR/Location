@@ -42,8 +42,8 @@ Vector3d LPF::LowPassFilter2nd(Status *status, Vector3d &cur_data) {
 }
 
 // 初始化,计算对应参数
-LPF::LPF(Status *status) {
-    LowPassFilter2ndFactorCal(status);
+LPF::LPF() {
+//    LowPassFilter2ndFactorCal(status);
 }
 
 LPF::~LPF() {}
