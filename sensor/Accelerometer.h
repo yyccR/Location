@@ -47,7 +47,11 @@ public:
     // position integral.
     void PositionIntegral(routing::Status *status, Eigen::Vector3d &acc, double t) const;
 
-    void StrapdownUpdateVelocityPosition(routing::Status *status, Eigen::Vector3d &acc, Eigen::Vector4d &q_attitude) const;
+    void StrapdownUpdateVelocityPosition(routing::Status *status, Eigen::Vector3d &acc,
+                                         Eigen::Vector4d &q_attitude, Eigen::Vector3d &g_data) const;
+
+    // 滤波平滑数据
+//    Eigen::Vector3d FilterData(routing::Status *status, Eigen::Vector3d &acc_data);
 };
 
 

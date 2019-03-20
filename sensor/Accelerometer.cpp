@@ -89,7 +89,7 @@ void Accelerometer::PositionIntegral(Status *status, Vector3d &acc, double t) co
  * @param acc, 载体系加速度
  * @param q_attitude, 上一时刻姿态四元数
  */
-void Accelerometer::StrapdownUpdateVelocityPosition(Status *status, Vector3d &acc, Vector4d &q_attitude) const {
+void Accelerometer::StrapdownUpdateVelocityPosition(Status *status, Vector3d &acc, Vector4d &q_attitude, Vector3d &g_data) const {
 
     Quaternions quaternions;
 
@@ -113,13 +113,15 @@ void Accelerometer::StrapdownUpdateVelocityPosition(Status *status, Vector3d &ac
     Vector3d we_n(v_east / Rh, -v_north / Rh, -v_east * tan(cur_lat) / Rh);
 
     // 计算导航系下的重力加速计修正向量
-    Vector3d gn(0.0,0.0,(*status).parameters.g);
+//    Vector3d gn(0.0,0.0,(*status).parameters.g);
+    Vector3d gn = dcm_b2n * g_data;
     double beta = (*status).parameters.we * (*status).parameters.we * Rh / 2.0;
     Vector3d wwR(beta * sin(2.0 * cur_lat), 0.0, beta * (1.0 + cos(2.0 * cur_lat)));
     Vector3d gl_n = gn - wwR;
 
     // 计算导航系下加速度减去地球旋转影响和重力影响
     Vector3d acc_n_real = acc_n - (2.0 * wi_n + we_n).cross(ve_n) - gl_n;
+
 
     // 速度和位置积分
     double deltaT = (*status).parameters.t;
@@ -129,8 +131,8 @@ void Accelerometer::StrapdownUpdateVelocityPosition(Status *status, Vector3d &ac
     double x_new = (*status).position.x + (v_north + v_x_new) * deltaT * 0.5;
     double y_new = (*status).position.y + (v_east + v_y_new) * deltaT * 0.5;
     double z_new = (*status).position.z + (v_down + v_z_new) * deltaT * 0.5;
-//    std::cout << "acc " << acc_n_real.transpose() << std::endl;
-//    std::cout << "v " << v_x_new << " " << v_y_new << " " << v_z_new << "\n" <<std::endl;
+    std::cout << "acc " << acc_n_real.transpose() << std::endl;
+    std::cout << "v " << v_x_new << " " << v_y_new << " " << v_z_new << "\n" <<std::endl;
 
     // 更新速度和位置
     (*status).velocity.v_x = v_x_new;
