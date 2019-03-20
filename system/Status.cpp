@@ -77,6 +77,7 @@ void Status::Init() {
     Vector3d acc(0.0,0.0,0.0);
     this->parameters.last_acc_data = acc;
     this->parameters.sec_last_acc_data = acc;
+    this->parameters.acc_thres = 0.1;
 
     Vector3d err(0.0,0.0,0.0);
     this->parameters.err = err;

@@ -77,6 +77,8 @@ namespace routing {
         // 用于平滑数据,t-1 与 t-2 时刻的加速计数都
         Eigen::Vector3d last_acc_data;
         Eigen::Vector3d sec_last_acc_data;
+        // 用于加速计干扰过滤
+        double acc_thres;
 
         // AHRS算法参数
         // 误差积分
