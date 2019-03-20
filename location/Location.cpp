@@ -18,7 +18,10 @@ using namespace routing;
  * Location 初始化。
  */
 Location::Location() {
+    // 初始化参数
     this->status.Init();
+    LPF lpf;
+    lpf.LowPassFilter2ndFactorCal(&status);
 }
 
 Location::~Location() {}
@@ -83,12 +86,10 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     // 加速计从b系转到n系
     Quaternions quaternions;
     attitude = quaternions.GetQFromEuler(ornt_data);
-    Matrix3d newRotated_b2n = quaternions.GetDCMFromQ(attitude);
-    Vector3d acc_b = acc_data_cali - g_data_format;
-    Vector3d final_acc = newRotated_b2n * acc_b * status.parameters.g;
-    LPF lpf;
-    lpf.LowPassFilter2ndFactorCal(&status);
-    Vector3d final_acc_lpf = lpf.LowPassFilter2nd(&status,final_acc);
+//    Matrix3d newRotated_b2n = quaternions.GetDCMFromQ(attitude);
+//    Vector3d acc_b = acc_data_cali - g_data_format;
+//    Vector3d final_acc = newRotated_b2n * acc_b * status.parameters.g;
+//    Vector3d final_acc_lpf = lpf.LowPassFilter2nd(&status,final_acc);
 //    std::cout << "final acc " << final_acc.transpose() << std::endl;
 //    std::cout << "final acclpf " << final_acc_lpf.transpose() << std::endl;
 
