@@ -106,5 +106,8 @@ bool GPS::IsGPSValid(Status *status, VectorXd *gps_data) {
         (*gps_data)(1) = (*status).parameters.gps_pre_lat;
     }
 
-    return (is_gps_accuracy && is_gps_not_null && is_gps_move_accepted && is_gps_not_duplicated) || is_gps_initializing;
+    // 当载体处于静止，则无论怎样都采用该GPS
+    bool is_gps_static = is_gps_not_null && (*gps_data)(4) == 0.0;
+
+    return (is_gps_accuracy && is_gps_not_null && is_gps_move_accepted && is_gps_not_duplicated) || is_gps_initializing || is_gps_static;
 }
