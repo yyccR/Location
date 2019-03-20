@@ -5,6 +5,7 @@
 #include "Accelerometer.h"
 #include "../math/Optimizer.h"
 #include "iostream"
+#include "../math/LPF.h"
 
 using namespace Eigen;
 using namespace routing;
@@ -72,9 +73,9 @@ void Accelerometer::AccCalibration(MatrixXd &input_data, Status *status) {
 void Accelerometer::PositionIntegral(Status *status, Vector3d &acc, double t) const {
 
     // 更新位置
-    (*status).position.x = (*status).velocity.v_x * t + 0.5 * acc(0) * t * t;
-    (*status).position.y = (*status).velocity.v_y * t + 0.5 * acc(1) * t * t;
-    (*status).position.z = (*status).velocity.v_z * t + 0.5 * acc(2) * t * t;
+    (*status).position.x += (*status).velocity.v_x * t + 0.5 * acc(0) * t * t;
+    (*status).position.y += (*status).velocity.v_y * t + 0.5 * acc(1) * t * t;
+    (*status).position.z += (*status).velocity.v_z * t + 0.5 * acc(2) * t * t;
     // 更新速度
     (*status).velocity.v_x = (*status).velocity.v_x + acc(0) * t;
     (*status).velocity.v_y = (*status).velocity.v_y + acc(1) * t;
@@ -120,8 +121,8 @@ void Accelerometer::StrapdownUpdateVelocityPosition(Status *status, Vector3d &ac
     Vector3d gl_n = gn - wwR;
 
     // 计算导航系下加速度减去地球旋转影响和重力影响
-    Vector3d acc_n_real = acc_n - (2.0 * wi_n + we_n).cross(ve_n) - gl_n;
-
+    Vector3d acc_n_not_filter = acc_n - (2.0 * wi_n + we_n).cross(ve_n) - gl_n;
+    Vector3d acc_n_real = FilterData(status, acc_n_not_filter);
 
     // 速度和位置积分
     double deltaT = (*status).parameters.t;
@@ -131,8 +132,10 @@ void Accelerometer::StrapdownUpdateVelocityPosition(Status *status, Vector3d &ac
     double x_new = (*status).position.x + (v_north + v_x_new) * deltaT * 0.5;
     double y_new = (*status).position.y + (v_east + v_y_new) * deltaT * 0.5;
     double z_new = (*status).position.z + (v_down + v_z_new) * deltaT * 0.5;
-    std::cout << "acc " << acc_n_real.transpose() << std::endl;
-    std::cout << "v " << v_x_new << " " << v_y_new << " " << v_z_new << "\n" <<std::endl;
+//    std::cout.precision(9);
+//    std::cout << x_new << " " << y_new << std::endl;
+//    std::cout << "acc " << acc_n_real.transpose() << std::endl;
+//    std::cout << "v " << v_x_new << " " << v_y_new << " " << v_z_new << "\n" <<std::endl;
 
     // 更新速度和位置
     (*status).velocity.v_x = v_x_new;
@@ -143,21 +146,28 @@ void Accelerometer::StrapdownUpdateVelocityPosition(Status *status, Vector3d &ac
     (*status).position.z = z_new;
 }
 
-///**
-// * 加速计数据利用滤波修正
-// *
-// * @param status
-// * @param acc_data
-// * @return
-// */
-//Vector3d Accelerometer::FilterData(Status *status, Vector3d &acc_data) {
-//    Vector3d sec_last_acc_data = status->parameters.sec_last_acc_data;
-//    Vector3d last_acc_data = status->parameters.last_acc_data;
-//
-//    if(sec_last_acc_data(0) == 0.0 && sec_last_acc_data(2) == 0.0 && sec_last_acc_data(2) == 0.0){
-//
-//    }
-//}
+/**
+ * 加速计数据过滤
+ *
+ * @param status
+ * @param acc_data
+ * @return
+ */
+Vector3d Accelerometer::FilterData(Status *status, Vector3d &acc_data) const {
+    LPF lpf;
+    Vector3d filter_acc;
+    filter_acc = lpf.LowPassFilter2nd(status, acc_data);
+    if(abs(filter_acc(0)) <= (*status).parameters.acc_thres){
+        filter_acc(0) = 0.0;
+    }
+    if(abs(filter_acc(1)) <= (*status).parameters.acc_thres){
+        filter_acc(1) = 0.0;
+    }
+    if(abs(filter_acc(2)) <= (*status).parameters.acc_thres){
+        filter_acc(2) = 0.0;
+    }
+    return  filter_acc;
+}
 
 Accelerometer::Accelerometer() {}
 

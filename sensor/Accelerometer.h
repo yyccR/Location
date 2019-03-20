@@ -50,8 +50,8 @@ public:
     void StrapdownUpdateVelocityPosition(routing::Status *status, Eigen::Vector3d &acc,
                                          Eigen::Vector4d &q_attitude, Eigen::Vector3d &g_data) const;
 
-    // 滤波平滑数据
-//    Eigen::Vector3d FilterData(routing::Status *status, Eigen::Vector3d &acc_data);
+    // 用于加速计过滤数据
+    Eigen::Vector3d FilterData(routing::Status *status, Eigen::Vector3d &acc_data) const;
 };
 
 
