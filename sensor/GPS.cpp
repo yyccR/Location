@@ -95,19 +95,41 @@ bool GPS::IsGPSValid(Status *status, VectorXd *gps_data) {
                                 (*status).parameters.move_distance_threshod;
 
     // 判断是否当前是导航初始状态
-    bool is_gps_initializing = (*status).parameters.gps_count < (*status).parameters.gps_init_threshold;
+    bool is_gps_initializing = (*status).parameters.gps_count <= (*status).parameters.gps_init_threshold;
 
     // 判断当前GPS是否与上个GPS点同个时间戳
     bool is_gps_not_duplicated = (*gps_data)(6) != (*status).parameters.gps_pre_t;
 
-    // 当GPS在初始状态内时，处理为0.0的情况
+    // 当GPS在初始状态内时，处理为0.0的情况,gps(lng,lat,alt,accuracy,speed,bearing,t)
     if (is_gps_initializing && !is_gps_not_null) {
         (*gps_data)(0) = (*status).parameters.gps_pre_lng;
         (*gps_data)(1) = (*status).parameters.gps_pre_lat;
+        (*gps_data)(2) = (*status).parameters.gps_pre_altitude;
+        (*gps_data)(3) = (*status).parameters.gps_pre_accuracy;
+        (*gps_data)(4) = (*status).parameters.gps_pre_speed;
+        (*gps_data)(5) = (*status).parameters.gps_pre_bearing;
+        (*gps_data)(6) = (*status).parameters.gps_pre_t;
     }
 
     // 当载体处于静止，则无论怎样都采用该GPS
-    bool is_gps_static = is_gps_not_null && (*gps_data)(4) == 0.0;
+    bool is_gps_static = is_gps_not_null && (*gps_data)(4) <= (*status).parameters.gps_static_speed_threshold;
 
-    return (is_gps_accuracy && is_gps_not_null && is_gps_move_accepted && is_gps_not_duplicated) || is_gps_initializing || is_gps_static;
+    // 当前一个GPS点速度为0,当前GPS数据又为空的的时候,采用前一点的数据,gps(lng,lat,alt,accuracy,speed,bearing,t)
+    bool is_gps_still_static;
+    if(!is_gps_not_null && (*status).parameters.gps_pre_speed <= (*status).parameters.gps_static_speed_threshold){
+        (*gps_data)(0) = (*status).parameters.gps_pre_lng;
+        (*gps_data)(1) = (*status).parameters.gps_pre_lat;
+        (*gps_data)(2) = (*status).parameters.gps_pre_altitude;
+        (*gps_data)(3) = (*status).parameters.gps_pre_accuracy;
+        (*gps_data)(4) = (*status).parameters.gps_pre_speed;
+        (*gps_data)(5) = (*status).parameters.gps_pre_bearing;
+        (*gps_data)(6) = (*status).parameters.gps_pre_t;
+        is_gps_still_static = true;
+    } else {
+        is_gps_still_static = false;
+    }
+
+
+    return (is_gps_accuracy && is_gps_not_null && is_gps_move_accepted && is_gps_not_duplicated)
+           || is_gps_initializing || is_gps_static || is_gps_still_static;
 }
