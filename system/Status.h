@@ -91,6 +91,7 @@ namespace routing {
         double halfT;
         // 采样时间间隔
         double t;
+
         // 等间隔时间内GPS的运动距离阈值,用于判断高精度但是漂移的点
         double move_distance_threshod;
         // 利用惯导计算位置的次数;
@@ -99,10 +100,16 @@ namespace routing {
         int gps_count;
         // 导航GPS初始化后，记录多久后接入ins
         int gps_init_threshold;
-        // gps上一个点,经纬度,时间戳
+        // gps静止速度阈值
+        double gps_static_speed_threshold;
+        // gps上一个点,经纬度,时间戳,海拔,精度,速度,方向
         double gps_pre_lng;
         double gps_pre_lat;
         double gps_pre_t;
+        double gps_pre_altitude;
+        double gps_pre_accuracy;
+        double gps_pre_speed;
+        double gps_pre_bearing;
 
         // 当地重力加速度值
         double g;
