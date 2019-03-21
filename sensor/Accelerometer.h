@@ -45,13 +45,13 @@ public:
 //    void DeleteGravity();
 
     // position integral.
-    void PositionIntegral(routing::Status *status, Eigen::Vector3d &acc, double t) const;
+    void PositionIntegral(routing::Status *status, Eigen::Vector3d &acc, double t);
 
     void StrapdownUpdateVelocityPosition(routing::Status *status, Eigen::Vector3d &acc,
-                                         Eigen::Vector4d &q_attitude, Eigen::Vector3d &g_data) const;
+                                         Eigen::Vector4d &q_attitude, Eigen::Vector3d &g_data);
 
     // 用于加速计过滤数据
-    Eigen::Vector3d FilterData(routing::Status *status, Eigen::Vector3d &acc_data) const;
+    Eigen::Vector3d FilterData(routing::Status *status, Eigen::Vector3d &acc_data);
 };
 
 
