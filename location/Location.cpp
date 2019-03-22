@@ -164,9 +164,10 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
 }
 
 void Location::SetHz(double f) {
+    this->status.parameters.Hz = f;
     this->status.parameters.acc_hz = f / 2.0;
     this->status.parameters.halfT = 1.0 / (f * 2.0);
-    this->status.parameters.t = 1.0 / (f * 0.3);
+    this->status.parameters.t = 1.0 / (f * (this->status.parameters.static_t_factor));
 }
 
 

@@ -112,11 +112,20 @@ bool GPS::IsGPSValid(Status *status, VectorXd *gps_data) {
     }
 
     // 当载体处于静止，则无论怎样都采用该GPS
-    bool is_gps_static = is_gps_not_null && (*gps_data)(4) <= (*status).parameters.gps_static_speed_threshold;
+    bool is_gps_static;
+    if (is_gps_not_null && (*gps_data)(4) <= (*status).parameters.gps_static_speed_threshold) {
+        is_gps_static = true;
+        // 静止时候传感器采用静止因子
+        (*status).parameters.t = 1.0 / ((*status).parameters.Hz * (*status).parameters.static_t_factor);
+    } else {
+        is_gps_static = false;
+        // 运动时候传感器采用运动因子
+        (*status).parameters.t = 1.0 / ((*status).parameters.Hz * (*status).parameters.move_t_factor);
+    }
 
     // 当前一个GPS点速度为0,当前GPS数据又为空的的时候,采用前一点的数据,gps(lng,lat,alt,accuracy,speed,bearing,t)
     bool is_gps_still_static;
-    if(!is_gps_not_null && (*status).parameters.gps_pre_speed <= (*status).parameters.gps_static_speed_threshold){
+    if (!is_gps_not_null && (*status).parameters.gps_pre_speed <= (*status).parameters.gps_static_speed_threshold) {
         (*gps_data)(0) = (*status).parameters.gps_pre_lng;
         (*gps_data)(1) = (*status).parameters.gps_pre_lat;
         (*gps_data)(2) = (*status).parameters.gps_pre_altitude;
@@ -125,8 +134,12 @@ bool GPS::IsGPSValid(Status *status, VectorXd *gps_data) {
         (*gps_data)(5) = (*status).parameters.gps_pre_bearing;
         (*gps_data)(6) = (*status).parameters.gps_pre_t;
         is_gps_still_static = true;
+        // 静止时候传感器采用静止因子
+        (*status).parameters.t = 1.0 / ((*status).parameters.Hz * (*status).parameters.static_t_factor);
     } else {
         is_gps_still_static = false;
+        // 运动时候传感器采用运动因子
+        (*status).parameters.t = 1.0 / ((*status).parameters.Hz * (*status).parameters.move_t_factor);
     }
 
 
