@@ -83,8 +83,12 @@ void Status::Init() {
     this->parameters.err = err;
     this->parameters.ki = 0.05;
     this->parameters.kp = 10.0;
-    this->parameters.halfT = 1.0 / 20.0;
-    this->parameters.t = 1.0 / (10.0 * 0.3);
+    this->parameters.Hz = 10.0;
+    this->parameters.halfT = 1.0 / (this->parameters.Hz * 2.0);
+    this->parameters.static_t_factor = 0.35;
+    this->parameters.move_t_factor = 0.27;
+    this->parameters.t = 1.0 / (this->parameters.Hz * this->parameters.static_t_factor);
+
     this->parameters.move_distance_threshod = 500000.0;
     this->parameters.ins_count = 0;
 

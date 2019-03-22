@@ -87,10 +87,15 @@ namespace routing {
         double ki;
         // PID控制算法参数, 积分参数
         double kp;
+        // 采用频率
+        double Hz;
         // 采样频率的一半
         double halfT;
         // 采样时间间隔
         double t;
+        // 采样时间放大因子,分为运动和静止两个
+        double static_t_factor;
+        double move_t_factor;
 
         // 等间隔时间内GPS的运动距离阈值,用于判断高精度但是漂移的点
         double move_distance_threshod;
