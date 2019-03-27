@@ -11,10 +11,11 @@
 
 
 class Location {
-public:
-
+private:
     // 状态容器
     routing::Status status;
+
+public:
 
     Location();
     ~Location();
@@ -34,6 +35,9 @@ public:
 
     // 设置采样频率
     void SetHz(double f);
+
+    // 采样时间自适应
+    void AutoAdjustTFactor(routing::Status *status, Eigen::VectorXd &gps_data, double ins_distance);
 
 };
 

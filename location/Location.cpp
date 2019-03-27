@@ -13,6 +13,7 @@
 
 using namespace Eigen;
 using namespace routing;
+using namespace std;
 
 /**
  * Location 初始化。
@@ -39,7 +40,7 @@ Location::~Location() {}
  */
 void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, Vector3d &mag_data, VectorXd &gps_data,
                                       Vector3d &g_data, Vector3d &ornt_data) {
-    
+
     // 传感器参数
     Parameters parameters = status.parameters;
 //    // 利用标定参数较正当前传感器数据
@@ -128,6 +129,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
         status.position.lat = gps_new(1);
         // 更新相关参数
         status.parameters.ins_count += 1;
+        status.parameters.ins_dist += distance;
     } else {
         // 采用GPS数据更新经纬度和方位角
         double gps_speed = gps_data(4);
@@ -145,10 +147,14 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
         status.parameters.gps_pre_speed = gps_speed;
         status.parameters.gps_pre_bearing = gps_bearing;
         status.parameters.gps_pre_t = gps_data(6);
+        // 时间t影响因子自调整
+        AutoAdjustTFactor(&status, gps_data, status.parameters.ins_dist);
+        // 更新其他INS变量
         status.parameters.gps_count += 1;
         status.parameters.ins_count = 0;
+        status.parameters.ins_dist = 0;
         // 更新融合定位结果输出
-        status.gnssins.accuracy =  gps_data(3);
+        status.gnssins.accuracy = gps_data(3);
         status.gnssins.speed = gps_speed;
         // 每个x,y,z都是相对与上一个准确的GPS数据。
         status.position.x = 0.0;
@@ -194,4 +200,46 @@ Position Location::GetCurrentPosition() {
  */
 double Location::GetCurrentBearing() {
     return this->status.attitude.yaw;
+}
+
+/**
+ * 自调节机制, 利用GPS运动距离调整t的放大因子
+ *
+ * @param status
+ * @param gps_data, gps(lng,lat,alt,accuracy,speed,bearing,t)
+ * @param ins_distance
+ */
+void Location::AutoAdjustTFactor(routing::Status *status, Eigen::VectorXd &gps_data, double ins_distance) {
+
+    static int cnt = 0;
+    static MatrixXd gps_queue(3, 7);
+    static Vector3d ins_move_dist(3);
+
+    if (cnt < 3) {
+        gps_queue.row(cnt) = gps_data;
+        ins_move_dist(cnt) = ins_distance;
+        cnt += 1;
+    } else {
+        GPS gps;
+        double lng1 = gps_queue(0, 0);
+        double lat1 = gps_queue(0, 1);
+        double lng2 = gps_queue(1, 0);
+        double lat2 = gps_queue(1, 1);
+        double lng3 = gps_queue(2, 0);
+        double lat3 = gps_queue(2, 1);
+        double gps_dist = gps.CalDistance(lng1, lat1, lng2, lat2) + gps.CalDistance(lng2, lat2, lng3, lat3);
+        double ins_dist = ins_move_dist(1) + ins_move_dist(2);
+        double deltaT = (gps_queue(2,6) - gps_queue(0,6)) / 1000.0;
+        if(gps_dist != 0.0 && ins_dist != 0.0 && deltaT != 0.0){
+            double newT = gps_dist / (ins_dist * (*status).parameters.Hz * deltaT);
+            (*status).parameters.t = newT;
+//            cout << gps_dist << " " << ins_dist << " "  << deltaT << " " << newT << endl;
+        }
+        // 先进先出
+        gps_queue.block(0,0,1,7) = gps_queue.block(1,0,1,7);
+        gps_queue.block(1,0,1,7) = gps_queue.block(2,0,1,7);
+        ins_move_dist(0) = ins_move_dist(1);
+        ins_move_dist(1) = ins_move_dist(2);
+        cnt -= 1;
+    }
 }
