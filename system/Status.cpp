@@ -86,13 +86,14 @@ void Status::Init() {
     this->parameters.Hz = 10.0;
     this->parameters.halfT = 1.0 / (this->parameters.Hz * 2.0);
     this->parameters.static_t_factor = 0.35;
-    this->parameters.move_t_factor = 0.27;
+    this->parameters.move_t_factor = 0.22;
     this->parameters.t = 1.0 / (this->parameters.Hz * this->parameters.static_t_factor);
 
     this->parameters.move_distance_threshod = 500000.0;
     this->parameters.ins_count = 0;
+    this->parameters.ins_dist = 0.0;
 
-    this->parameters.gps_static_speed_threshold = 0.02;
+    this->parameters.gps_static_speed_threshold = 0.5;
     this->parameters.gps_count = 0;
     this->parameters.gps_init_threshold = 1;
     this->parameters.gps_pre_lng = 0.0;
