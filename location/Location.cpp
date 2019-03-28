@@ -114,7 +114,6 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     double end_y = status.position.y;
     double distance = sqrt((end_x - start_x) * (end_x - start_x) + (end_y - start_y) * (end_y - start_y));
 
-
     // 判断是否采用GPS数据
     bool is_gps_valid = gps.IsGPSValid(&status, &gps_data);
     if (!is_gps_valid) {
@@ -167,6 +166,8 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     status.gnssins.lat = status.position.lat;
     status.gnssins.altitude = status.position.altitude;
     status.gnssins.bearing = status.attitude.yaw;
+
+//    cout << distance << " " << status.parameters.t << " " << status.velocity.v_x << " " << status.velocity.v_y << endl;
 }
 
 void Location::SetHz(double f) {
@@ -231,15 +232,20 @@ void Location::AutoAdjustTFactor(routing::Status *status, Eigen::VectorXd &gps_d
         double ins_dist = ins_move_dist(1) + ins_move_dist(2);
         double deltaT = (gps_queue(2,6) - gps_queue(0,6)) / 1000.0;
         if(gps_dist != 0.0 && ins_dist != 0.0 && deltaT != 0.0){
-            double newT = gps_dist / (ins_dist * (*status).parameters.Hz * deltaT);
-            (*status).parameters.t = newT;
+//            double newT = gps_dist / (ins_dist * (*status).parameters.Hz * deltaT);
+//            (*status).parameters.t *= sqrt(newT);
+            (*status).parameters.move_t_factor *= sqrt(gps_dist / ins_dist);
 //            cout << gps_dist << " " << ins_dist << " "  << deltaT << " " << newT << endl;
+//            cout << gps_dist << " ins_dist= " << ins_dist << " t= " << (*status).parameters.t << " deltaT= " << deltaT << " " << (*status).velocity.v_x << " " << (*status).velocity.v_y << endl;
         }
+//                    cout << gps_dist << " ins_dist= " << ins_dist << " t= " << (*status).parameters.t << " deltaT= " << deltaT << " " << (*status).velocity.v_x << " " << (*status).velocity.v_y  << " speed= " << gps_data(4) << " newt= " << (*status).parameters.move_t_factor << endl;
         // 先进先出
-        gps_queue.block(0,0,1,7) = gps_queue.block(1,0,1,7);
-        gps_queue.block(1,0,1,7) = gps_queue.block(2,0,1,7);
+        gps_queue.row(0) = gps_queue.row(1);
+        gps_queue.row(1) = gps_queue.row(2);
+        gps_queue.row(2) = gps_data;
         ins_move_dist(0) = ins_move_dist(1);
         ins_move_dist(1) = ins_move_dist(2);
-        cnt -= 1;
+        ins_move_dist(2) = ins_distance;
+//        cnt -= 1;
     }
 }
