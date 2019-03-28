@@ -129,12 +129,12 @@ void Accelerometer::StrapdownUpdateVelocityPosition(Status *status, Vector3d &ac
     double v_x_new = v_north + acc_n_real(0) * deltaT;
     double v_y_new = v_east + acc_n_real(1) * deltaT;
     double v_z_new = v_down + acc_n_real(2) * deltaT;
-//    double x_new = (*status).position.x + (v_north + v_x_new) * deltaT * 0.5;
-//    double y_new = (*status).position.y + (v_east + v_y_new) * deltaT * 0.5;
-//    double z_new = (*status).position.z + (v_down + v_z_new) * deltaT * 0.5;
-    double x_new = (v_north + v_x_new) * deltaT * 0.5;
-    double y_new = (v_east + v_y_new) * deltaT * 0.5;
-    double z_new = (v_down + v_z_new) * deltaT * 0.5;
+    double x_new = (*status).position.x + (v_north + v_x_new) * deltaT * (*status).parameters.move_t_factor * 0.5;
+    double y_new = (*status).position.y + (v_east + v_y_new) * deltaT * (*status).parameters.move_t_factor * 0.5;
+    double z_new = (*status).position.z + (v_down + v_z_new) * deltaT * (*status).parameters.move_t_factor * 0.5;
+//    double x_new = (v_north + v_x_new) * deltaT * 0.5;
+//    double y_new = (v_east + v_y_new) * deltaT * 0.5;
+//    double z_new = (v_down + v_z_new) * deltaT * 0.5;
 //    std::cout.precision(9);
 //    std::cout << x_new << " " << y_new << std::endl;
 //    std::cout << "acc " << acc_n_real.transpose() << std::endl;
