@@ -120,7 +120,7 @@ bool GPS::IsGPSValid(Status *status, VectorXd *gps_data) {
     } else {
         is_gps_static = false;
         // 运动时候传感器采用运动因子
-        (*status).parameters.t = 1.0 / ((*status).parameters.Hz * (*status).parameters.move_t_factor);
+//        (*status).parameters.t = 1.0 / ((*status).parameters.Hz * (*status).parameters.move_t_factor);
     }
 
     // 当前一个GPS点速度为0,当前GPS数据又为空的的时候,采用前一点的数据,gps(lng,lat,alt,accuracy,speed,bearing,t)
@@ -139,7 +139,7 @@ bool GPS::IsGPSValid(Status *status, VectorXd *gps_data) {
     } else {
         is_gps_still_static = false;
         // 运动时候传感器采用运动因子
-        (*status).parameters.t = 1.0 / ((*status).parameters.Hz * (*status).parameters.move_t_factor);
+//        (*status).parameters.t = 1.0 / ((*status).parameters.Hz * (*status).parameters.move_t_factor);
     }
 
 
