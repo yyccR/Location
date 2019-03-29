@@ -13,7 +13,7 @@
 
 using namespace Eigen;
 using namespace routing;
-using namespace std;
+//using namespace std;
 
 /**
  * Location 初始化。
@@ -119,7 +119,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     if (!is_gps_valid) {
         // 采用惯导更新经纬度
         // 获取航向角
-        double heading = ornt_data(2);
+        double heading = ornt_data(2) + status.parameters.diff_gps_ornt;
         status.attitude.yaw = heading;
         // 计算航向角
         Vector2d gps_new = gps.CalDestination(start_lng, start_lat, distance, heading);
@@ -148,6 +148,9 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
         status.parameters.gps_pre_t = gps_data(6);
         // 时间t影响因子自调整
         AutoAdjustTFactor(&status, gps_data, status.parameters.ins_dist);
+        // 更新GPS方向和方向传感器Z轴方向
+        UpdateZaxisWithGPS(&status, gps_data, ornt_data);
+        std::cout << status.parameters.diff_gps_ornt << std::endl;
         // 更新其他INS变量
         status.parameters.gps_count += 1;
         status.parameters.ins_count = 0;
@@ -230,13 +233,9 @@ void Location::AutoAdjustTFactor(routing::Status *status, Eigen::VectorXd &gps_d
         double lat3 = gps_queue(2, 1);
         double gps_dist = gps.CalDistance(lng1, lat1, lng2, lat2) + gps.CalDistance(lng2, lat2, lng3, lat3);
         double ins_dist = ins_move_dist(1) + ins_move_dist(2);
-        double deltaT = (gps_queue(2,6) - gps_queue(0,6)) / 1000.0;
-        if(gps_dist != 0.0 && ins_dist != 0.0 && deltaT != 0.0){
-//            double newT = gps_dist / (ins_dist * (*status).parameters.Hz * deltaT);
-//            (*status).parameters.t *= sqrt(newT);
+        double deltaT = (gps_queue(2, 6) - gps_queue(0, 6)) / 1000.0;
+        if (gps_dist != 0.0 && ins_dist != 0.0 && deltaT != 0.0) {
             (*status).parameters.move_t_factor *= sqrt(gps_dist / ins_dist);
-//            cout << gps_dist << " " << ins_dist << " "  << deltaT << " " << newT << endl;
-//            cout << gps_dist << " ins_dist= " << ins_dist << " t= " << (*status).parameters.t << " deltaT= " << deltaT << " " << (*status).velocity.v_x << " " << (*status).velocity.v_y << endl;
         }
 //                    cout << gps_dist << " ins_dist= " << ins_dist << " t= " << (*status).parameters.t << " deltaT= " << deltaT << " " << (*status).velocity.v_x << " " << (*status).velocity.v_y  << " speed= " << gps_data(4) << " newt= " << (*status).parameters.move_t_factor << endl;
         // 先进先出
@@ -247,5 +246,45 @@ void Location::AutoAdjustTFactor(routing::Status *status, Eigen::VectorXd &gps_d
         ins_move_dist(1) = ins_move_dist(2);
         ins_move_dist(2) = ins_distance;
 //        cnt -= 1;
+    }
+}
+
+/**
+ * 方向传感器和GPS方向差值修正
+ *
+ * @param status
+ * @param gps_data, gps(lng,lat,alt,accuracy,speed,bearing,t)
+ * @param ornt_data
+ */
+void Location::UpdateZaxisWithGPS(routing::Status *status, Eigen::VectorXd &gps_data, Eigen::Vector3d &ornt_data) {
+    static MatrixXd gps_queue((*status).parameters.queue_gps_ornt, 7);
+    static MatrixXd ornt_queue((*status).parameters.queue_gps_ornt, 3);
+    static int cnt = 0;
+
+    if (cnt < (*status).parameters.queue_gps_ornt) {
+        if(gps_data(4) > (*status).parameters.gps_static_speed_threshold){
+            gps_queue.row(cnt) = gps_data;
+            ornt_queue.row(cnt) = ornt_data;
+            cnt += 1;
+        }
+    } else {
+        VectorXd gps_bearing = gps_queue.col(5);
+        VectorXd ornt_bearing = ornt_queue.col(2);
+        double diff_gps_ornt = (gps_bearing - ornt_bearing).mean();
+        (*status).parameters.diff_gps_ornt = diff_gps_ornt;
+//        std::cout << "gps_data " << gps_data.transpose() << std::endl;
+//        std::cout << "gps_bearing " << gps_bearing.transpose() << std::endl;
+//        std::cout << "ornt_data " << ornt_data.transpose() << std::endl;
+//        std::cout << "ornt_bearing " << ornt_bearing.transpose() << std::endl;
+//        std::cout << "(gps_bearing - ornt_bearing) " << (gps_bearing - ornt_bearing).transpose() << std::endl;
+//        std::cout << "---------" << std::endl;
+        if (gps_data(4) > (*status).parameters.gps_static_speed_threshold) {
+            for (int i = 0; i < (*status).parameters.queue_gps_ornt - 1; i++) {
+                gps_queue.row(i) = gps_queue.row(i + 1);
+                ornt_queue.row(i) = ornt_queue.row(i + 1);
+            }
+            gps_queue.row((*status).parameters.queue_gps_ornt - 1) = gps_data;
+            ornt_queue.row((*status).parameters.queue_gps_ornt - 1) = ornt_data;
+        }
     }
 }
