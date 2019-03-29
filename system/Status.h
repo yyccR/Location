@@ -103,6 +103,10 @@ namespace routing {
         int ins_count;
         // 利用惯导计算的距离
         double ins_dist;
+        // GPS和方向传感器持续较正的队列长度
+        int queue_gps_ornt;
+        // GPS和方向传感器之间的偏差
+        double diff_gps_ornt;
         // GPS初始状态计数
         int gps_count;
         // 导航GPS初始化后，记录多久后接入ins

@@ -93,6 +93,8 @@ void Status::Init() {
     this->parameters.ins_count = 0;
     this->parameters.ins_dist = 0.0;
 
+    this->parameters.queue_gps_ornt = 3;
+    this->parameters.diff_gps_ornt = 0.0;
     this->parameters.gps_static_speed_threshold = 0.5;
     this->parameters.gps_count = 0;
     this->parameters.gps_init_threshold = 1;
