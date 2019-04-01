@@ -81,8 +81,8 @@ void Status::Init() {
 
     Vector3d err(0.0,0.0,0.0);
     this->parameters.err = err;
-    this->parameters.ki = 0.05;
-    this->parameters.kp = 10.0;
+    this->parameters.ki = 0.1;
+    this->parameters.kp = 5.5;
     this->parameters.Hz = 10.0;
     this->parameters.halfT = 1.0 / (this->parameters.Hz * 2.0);
     this->parameters.static_t_factor = 1.5;
@@ -95,7 +95,7 @@ void Status::Init() {
 
     this->parameters.queue_gps_ornt = 3;
     this->parameters.diff_gps_ornt = 0.0;
-    this->parameters.gps_static_speed_threshold = 0.5;
+    this->parameters.gps_static_speed_threshold = 2.0;
     this->parameters.gps_count = 0;
     this->parameters.gps_init_threshold = 1;
     this->parameters.gps_pre_lng = 0.0;
