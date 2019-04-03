@@ -44,3 +44,4 @@
 7. [A Calibration Algorithm for Microelectromechanical Systems Accelerometers in Inertial Navigation Sensors](https://arxiv.org/pdf/1309.5075.pdf)
 8. [A Calibration Method of Three-axis Magnetic Sensor Based on Ellipsoid Fitting](https://www.researchgate.net/publication/273845104_A_Calibration_Method_of_Three-axis_Magnetic_Sensor_Based_on_Ellipsoid_Fitting)
 9. [Accuracy Improvement of Low Cost INS/GPS for Land Applications](https://prism.ucalgary.ca/bitstream/handle/1880/41142/2001_Shin.pdf?sequence=1)
+10. [Trajectory preprocessing: Computing with Spatial Trajectories](https://books.google.com.hk/books?hl=zh-CN&lr=&id=JShQJF23xBgC&oi=fnd&pg=PR3&dq=Trajectory+preprocessing.+Computing+with+Spatial+Trajectories&ots=6NUeew5i9_&sig=o7XM_QcuUnmOv5KNeezTN4H8PMw&redir_esc=y&hl=zh-CN&sourceid=cndr#v=onepage&q=Trajectory%20preprocessing.%20Computing%20with%20Spatial%20Trajectories&f=false)
