@@ -101,12 +101,15 @@ namespace routing {
         double move_distance_threshod;
         // 利用惯导计算位置的次数;
         int ins_count;
+        // 惯导累计的最大距离限制
+        double max_ins_dist;
         // 利用惯导计算的距离
         double ins_dist;
         // GPS和方向传感器持续较正的队列长度
         int queue_gps_ornt;
         // GPS和方向传感器之间的偏差
         double diff_gps_ornt;
+
         // GPS初始状态计数
         int gps_count;
         // 导航GPS初始化后，记录多久后接入ins
@@ -121,6 +124,10 @@ namespace routing {
         double gps_pre_accuracy;
         double gps_pre_speed;
         double gps_pre_bearing;
+        // gps轨迹历史信息记录长度
+        int gps_track_len;
+        // gps最大时间间隔,超过这个间隔的GPS都会采用,不做任何舍弃
+        int gps_max_gap_time;
 
         // 当地重力加速度值
         double g;
