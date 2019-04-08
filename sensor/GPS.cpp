@@ -147,17 +147,11 @@ bool GPS::IsGPSBelongToTrack(routing::Status *status, Eigen::VectorXd &gps_data)
                 gps_queue.row(i) = gps_queue.row(i + 1);
             }
             gps_queue.row((*status).parameters.gps_track_len - 1) = gps_data;
-            return result;
         } else {
-            if (time_diff2 > (*status).parameters.gps_max_gap_time) {
-                // 误差不可接受,但是时间间隔超出了允许的间隔范围,则认为该点已超出预估能力范围
-                result = true;
-            } else {
-                // 误差不可接受,时间间隔也没有超出了允许的间隔范围,则认为改点是误差点
-                result = false;
-            }
+            // 误差不可接受,但是时间间隔超出了允许的间隔范围,则认为该点已超出预估能力范围
+            // 误差不可接受,时间间隔也没有超出了允许的间隔范围,则认为改点是误差点
+            result = time_diff2 > (*status).parameters.gps_max_gap_time;
             cnt = 0;
-            return result;
         }
     }
     return result;
