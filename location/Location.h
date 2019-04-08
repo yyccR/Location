@@ -43,6 +43,8 @@ public:
     // 方向传感器和GPS方向差值修正
     void UpdateZaxisWithGPS(routing::Status *status, Eigen::VectorXd &gps_data, Eigen::Vector3d &ornt_data);
 
+
+
 };
 
 

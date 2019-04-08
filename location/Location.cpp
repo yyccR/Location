@@ -42,7 +42,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
                                       Vector3d &g_data, Vector3d &ornt_data) {
 
     // 传感器参数
-    Parameters parameters = status.parameters;
+//    Parameters parameters = status.parameters;
 //    // 利用标定参数较正当前传感器数据
 //    Vector3d gyro_data_cali;
 //    Vector3d acc_data_cali;
@@ -67,7 +67,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
 //
 //    // 获取姿态
 //    AHRS ahrs;
-//    Vector4d q_attitude;
+//    static Vector4d q_attitude(1.0,0.0,0.0,0.0);
 //    if(this->status.parameters.ins_count == 0) {
 //        Quaternions quaternions;
 //        q_attitude = quaternions.GetQFromEuler(ornt_data);
@@ -78,9 +78,10 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
 //    double ki = status.parameters.ki;
 //    double kp = status.parameters.kp;
 //    double halfT = status.parameters.halfT;
-////    StrapdownAHRS strapdownAHRS;
-////    Vector4d attitude = strapdownAHRS.StrapdownUpdateAttitude(q_attitude, gyro_data, &status);
-//    Vector4d attitude = ahrs.UpdateAttitude(err, q_attitude, gyro_data_cali, g_data, mag_data_cali, ki, kp, halfT);
+//    StrapdownAHRS strapdownAHRS;
+//    Vector4d attitude = strapdownAHRS.StrapdownUpdateAttitude(q_attitude, gyro_data, &status);
+//    SetHz(20.0);
+//    q_attitude = ahrs.UpdateAttitude(err, q_attitude, gyro_data, g_data, mag_data, ki, kp, halfT);
 //    // 更新姿态
 //    status.attitude.q_attitude = attitude;
 
@@ -93,6 +94,8 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
 //    Vector3d final_acc_lpf = lpf.LowPassFilter2nd(&status,final_acc);
 //    std::cout << "final acc " << final_acc.transpose() << std::endl;
 //    std::cout << "final acclpf " << final_acc_lpf.transpose() << std::endl;
+//    std::cout << gps_data(0) << " " << gps_data(1) << std::endl;
+//    std::cout << "gps " << gps_data.transpose() << std::endl;
 
     // 记录起始位置和当前位置
     double start_x = status.position.x;
@@ -114,9 +117,11 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     double end_y = status.position.y;
     double distance = sqrt((end_x - start_x) * (end_x - start_x) + (end_y - start_y) * (end_y - start_y));
 
+    // 判断ins是否走的距离达到限制最大距离
+    bool is_ins_move_not_too_far = status.parameters.ins_dist < status.parameters.max_ins_dist;
     // 判断是否采用GPS数据
     bool is_gps_valid = gps.IsGPSValid(&status, &gps_data);
-    if (!is_gps_valid) {
+    if (!is_gps_valid && is_ins_move_not_too_far) {
         // 采用惯导更新经纬度
         // 获取航向角
         double heading = ornt_data(2) + status.parameters.diff_gps_ornt;
@@ -150,7 +155,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
         AutoAdjustTFactor(&status, gps_data, status.parameters.ins_dist);
         // 更新GPS方向和方向传感器Z轴方向
         UpdateZaxisWithGPS(&status, gps_data, ornt_data);
-        std::cout << status.parameters.diff_gps_ornt << std::endl;
+//        std::cout << status.parameters.diff_gps_ornt << std::endl;
         // 更新其他INS变量
         status.parameters.gps_count += 1;
         status.parameters.ins_count = 0;
