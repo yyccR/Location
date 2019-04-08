@@ -79,9 +79,9 @@ Vector4d Quaternions::CrossMulti(Vector4d &q1, Vector4d &q2) const {
 Vector4d Quaternions::GetQFromEuler(Vector3d &euler_angle) const {
     Vector4d eulerQ;
 
-    double r = euler_angle(0) / 2.0;
-    double p = euler_angle(1) / 2.0;
-    double y = euler_angle(2) / 2.0;
+    double r = (euler_angle(0) * M_PI / 180.0) / 2.0;
+    double p = (euler_angle(1) * M_PI / 180.0) / 2.0;
+    double y = (euler_angle(2) * M_PI / 180.0) / 2.0;
 
 
     double sinp = sin(p);
