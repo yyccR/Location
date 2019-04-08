@@ -96,76 +96,70 @@ Eigen::Vector4d GPS::CalcState(Eigen::VectorXd &gps_data) {
 bool GPS::IsGPSBelongToTrack(routing::Status *status, Eigen::VectorXd &gps_data) {
 
     bool result = true;
-//    static Matrix<double, 7, 7>  gps_queue;
     static MatrixXd gps_queue((*status).parameters.gps_track_len, 7);
-//    static MatrixXd gps_queue = [](routing::Status *status) {
-//        int rows = (*status).parameters.gps_track_len;
-//        MatrixXd temp = MatrixXd::Constant(rows, 7, 0.0);
-//        return temp;
-//    }(status);
     static int cnt = 0;
 
     std::cout << "IsGPSBelongToTrack in " << std::endl;
-//    if (cnt < (*status).parameters.gps_track_len) {
-//        if (cnt >= 1) {
-//            // 初步判断该点是否时间在允许的范围内
-//            // TODO: 可以做更进一步判断该点是否合理能被加入数据做滤波轨迹
-//            double time_diff1 = (gps_data(6) - gps_queue(cnt - 1, 6)) / 1000.0;
-//            if (time_diff1 < (*status).parameters.gps_max_gap_time && time_diff1 != 0.0) {
-//                gps_queue.row(cnt) = gps_data;
-//                cnt += 1;
-//            } else {
-//                cnt = 0;
-//            }
-//        } else {
-//            gps_queue.row(cnt) = gps_data;
-//            cnt += 1;
-//        }
-//    } else {
-//
-//        // 初始化kalman
-//        VectorXd init_state = gps_queue.row(0);
-//        Vector4d cur_state = CalcState(init_state);
-//        KalmanFilter kalmanFilter(cur_state);
-//
-//        // 滤波计算
-//        for (int i = 1; i < (*status).parameters.gps_track_len; ++i) {
-//            VectorXd origin_gps = gps_queue.row(i);
-//            Vector4d measurement_state = CalcState(origin_gps);
-//            double delta_t = (gps_queue(i, 6) - gps_queue(i - 1, 6)) / 1000.0;
-//            kalmanFilter.SetF(delta_t);
-//            kalmanFilter.UpdateState(measurement_state);
-//        }
-//
-//        // 计算比较当前预测与实际测量的差距
-//        VectorXd predict_state = kalmanFilter.PredictState();
-//        double start_lng = predict_state(0);
-//        double start_lat = predict_state(1);
-//        double end_lng = gps_data(0);
-//        double end_lat = gps_data(1);
-//        double cur_error = CalDistance(start_lng, start_lat, end_lng, end_lat);
-//        double time_diff2 = (gps_data(6) - gps_queue.row((*status).parameters.gps_track_len - 1)(6)) / 1000.0;
-//
-//        std::cout << "cur_error <= (*status).parameters.weak_gps " << cur_error << std::endl;
-//        if (cur_error <= (*status).parameters.weak_gps) {
-//            // 误差在可接受的范围
-//            for (int i = 0; i < (*status).parameters.gps_track_len - 1; i++) {
-//                gps_queue.row(i) = gps_queue.row(i + 1);
-//            }
-//            gps_queue.row((*status).parameters.gps_track_len - 1) = gps_data;
-//            return result;
-//        } else {
-//            if (time_diff2 > (*status).parameters.gps_max_gap_time) {
-//                // 误差不可接受,但是时间间隔超出了允许的间隔范围,则认为该点已超出预估能力范围
-//                result = true;
-//            } else {
-//                // 误差不可接受,时间间隔也没有超出了允许的间隔范围,则认为改点是误差点
-//                result = false;
-//            }
-//            cnt = 0;
-//            return result;
-//        }
-//    }
+    if (cnt < (*status).parameters.gps_track_len) {
+        if (cnt >= 1) {
+            // 初步判断该点是否时间在允许的范围内
+            // TODO: 可以做更进一步判断该点是否合理能被加入数据做滤波轨迹
+            double time_diff1 = (gps_data(6) - gps_queue(cnt - 1, 6)) / 1000.0;
+            if (time_diff1 < (*status).parameters.gps_max_gap_time && time_diff1 != 0.0) {
+                gps_queue.row(cnt) = gps_data;
+                cnt += 1;
+            } else {
+                cnt = 0;
+            }
+        } else {
+            gps_queue.row(cnt) = gps_data;
+            cnt += 1;
+        }
+    } else {
+
+        // 初始化kalman
+        VectorXd init_state = gps_queue.row(0);
+        Vector4d cur_state = CalcState(init_state);
+        KalmanFilter kalmanFilter(cur_state);
+
+        // 滤波计算
+        for (int i = 1; i < (*status).parameters.gps_track_len; ++i) {
+            VectorXd origin_gps = gps_queue.row(i);
+            Vector4d measurement_state = CalcState(origin_gps);
+            double delta_t = (gps_queue(i, 6) - gps_queue(i - 1, 6)) / 1000.0;
+            kalmanFilter.SetF(delta_t);
+            kalmanFilter.UpdateState(measurement_state);
+        }
+
+        // 计算比较当前预测与实际测量的差距
+        VectorXd predict_state = kalmanFilter.PredictState();
+        double start_lng = predict_state(0);
+        double start_lat = predict_state(1);
+        double end_lng = gps_data(0);
+        double end_lat = gps_data(1);
+        double cur_error = CalDistance(start_lng, start_lat, end_lng, end_lat);
+        double time_diff2 = (gps_data(6) - gps_queue.row((*status).parameters.gps_track_len - 1)(6)) / 1000.0;
+
+        std::cout << "cur_error <= (*status).parameters.weak_gps " << cur_error << std::endl;
+        if (cur_error <= (*status).parameters.weak_gps) {
+            // 误差在可接受的范围
+            for (int i = 0; i < (*status).parameters.gps_track_len - 1; i++) {
+                gps_queue.row(i) = gps_queue.row(i + 1);
+            }
+            gps_queue.row((*status).parameters.gps_track_len - 1) = gps_data;
+            return result;
+        } else {
+            if (time_diff2 > (*status).parameters.gps_max_gap_time) {
+                // 误差不可接受,但是时间间隔超出了允许的间隔范围,则认为该点已超出预估能力范围
+                result = true;
+            } else {
+                // 误差不可接受,时间间隔也没有超出了允许的间隔范围,则认为改点是误差点
+                result = false;
+            }
+            cnt = 0;
+            return result;
+        }
+    }
     return result;
 }
 
