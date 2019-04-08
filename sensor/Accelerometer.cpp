@@ -122,7 +122,10 @@ void Accelerometer::StrapdownUpdateVelocityPosition(Status *status, Vector3d &ac
 
     // 计算导航系下加速度减去地球旋转影响和重力影响
     Vector3d acc_n_not_filter = acc_n - (2.0 * wi_n + we_n).cross(ve_n) - gl_n;
+
+//    std::cout << "acc_n_not_filter " << acc_n_not_filter.transpose() << std::endl;
     Vector3d acc_n_real = FilterData(status, acc_n_not_filter);
+//    std::cout << "acc_n_real " << acc_n_real.transpose() << std::endl;
 
     // 速度和位置积分
     double deltaT = (*status).parameters.t;
@@ -138,7 +141,7 @@ void Accelerometer::StrapdownUpdateVelocityPosition(Status *status, Vector3d &ac
 //    std::cout.precision(9);
 //    std::cout << x_new << " " << y_new << std::endl;
 //    std::cout << "acc " << acc_n_real.transpose() << std::endl;
-//    std::cout << "v " << v_x_new << " " << v_y_new << " " << v_z_new << "\n" <<std::endl;
+//    std::cout << "v " << v_x_new << " " << v_y_new << " " << v_z_new  <<std::endl;
 
     // 更新速度和位置
     (*status).velocity.v_x = v_x_new;
