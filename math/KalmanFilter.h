@@ -20,24 +20,24 @@ private:
     // 状态转移误差矩阵
     Eigen::Matrix4d Q;
     // 测量矩阵
-    Eigen::Matrix<double, 2, 4> H;
+    Eigen::Matrix4d H;
     // 测量误差矩阵)
-    Eigen::Matrix2d R;
+    Eigen::Matrix4d R;
     // 协方差矩阵
     Eigen::Matrix4d P;
 
 public:
 
     // 实例化
-    KalmanFilter(Eigen::VectorXd &init_state);
+    KalmanFilter(Eigen::Vector4d &init_state);
 
     // 预测过程
-    Eigen::VectorXd PredictState();
+    Eigen::Vector4d PredictState();
 
-    Eigen::VectorXd CalcPrioriCov();
+    Eigen::Matrix4d CalcPrioriCov();
 
     // 更新过程
-    void UpdateState(Eigen::VectorXd &measure_state);
+    void UpdateState(Eigen::Vector4d &measure_state);
 
     // 由于每次GPS更新间隔并非常数,需手动更新矩阵F
     void SetF(double deltaT);

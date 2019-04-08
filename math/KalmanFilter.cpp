@@ -8,7 +8,7 @@
 using namespace Eigen;
 
 
-KalmanFilter::KalmanFilter(Eigen::VectorXd &init_state) {
+KalmanFilter::KalmanFilter(Eigen::Vector4d &init_state) {
 
     this->x = init_state;
 
@@ -45,7 +45,7 @@ KalmanFilter::KalmanFilter(Eigen::VectorXd &init_state) {
 }
 
 
-Eigen::VectorXd KalmanFilter::PredictState() {
+Eigen::Vector4d KalmanFilter::PredictState() {
 
     GPS gps;
     double lng = this->x(0);
@@ -63,17 +63,17 @@ Eigen::VectorXd KalmanFilter::PredictState() {
     return priori_State;
 }
 
-Eigen::VectorXd KalmanFilter::CalcPrioriCov() {
+Eigen::Matrix4d KalmanFilter::CalcPrioriCov() {
     return this->F * this->P * this->F.transpose() + this->Q;
 }
 
-void KalmanFilter::UpdateState(Eigen::VectorXd &measure_state) {
+void KalmanFilter::UpdateState(Eigen::Vector4d &measure_state) {
 
-    VectorXd prioriState = PredictState();
-    MatrixXd prioriCov = CalcPrioriCov();
-    MatrixXd k = prioriCov * this->H.transpose() * (this->H * prioriCov * this->H.transpose() + this->R).inverse();
-    VectorXd posteriorState = prioriState + k * (measure_state - this->H * prioriState);
-    MatrixXd posteriorCov = (MatrixXd::Identity(4, 4) - k * this->H) * prioriCov;
+    Vector4d prioriState = PredictState();
+    Matrix4d prioriCov = CalcPrioriCov();
+    Matrix4d k = prioriCov * this->H.transpose() * (this->H * prioriCov * this->H.transpose() + this->R).inverse();
+    Vector4d posteriorState = prioriState + k * (measure_state - this->H * prioriState);
+    Matrix4d posteriorCov = (MatrixXd::Identity(4, 4) - k * this->H) * prioriCov;
     this->x = posteriorState;
     this->P = posteriorCov;
 }
