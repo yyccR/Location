@@ -3,6 +3,7 @@
 //
 
 #include "GPS.h"
+#include "../math/KalmanFilter.h"
 #include <cmath>
 
 using namespace Eigen;
@@ -70,6 +71,97 @@ double GPS::CalDistance(double &startLng, double &startLat, double &endLng, doub
 }
 
 /**
+ * 计算当前kalman输入所需gps状态
+ *
+ * @param gps_data
+ * @return vector4d(lng,lat,v_east,v_north)
+ */
+Eigen::Vector4d GPS::CalcState(Eigen::VectorXd &gps_data) {
+    // 根据当前gps角度计算两个分速度
+    double bearing_rad = gps_data(5) / 180.0 * M_PI;
+    double v_north = gps_data(4) * cos(bearing_rad);
+    double v_east = gps_data(4) * sin(bearing_rad);
+
+    Vector4d cur_state(gps_data(0), gps_data(1), v_east, v_north);
+    return cur_state;
+}
+
+/**
+ * 判断GPS点是否符合GPS历史轨迹
+ *
+ * @param status
+ * @param gps_data, gps(lng,lat,alt,accuracy,speed,bearing,t)
+ * @return
+ */
+bool GPS::IsGPSBelongToTrack(routing::Status *status, Eigen::VectorXd &gps_data) {
+
+    bool result = true;
+    static MatrixXd gps_queue((*status).parameters.gps_track_len, 7);
+    static int cnt = 0;
+
+    if (cnt < (*status).parameters.gps_track_len) {
+        if (cnt >= 1) {
+            // 初步判断该点是否时间在允许的范围内
+            // TODO: 可以做更进一步判断该点是否合理能被加入数据做滤波轨迹
+            double time_diff1 = (gps_data(6) - gps_queue(cnt - 1, 6)) / 1000.0;
+            if (time_diff1 < (*status).parameters.gps_max_gap_time && time_diff1 != 0.0) {
+                gps_queue.row(cnt) = gps_data;
+                cnt += 1;
+            } else {
+                cnt = 0;
+            }
+        } else {
+            gps_queue.row(cnt) = gps_data;
+            cnt += 1;
+        }
+    } else {
+
+        // 初始化kalman
+        VectorXd init_state = gps_queue.row(0);
+        VectorXd cur_state = CalcState(init_state);
+        KalmanFilter kalmanFilter(cur_state);
+
+        // 滤波计算
+        for (int i = 1; i < (*status).parameters.gps_track_len; ++i) {
+            VectorXd origin_gps = gps_queue.row(i);
+            VectorXd measurement_state = CalcState(origin_gps);
+            double delta_t = (gps_queue(i, 6) - gps_queue(i - 1, 6)) / 1000.0;
+            kalmanFilter.SetF(delta_t);
+            kalmanFilter.UpdateState(measurement_state);
+        }
+
+        // 计算比较当前预测与实际测量的差距
+        VectorXd predict_state = kalmanFilter.PredictState();
+        double start_lng = predict_state(0);
+        double start_lat = predict_state(1);
+        double end_lng = gps_data(0);
+        double end_lat = gps_data(1);
+        double cur_error = CalDistance(start_lng, start_lat, end_lng, end_lat);
+        double time_diff2 = (gps_data(6) - gps_queue.row((*status).parameters.gps_track_len - 1)(6)) / 1000.0;
+
+        if (cur_error <= (*status).parameters.weak_gps) {
+            // 误差在可接受的范围
+            for (int i = 0; i < (*status).parameters.gps_track_len - 1; i++) {
+                gps_queue.row(i) = gps_queue.row(i + 1);
+            }
+            gps_queue.row((*status).parameters.gps_track_len - 1) = gps_data;
+            return result;
+        } else {
+            if (time_diff2 > (*status).parameters.gps_max_gap_time) {
+                // 误差不可接受,但是时间间隔超出了允许的间隔范围,则认为该点已超出预估能力范围
+                result = true;
+            } else {
+                // 误差不可接受,时间间隔也没有超出了允许的间隔范围,则认为改点是误差点
+                result = false;
+            }
+            cnt = 0;
+            return result;
+        }
+    }
+    return result;
+}
+
+/**
  * 根据当前输入以及状态判断采用GPS还是INS
  *
  * @param status
@@ -99,6 +191,12 @@ bool GPS::IsGPSValid(Status *status, VectorXd *gps_data) {
 
     // 判断当前GPS是否与上个GPS点同个时间戳
     bool is_gps_not_duplicated = (*gps_data)(6) != (*status).parameters.gps_pre_t;
+
+    // 判断GPS高精情况下是否存在漂移,利用kalman根据历史轨迹进行滤波估计
+    bool is_gps_belong_to_track = true;
+    if (is_gps_accuracy && is_gps_not_null && is_gps_not_duplicated) {
+        is_gps_belong_to_track = IsGPSBelongToTrack(status, (*gps_data));
+    }
 
     // 当GPS在初始状态内时，处理为0.0的情况,gps(lng,lat,alt,accuracy,speed,bearing,t)
     if (is_gps_initializing && !is_gps_not_null) {
@@ -142,7 +240,6 @@ bool GPS::IsGPSValid(Status *status, VectorXd *gps_data) {
 //        (*status).parameters.t = 1.0 / ((*status).parameters.Hz * (*status).parameters.move_t_factor);
     }
 
-
-    return (is_gps_accuracy && is_gps_not_null && is_gps_move_accepted && is_gps_not_duplicated)
+    return (is_gps_accuracy && is_gps_not_null && is_gps_move_accepted && is_gps_not_duplicated && is_gps_belong_to_track)
            || is_gps_initializing || is_gps_static || is_gps_still_static;
 }

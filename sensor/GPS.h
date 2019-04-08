@@ -22,6 +22,15 @@ public:
 
     // 根据当前输入以及状态判断采用GPS还是INS
     bool IsGPSValid(routing::Status *status,  Eigen::VectorXd *gps_data);
+
+    // 判断GPS点是否符合GPS历史轨迹
+    bool IsGPSBelongToTrack(routing::Status *status, Eigen::VectorXd &gps_data);
+
+private:
+    // 计算kalman当前gps所需状态
+    Eigen::Vector4d CalcState(Eigen::VectorXd &gps_data);
+
+
 };
 
 
