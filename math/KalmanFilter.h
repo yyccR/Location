@@ -7,48 +7,47 @@
 
 
 #include <Eigen/Dense>
-#include <vector>
-#include <iostream>
 
 
 class KalmanFilter {
 
+private:
+
+    // t-1时刻状态
+    Eigen::Vector4d x;
+    // 转移矩阵
+    Eigen::Matrix4d F;
+    // 状态转移误差矩阵
+    Eigen::Matrix4d Q;
+    // 测量矩阵
+    Eigen::Matrix<double, 2, 4> H;
+    // 测量误差矩阵)
+    Eigen::Matrix2d R;
+    // 协方差矩阵
+    Eigen::Matrix4d P;
+
 public:
-    // state vecotr
-    Eigen::VectorXd x;
-    // priori state vector
-    Eigen::VectorXd x_priori;
-    // covariance matrix
-    Eigen::MatrixXd P;
-    // priori covariance matrix
-    Eigen::MatrixXd p_priori;
-    // transistion matrix
-    Eigen::MatrixXd F;
-    // measurement matrix
-    Eigen::MatrixXd H;
-    // measurement covariance matrix
-    Eigen::MatrixXd R;
-    // error covariance matrix
-    Eigen::MatrixXd Q;
-    // input size;
-    Eigen::Index s;
 
-    /**
-    * Constructor
-    */
-    KalmanFilter();
+    // 实例化
+    KalmanFilter(Eigen::VectorXd &init_state);
 
-    /**
-    * Destructor
-    */
-    virtual ~KalmanFilter();
+    // 预测过程
+    Eigen::VectorXd PredictState();
 
-    void Init(Eigen::VectorXd &state, Eigen::MatrixXd &covMat, Eigen::MatrixXd &tranMat, Eigen::MatrixXd &measMat,
-              Eigen::MatrixXd &mCovMat, Eigen::MatrixXd &eCovMat);
+    Eigen::VectorXd CalcPrioriCov();
 
-    void Correct(const Eigen::VectorXd &measState);
+    // 更新过程
+    void UpdateState(Eigen::VectorXd &measure_state);
 
-    void Predict();
+    // 由于每次GPS更新间隔并非常数,需手动更新矩阵F
+    void SetF(double deltaT);
+
+    // 过程随着运动不断更新deltas,即速度方差, P和Q
+    void SetPQ(double varS);
+
+    // 获取过滤后的
+    Eigen::Vector4d GetState();
+
 };
 
 
