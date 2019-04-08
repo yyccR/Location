@@ -28,7 +28,9 @@
 
 <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/gps6.png" width="370" height="170" /> <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/gps8.png" width="370" height="170" />
 
-### 真实路测, 运动过程不绑路, 且屏蔽GPS后恢复GPS
+### 真实路测
+
+- 运动过程不绑路, 且屏蔽GPS后恢复GPS
 
 <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/ins_gps_test_case1.gif" width="300" height="600" />
 
