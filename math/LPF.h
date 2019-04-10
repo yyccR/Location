@@ -18,7 +18,9 @@ public:
 
     void LowPassFilter2ndFactorCal(routing::Status *status);
 
-    Eigen::Vector3d LowPassFilter2nd(routing::Status *status, Eigen::Vector3d &cur_data);
+    Eigen::Vector3d LowPassFilter2nd4ACC(routing::Status *status, Eigen::Vector3d &cur_data);
+
+    Eigen::Vector3d LowPassFilter4Ornt(routing::Status *status, Eigen::Vector3d &ornt_data);
 };
 
 
