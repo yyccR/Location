@@ -14,6 +14,12 @@
 
 ## Test case
 
+### 数据修正
+
+- 方向数据平滑(二阶IIR滤波)
+
+<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/ornt_filter.png" width="1000" height="800" />
+
 ### GPS轨迹与INS轨迹对比
 
 - 融合
