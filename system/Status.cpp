@@ -74,10 +74,14 @@ void Status::Init() {
     this->parameters.acc_a2 = 0.0;
     this->parameters.acc_b0 = 0.0;
     this->parameters.acc_hz = 5.0;
+    this->parameters.acc_thres = 0.1;
     Vector3d acc(0.0,0.0,0.0);
     this->parameters.last_acc_data = acc;
     this->parameters.sec_last_acc_data = acc;
-    this->parameters.acc_thres = 0.1;
+    this->parameters.ornt_hz = 0.5;
+    Vector3d ornt(0.0,0.0,0.0);
+    this->parameters.last_ornt_data = ornt;
+    this->parameters.sec_last_ornt_data = ornt;
 
     Vector3d err(0.0,0.0,0.0);
     this->parameters.err = err;

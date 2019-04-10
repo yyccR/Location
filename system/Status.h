@@ -71,12 +71,12 @@ namespace routing {
         int max_step;
 
         // 低通滤波算法参数
-        double acc_a1, acc_a2, acc_b0;
+        double acc_a1, acc_a2, acc_b0, ornt_a1, ornt_a2, ornt_b0;
         // 加速计截至频率
-        double acc_hz;
+        double acc_hz, ornt_hz;
         // 用于平滑数据,t-1 与 t-2 时刻的加速计数都
-        Eigen::Vector3d last_acc_data;
-        Eigen::Vector3d sec_last_acc_data;
+        Eigen::Vector3d last_acc_data, last_ornt_data;
+        Eigen::Vector3d sec_last_acc_data, sec_last_ornt_data;
         // 用于加速计干扰过滤
         double acc_thres;
 
