@@ -16,9 +16,13 @@
 
 ### 数据修正
 
-- 方向数据平滑(二阶IIR滤波)
+- 方向传感器数据平滑(二阶IIR滤波),蓝线为原始数据,橙色线为修正后数据
 
 <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/ornt_filter.png" width="1000" height="800" />
+
+- 指南针数据与GPS方向数据对比, 蓝线为GPS方向, 橙色线为指南针方向, 由于指南针数据受环境影响较大, 且指南针为地磁北, GPS方向为地理北, 存在磁偏角, 故需用GPS方向修正指南针方向
+
+<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/gps_compass.png" width="1000" height="300" />
 
 ### GPS轨迹与INS轨迹对比
 
