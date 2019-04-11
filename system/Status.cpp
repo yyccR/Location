@@ -78,7 +78,7 @@ void Status::Init() {
     Vector3d acc(0.0,0.0,0.0);
     this->parameters.last_acc_data = acc;
     this->parameters.sec_last_acc_data = acc;
-    this->parameters.ornt_hz = 0.5;
+    this->parameters.ornt_hz = 0.25;
     Vector3d ornt(0.0,0.0,0.0);
     this->parameters.last_ornt_data = ornt;
     this->parameters.sec_last_ornt_data = ornt;
