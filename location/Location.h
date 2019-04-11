@@ -23,7 +23,9 @@ public:
 
     // 定位,计算当前位置
     void PredictCurrentPosition(Eigen::Vector3d &gyro_data, Eigen::Vector3d &acc_data, Eigen::Vector3d &mag_data,
-                                Eigen::VectorXd &gps_data, Eigen::Vector3d &g_data, Eigen::Vector3d &ornt_data);
+                                Eigen::VectorXd &gps_data, Eigen::Vector3d &g_data, Eigen::Vector3d &ornt_data,
+                                Eigen::Vector2d &road_data
+    );
 
     // 获取当前融合定位的输出
     routing::GNSSINS GetGNSSINS();
@@ -41,7 +43,7 @@ public:
     void AutoAdjustTFactor(routing::Status *status, Eigen::VectorXd &gps_data, double ins_distance);
 
     // 方向传感器和GPS方向差值修正
-    void UpdateZaxisWithGPS(routing::Status *status, Eigen::VectorXd &gps_data, Eigen::Vector3d &ornt_data);
+    void UpdateZaxisWithGPSAndRoad(routing::Status *status, Eigen::VectorXd &gps_data, Eigen::Vector3d &ornt_data, Eigen::Vector2d &road_data);
 
 
 
