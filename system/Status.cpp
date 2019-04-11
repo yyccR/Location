@@ -98,6 +98,7 @@ void Status::Init() {
     this->parameters.ins_dist = 0.0;
     this->parameters.max_ins_dist = 1000.0;
 
+    this->parameters.least_gap_time_for_using_road = 2.5;
     this->parameters.queue_gps_ornt = 2;
     this->parameters.diff_gps_ornt = 0.0;
     this->parameters.gps_static_speed_threshold = 2.0;
