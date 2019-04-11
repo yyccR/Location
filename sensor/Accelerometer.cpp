@@ -162,7 +162,7 @@ void Accelerometer::StrapdownUpdateVelocityPosition(Status *status, Vector3d &ac
 Vector3d Accelerometer::FilterData(Status *status, Vector3d &acc_data) {
     LPF lpf;
     Vector3d filter_acc;
-    filter_acc = lpf.LowPassFilter2nd(status, acc_data);
+    filter_acc = lpf.LowPassFilter2nd4ACC(status, acc_data);
     if(abs(filter_acc(0)) <= (*status).parameters.acc_thres){
         filter_acc(0) = 0.0;
     }

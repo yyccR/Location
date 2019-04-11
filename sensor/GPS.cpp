@@ -99,7 +99,7 @@ bool GPS::IsGPSBelongToTrack(routing::Status *status, Eigen::VectorXd &gps_data)
     static MatrixXd gps_queue((*status).parameters.gps_track_len, 7);
     static int cnt = 0;
 
-    std::cout << "IsGPSBelongToTrack in " << std::endl;
+//    std::cout << "IsGPSBelongToTrack in " << std::endl;
     if (cnt < (*status).parameters.gps_track_len) {
         if (cnt >= 1) {
             // 初步判断该点是否时间在允许的范围内
@@ -140,7 +140,7 @@ bool GPS::IsGPSBelongToTrack(routing::Status *status, Eigen::VectorXd &gps_data)
         double cur_error = CalDistance(start_lng, start_lat, end_lng, end_lat);
         double time_diff2 = (gps_data(6) - gps_queue.row((*status).parameters.gps_track_len - 1)(6)) / 1000.0;
 
-        std::cout << "cur_error <= (*status).parameters.weak_gps " << cur_error << std::endl;
+//        std::cout << "cur_error <= (*status).parameters.weak_gps " << cur_error << std::endl;
         if (cur_error <= (*status).parameters.weak_gps) {
             // 误差在可接受的范围
             for (int i = 0; i < (*status).parameters.gps_track_len - 1; i++) {
