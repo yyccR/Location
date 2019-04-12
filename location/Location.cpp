@@ -74,7 +74,13 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     if (!is_gps_valid && is_ins_move_not_too_far) {
         // 采用惯导更新经纬度
         // 获取航向角
-        double heading = ornt_filter(2) + status.parameters.diff_gps_ornt;
+        double heading_no_limit = ornt_filter(2) + status.parameters.diff_gps_ornt;
+        double heading;
+        if(heading_no_limit > 360.0) {
+            heading = heading_no_limit - 360.0;
+        }else {
+            heading = heading_no_limit;
+        }
         status.attitude.yaw = heading;
         // 计算航向角
         Vector2d gps_new = gps.CalDestination(start_lng, start_lat, distance, heading);
