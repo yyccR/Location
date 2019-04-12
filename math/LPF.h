@@ -21,6 +21,10 @@ public:
     Eigen::Vector3d LowPassFilter2nd4ACC(routing::Status *status, Eigen::Vector3d &cur_data);
 
     Eigen::Vector3d LowPassFilter4Ornt(routing::Status *status, Eigen::Vector3d &ornt_data);
+
+    Eigen::Vector3d JumpPointCompensate(double current, double sec_last, double last);
+
+    std::string JudgeOrientation(double orientation);
 };
 
 
