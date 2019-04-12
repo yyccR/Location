@@ -130,7 +130,7 @@ Eigen::Vector3d LPF::LowPassFilter4Ornt(routing::Status *status, Eigen::Vector3d
 
     status->parameters.last_ornt_data = status->parameters.sec_last_ornt_data;
     status->parameters.sec_last_ornt_data = lpf_ornt;
-    std::cout << ornt_data(2) << " " << lpf_ornt(2) << std::endl;
+//    std::cout << ornt_data(2) << " " << lpf_ornt(2) << std::endl;
 //    std::cout << "parameter " << b0 << " " <<  a1  << " " << a2 << std::endl;
     return lpf_ornt;
 
