@@ -114,6 +114,12 @@ Eigen::Vector3d LPF::LowPassFilter4Ornt(routing::Status *status, Eigen::Vector3d
     double b0 = status->parameters.ornt_b0;
     double a1 = status->parameters.ornt_a1;
     double a2 = status->parameters.ornt_a2;
+
+    if((*status).parameters.gps_count == 0){
+        status->parameters.last_ornt_data = ornt_data;
+        status->parameters.sec_last_ornt_data = ornt_data;
+    }
+
     for(int i = 0; i < 3; ++i){
         Vector3d lpf_compensate = JumpPointCompensate(ornt_data(i), status->parameters.sec_last_ornt_data(i), status->parameters.last_ornt_data(i));
         double lpf_filter = lpf_compensate(0) * b0 + lpf_compensate(1) * a1 - lpf_compensate(2) * a2;
