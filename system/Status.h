@@ -131,6 +131,9 @@ namespace routing {
         // gps最大时间间隔,超过这个间隔的GPS都会采用,不做任何舍弃
         int gps_max_gap_time;
 
+        // 重力判断晃动阈值
+        double shaking_threshold;
+
         // 当地重力加速度值
         double g;
         // 当地场强模值
