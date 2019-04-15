@@ -44,7 +44,12 @@
 
 <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/ins_gps_test_case1.gif" width="300" height="600" />
 
+## TODO
 
+- [] 各类接口模板化
+- [] 改用智能指针替换里面的普通指针
+- [] 完善各类文档,包括quick start和英文文档, readme改为英文文档
+- [] 完善测试用例
 
 ## reference:
 
