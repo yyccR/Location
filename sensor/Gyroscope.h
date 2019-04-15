@@ -2,7 +2,7 @@
 // Created by yangcheng on 2018/12/13.
 //
 
-#include <eigen/Dense>
+#include <Eigen/Dense>
 #include "../system/Status.h"
 
 #ifndef LOCATION_GYROSCOPE_H
