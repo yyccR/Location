@@ -45,7 +45,7 @@ public:
     // 方向传感器和GPS方向差值修正
     void UpdateZaxisWithGPSAndRoad(routing::Status *status, Eigen::VectorXd &gps_data, Eigen::Vector3d &ornt_data, Eigen::Vector2d &road_data);
 
-
+    Eigen::VectorXd GPSJumpPointCompensate(routing::Status *status, Eigen::VectorXd &gps_bearing_queue);
 
 };
 

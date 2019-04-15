@@ -5,6 +5,7 @@
 #include <cmath>
 #include "../sensor/GPS.h"
 #include "../sensor/Accelerometer.h"
+#include "../sensor/Gravity.h"
 #include "../models/AHRS.h"
 #include "../models/StrapdownAHRS.h"
 #include "Location.h"
@@ -13,7 +14,6 @@
 
 using namespace Eigen;
 using namespace routing;
-//using namespace std;
 
 /**
  * Location 初始化。
@@ -42,8 +42,6 @@ Location::~Location() {}
 void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, Vector3d &mag_data, VectorXd &gps_data,
                                       Vector3d &g_data, Vector3d &ornt_data, Vector2d &road_data) {
 
-    static VectorXd gps_data_null = MatrixXd::Constant(7, 1, 0.0);
-
     // 记录起始位置和当前位置
     double start_x = status.position.x;
     double start_y = status.position.y;
@@ -56,11 +54,12 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     Quaternions quaternions;
     // 方向数据修正
     LPF lpf;
-//    Vector3d ornt_filter = ornt_data;
     Vector3d ornt_filter = lpf.LowPassFilter4Ornt(&status, ornt_data);
     Vector4d attitude = quaternions.GetQFromEuler(ornt_filter);
     accelerometer.StrapdownUpdateVelocityPosition(&status, acc_data, attitude, g_data);
 
+//    Gravity gravity;
+//    bool is_shaking = gravity.IsShaking(&status, g_data);
     // 获取GPS精度
     GPS gps;
     // 计算传感器运动距离
@@ -212,7 +211,7 @@ void Location::AutoAdjustTFactor(routing::Status *status, Eigen::VectorXd &gps_d
 }
 
 /**
- * 方向传感器和GPS方向差值修正
+ * 方向传感器和GPS,道路方向差值修正
  *
  * @param status
  * @param gps_data, gps(lng,lat,alt,accuracy,speed,bearing,t)
