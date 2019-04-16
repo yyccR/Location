@@ -117,7 +117,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
         // 时间t影响因子自调整
         AutoAdjustTFactor(&status, gps_data, status.parameters.ins_dist);
         // 更新GPS方向和方向传感器Z轴方向, 当GPS可用且精度高时
-        UpdateZaxisWithGPSAndRoad(&status, gps_data, ornt_filter, road_data);
+//        UpdateZaxisWithGPSAndRoad(&status, gps_data, ornt_filter, road_data);
         // 更新其他INS变量
         status.parameters.gps_count += 1;
         status.parameters.ins_count = 0;
