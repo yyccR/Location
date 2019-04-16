@@ -58,6 +58,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     Vector4d attitude = quaternions.GetQFromEuler(ornt_filter);
     accelerometer.StrapdownUpdateVelocityPosition(&status, acc_data, attitude, g_data);
 
+    // 判断手机是否摆放发生变化
 //    Gravity gravity;
 //    bool is_shaking = gravity.IsShaking(&status, g_data);
     // 获取GPS精度
@@ -73,8 +74,10 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     bool is_gps_valid = gps.IsGPSValid(&status, &gps_data);
     if (!is_gps_valid && is_ins_move_not_too_far) {
         // 采用惯导更新经纬度
-        // 更新道路方向和方向传感器Z轴方向, 当GPS精度低或不可用一定时间后
-        UpdateZaxisWithGPSAndRoad(&status, gps_data, ornt_filter, road_data);
+//        if(is_shaking){
+            // 更新道路方向和方向传感器Z轴方向, 当GPS精度低或不可用一定时间后
+//            UpdateZaxisWithGPSAndRoad(&status, gps_data, ornt_filter, road_data);
+//        }
         // 获取航向角
         double heading_no_limit = ornt_filter(2) + status.parameters.diff_gps_ornt;
         double heading;
