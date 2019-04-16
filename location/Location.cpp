@@ -117,7 +117,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
         // 时间t影响因子自调整
         AutoAdjustTFactor(&status, gps_data, status.parameters.ins_dist);
         // 更新GPS方向和方向传感器Z轴方向, 当GPS可用且精度高时
-//        UpdateZaxisWithGPSAndRoad(&status, gps_data, ornt_filter, road_data);
+        UpdateZaxisWithGPSAndRoad(&status, gps_data, ornt_filter, road_data);
         // 更新其他INS变量
         status.parameters.gps_count += 1;
         status.parameters.ins_count = 0;
@@ -229,16 +229,16 @@ void Location::UpdateZaxisWithGPSAndRoad(routing::Status *status, Eigen::VectorX
     static int gps_ornt_cnt = 0;
     static int road_ornt_cnt = 0;
 
-//    if (gps_ornt_cnt < (*status).parameters.queue_gps_ornt && road_ornt_cnt < (*status).parameters.queue_gps_ornt) {
-    if (gps_ornt_cnt < (*status).parameters.queue_gps_ornt) {
+    if (gps_ornt_cnt < (*status).parameters.queue_gps_ornt && road_ornt_cnt < (*status).parameters.queue_gps_ornt) {
+//    if (gps_ornt_cnt < (*status).parameters.queue_gps_ornt) {
         // gps方向队列
-        if (gps_data(4) > (*status).parameters.gps_static_speed_threshold) {
+        if (gps_ornt_cnt < (*status).parameters.queue_gps_ornt && gps_data(4) > (*status).parameters.gps_static_speed_threshold) {
             gps_queue.row(gps_ornt_cnt) = gps_data;
             ornt_queue.row(gps_ornt_cnt) = ornt_data;
             gps_ornt_cnt += 1;
         }
         // 道路方向队列
-        if (road_data(0) != 0.0 && road_data(1) != 0.0) {
+        if (road_ornt_cnt < (*status).parameters.queue_gps_ornt && road_data(0) != 0.0 && road_data(1) != 0.0) {
             road_queue.row(road_ornt_cnt) = road_data;
             road_ornt_cnt += 1;
         }
