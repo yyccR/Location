@@ -134,6 +134,12 @@ namespace routing {
         // 重力判断晃动阈值
         double shaking_threshold;
 
+        // 指南针方差计算队列长度
+        int compass_queue_len;
+        // 指南针晃动方差阈值
+        double compass_vaild_var_thres;
+
+
         // 当地重力加速度值
         double g;
         // 当地场强模值

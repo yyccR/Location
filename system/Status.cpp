@@ -78,7 +78,7 @@ void Status::Init() {
     Vector3d acc(0.0,0.0,0.0);
     this->parameters.last_acc_data = acc;
     this->parameters.sec_last_acc_data = acc;
-    this->parameters.ornt_hz = 0.7;
+    this->parameters.ornt_hz = 0.9;
     Vector3d ornt(0.0,0.0,0.0);
     this->parameters.last_ornt_data = ornt;
     this->parameters.sec_last_ornt_data = ornt;
@@ -115,6 +115,8 @@ void Status::Init() {
     this->parameters.gps_max_gap_time = 5;
 
     this->parameters.shaking_threshold = 0.5;
+    this->parameters.compass_queue_len = 20;
+    this->parameters.compass_vaild_var_thres = 0.085;
 
     this->parameters.g = 9.805567;
     this->parameters.mag = 157.44;
