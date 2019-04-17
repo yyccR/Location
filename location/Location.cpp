@@ -6,6 +6,7 @@
 #include "../sensor/GPS.h"
 #include "../sensor/Accelerometer.h"
 #include "../sensor/Gravity.h"
+#include "../sensor/Compass.h"
 #include "../models/AHRS.h"
 #include "../models/StrapdownAHRS.h"
 #include "Location.h"
@@ -58,6 +59,10 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     Vector4d attitude = quaternions.GetQFromEuler(ornt_filter);
     accelerometer.StrapdownUpdateVelocityPosition(&status, acc_data, attitude, g_data);
 
+    // 指南针波动情况
+    Compass compass;
+    bool is_compass_vaild = compass.IsCompassVaild(&status, ornt_data);
+
     // 判断手机是否摆放发生变化
     Gravity gravity;
     bool is_shaking = gravity.IsShaking(&status, g_data);
@@ -72,9 +77,9 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     bool is_ins_move_not_too_far = status.parameters.ins_dist < status.parameters.max_ins_dist;
     // 判断是否采用GPS数据
     bool is_gps_valid = gps.IsGPSValid(&status, &gps_data);
-    if (!is_gps_valid && is_ins_move_not_too_far) {
+    if (!is_gps_valid) {
         // 采用惯导更新经纬度
-        if(is_shaking){
+        if(is_shaking || !is_compass_vaild){
             // 更新道路方向和方向传感器Z轴方向, 当GPS精度低或不可用一定时间后
             UpdateZaxisWithGPSAndRoad(&status, gps_data, ornt_filter, road_data);
         }
@@ -87,14 +92,16 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
             heading = heading_no_limit;
         }
         status.attitude.yaw = heading;
-        // 计算航向角
-        Vector2d gps_new = gps.CalDestination(start_lng, start_lat, distance, heading);
-        // 更新经纬度
-        status.position.lng = gps_new(0);
-        status.position.lat = gps_new(1);
-        // 更新相关参数
-        status.parameters.ins_count += 1;
-        status.parameters.ins_dist += distance;
+        if(is_ins_move_not_too_far){
+            // 计算航向角
+            Vector2d gps_new = gps.CalDestination(start_lng, start_lat, distance, heading);
+            // 更新经纬度
+            status.position.lng = gps_new(0);
+            status.position.lat = gps_new(1);
+            // 更新相关参数
+            status.parameters.ins_count += 1;
+            status.parameters.ins_dist += distance;
+        }
 //        std::cout << status.parameters.gps_pre_bearing << " " << ornt_filter(2) << " " << status.parameters.diff_gps_ornt << " "
 //                  << heading_no_limit << std::endl;
     } else {
