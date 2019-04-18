@@ -103,7 +103,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
             status.parameters.ins_dist += distance;
         }
 //        std::cout << status.parameters.gps_pre_bearing << " " << ornt_filter(2) << " " << status.parameters.diff_gps_ornt << " "
-//                  << heading_no_limit << std::endl;
+//                  << heading_no_limit << " " << road_data(1) << std::endl;
     } else {
         // 采用GPS数据更新经纬度和方位角
         double gps_speed = gps_data(4);
@@ -137,6 +137,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
         status.position.y = 0.0;
         status.position.z = 0.0;
     }
+    std::cout << acc_data(0)-g_data(0) << " " << acc_data(1)-g_data(1) << " " << acc_data(2)-g_data(2) << " " << status.parameters.gps_pre_speed << std::endl;
 
     // 更新融合定位的结果，精度沿用GPS信号好时的精度,速度由于加速计计算的是三个方位的速度，故速度还是沿用GPS的速度
     status.gnssins.lng = status.position.lng;
@@ -258,7 +259,7 @@ void Location::UpdateZaxisWithGPSAndRoad(routing::Status *status, Eigen::VectorX
                 VectorXd ornt_bearing = ornt_queue.col(2);
                 double diff_road_ornt = (road_bearing - ornt_bearing).mean();
                 // TODO: 当距下个路口一定距离同时方向差别在一定范围内,采用道路方向修正指南针方向
-                (*status).parameters.diff_gps_ornt = diff_road_ornt;
+//                (*status).parameters.diff_gps_ornt = diff_road_ornt;
                 if (road_data(0) != 0.0 && road_data(1) != 0.0) {
                     for (int i = 0; i < (*status).parameters.queue_gps_ornt - 1; i++) {
                         road_queue.row(i) = road_queue.row(i + 1);
