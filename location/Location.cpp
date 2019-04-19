@@ -37,11 +37,11 @@ Location::~Location() {}
  * @param gps_data, GPS原始数据, gps(lng,lat,alt,accuracy,speed,bearing,t)
  * @param g_data, 重力感应数据, g(x,y,z)
  * @param ornt_data, 方向传感器数据, o(roll,pitch,yaw)
- * @param road_data, 道路方向数据,包含距离下个路口距离和当前位置道路方向, v(distance, bearing)
+ * @param road_data, 道路方向数据,包含距离下个路口距离和当前位置道路方向, 道路类型编码, v(distance, bearing, code)
  * @param status, 状态容器, 包含位置,姿态,速度,参数等信息
  */
 void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, Vector3d &mag_data, VectorXd &gps_data,
-                                      Vector3d &g_data, Vector3d &ornt_data, Vector2d &road_data) {
+                                      Vector3d &g_data, Vector3d &ornt_data, Vector3d &road_data) {
 
     // 记录起始位置和当前位置
     double start_x = status.position.x;
@@ -49,6 +49,8 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     double start_lng = status.position.lng;
     double start_lat = status.position.lat;
 
+    // 更新道路状态
+    UpdateRoadType(&status, road_data);
     // 更新惯性位置,速度
     Accelerometer accelerometer;
 //    accelerometer.PositionIntegral(&status, final_acc_lpf, status.parameters.t);
@@ -137,7 +139,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
         status.position.y = 0.0;
         status.position.z = 0.0;
     }
-    std::cout << acc_data(0)-g_data(0) << " " << acc_data(1)-g_data(1) << " " << acc_data(2)-g_data(2) << " " << status.parameters.gps_pre_speed << std::endl;
+//    std::cout << acc_data(0)-g_data(0) << " " << acc_data(1)-g_data(1) << " " << acc_data(2)-g_data(2) << " " << status.parameters.gps_pre_speed << std::endl;
 
     // 更新融合定位的结果，精度沿用GPS信号好时的精度,速度由于加速计计算的是三个方位的速度，故速度还是沿用GPS的速度
     status.gnssins.lng = status.position.lng;
@@ -227,13 +229,13 @@ void Location::AutoAdjustTFactor(routing::Status *status, Eigen::VectorXd &gps_d
  * @param status
  * @param gps_data, gps(lng,lat,alt,accuracy,speed,bearing,t)
  * @param ornt_data, v(x,y,z)
- * @param road_data, 道路方向数据,包含距离下个路口距离,和当前点的瞬时方向, v(distance, heading)
+ * @param road_data, 道路方向数据,包含距离下个路口距离,和当前点的瞬时方向,以及当前道路类型编码, v(distance, heading, code)
  */
 void Location::UpdateZaxisWithGPSAndRoad(routing::Status *status, Eigen::VectorXd &gps_data, Eigen::Vector3d &ornt_data,
-                                         Eigen::Vector2d &road_data) {
+                                         Eigen::Vector3d &road_data) {
     static MatrixXd gps_queue((*status).parameters.queue_gps_ornt, 7);
     static MatrixXd ornt_queue((*status).parameters.queue_gps_ornt, 3);
-    static MatrixXd road_queue((*status).parameters.queue_gps_ornt, 2);
+    static MatrixXd road_queue((*status).parameters.queue_gps_ornt, 3);
     static int gps_ornt_cnt = 0;
     static int road_ornt_cnt = 0;
 
@@ -259,7 +261,7 @@ void Location::UpdateZaxisWithGPSAndRoad(routing::Status *status, Eigen::VectorX
                 VectorXd ornt_bearing = ornt_queue.col(2);
                 double diff_road_ornt = (road_bearing - ornt_bearing).mean();
                 // TODO: 当距下个路口一定距离同时方向差别在一定范围内,采用道路方向修正指南针方向
-//                (*status).parameters.diff_gps_ornt = diff_road_ornt;
+                (*status).parameters.diff_gps_ornt = diff_road_ornt;
                 if (road_data(0) != 0.0 && road_data(1) != 0.0) {
                     for (int i = 0; i < (*status).parameters.queue_gps_ornt - 1; i++) {
                         road_queue.row(i) = road_queue.row(i + 1);
@@ -296,6 +298,16 @@ void Location::UpdateZaxisWithGPSAndRoad(routing::Status *status, Eigen::VectorX
         }
     }
 }
+
+/**
+ * 更新道路状态
+ * @param status
+ * @param road_data, v(distance, bearing, code)
+ */
+void Location::UpdateRoadType(routing::Status *status, Eigen::Vector3d &road_data) {
+    (*status).parameters.road_type = road_data(2);
+}
+
 
 //Eigen::VectorXd Location::GPSJumpPointCompensate(routing::Status *status, Eigen::VectorXd &gps_bearing_queue) {
 //
