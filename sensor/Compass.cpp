@@ -3,6 +3,7 @@
 //
 
 #include "Compass.h"
+#include <iostream>
 
 using namespace Eigen;
 
