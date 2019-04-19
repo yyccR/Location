@@ -139,6 +139,12 @@ namespace routing {
         // 指南针晃动方差阈值
         double compass_vaild_var_thres;
 
+        /**
+         * 道路类型
+         * 0:正常道路
+         * 1:隧道
+         */
+        double road_type;
 
         // 当地重力加速度值
         double g;
