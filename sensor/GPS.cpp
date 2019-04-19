@@ -148,10 +148,16 @@ bool GPS::IsGPSBelongToTrack(routing::Status *status, Eigen::VectorXd &gps_data)
             }
             gps_queue.row((*status).parameters.gps_track_len - 1) = gps_data;
         } else {
-            // 误差不可接受,但是时间间隔超出了允许的间隔范围,则认为该点已超出预估能力范围
-            // 误差不可接受,时间间隔也没有超出了允许的间隔范围,则认为改点是误差点
-            result = time_diff2 > (*status).parameters.gps_max_gap_time;
-            cnt = 0;
+
+            if ((*status).parameters.road_type == 1.0){
+                // 误差不可接受, 同时处于隧道状态, 则不考虑时间间隔,同时不拿下个点作为初始了,因为下个点可能是仍在隧道
+                result = false;
+            }else{
+                // 误差不可接受,但不处于隧道状态,但是时间间隔超出了允许的间隔范围,则认为该点已超出预估能力范围
+                // 误差不可接受,但不处于隧道状态,时间间隔也没有超出了允许的间隔范围,则认为改点是误差点
+                result = time_diff2 > (*status).parameters.gps_max_gap_time;
+                cnt = 0;
+            }
         }
     }
     return result;
@@ -187,6 +193,11 @@ bool GPS::IsGPSValid(Status *status, VectorXd *gps_data) {
 
     // 判断当前GPS是否与上个GPS点同个时间戳
     bool is_gps_not_duplicated = (*gps_data)(6) != (*status).parameters.gps_pre_t;
+
+    // 当GPS速度为0时,方向沿用上个GPS点方向
+    if ((*gps_data)(4) == 0.0) {
+        (*gps_data)(5) = (*status).parameters.gps_pre_bearing;
+    }
 
     // 判断GPS高精情况下是否存在漂移,利用kalman根据历史轨迹进行滤波估计
     bool is_gps_belong_to_track = true;
