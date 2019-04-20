@@ -145,6 +145,8 @@ namespace routing {
          * 1:隧道
          */
         double road_type;
+        // 隧道里判断为误差的最多次数
+        int max_ignore_in_tunnel;
 
         // 当地重力加速度值
         double g;
