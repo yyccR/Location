@@ -98,6 +98,7 @@ bool GPS::IsGPSBelongToTrack(routing::Status *status, Eigen::VectorXd &gps_data)
     bool result = true;
     static MatrixXd gps_queue((*status).parameters.gps_track_len, 7);
     static int cnt = 0;
+    static int ignore_in_tunnel = 0;
 
 //    std::cout << "IsGPSBelongToTrack in " << std::endl;
     if (cnt < (*status).parameters.gps_track_len) {
@@ -150,7 +151,13 @@ bool GPS::IsGPSBelongToTrack(routing::Status *status, Eigen::VectorXd &gps_data)
         } else {
 
             if ((*status).parameters.road_type == 1.0){
-                // 误差不可接受, 同时处于隧道状态, 则不考虑时间间隔,同时不拿下个点作为初始了,因为下个点可能是仍在隧道
+                // 误差不可接受, 同时处于隧道状态, 则不考虑时间间隔,同时不拿下个点作为初始了,因为下个点可能是仍在隧道,但有次数限制
+                if(ignore_in_tunnel < (*status).parameters.max_ignore_in_tunnel){
+                    ignore_in_tunnel += 1;
+                }else{
+                    cnt = 0;
+                    ignore_in_tunnel = 0;
+                }
                 result = false;
             }else{
                 // 误差不可接受,但不处于隧道状态,但是时间间隔超出了允许的间隔范围,则认为该点已超出预估能力范围
