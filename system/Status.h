@@ -147,6 +147,8 @@ namespace routing {
         double road_type;
         // 隧道里判断为误差的最多次数
         int max_ignore_in_tunnel;
+        // 距路口多少米时开始侧重指南针,在此之前gps可用则用,其次是道路方向
+        double min_dist_to_cross;
 
         // 当地重力加速度值
         double g;

@@ -120,6 +120,7 @@ void Status::Init() {
 
     this->parameters.road_type = 0.0;
     this->parameters.max_ignore_in_tunnel = 5;
+    this->parameters.min_dist_to_cross = 50.0;
 
     this->parameters.g = 9.805567;
     this->parameters.mag = 157.44;
