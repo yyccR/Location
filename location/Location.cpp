@@ -70,7 +70,8 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     bool is_shaking = gravity.IsShaking(&status, g_data);
 
     // 判断是否以及行走到路口一定范围内
-    bool is_near_cross = road_data(0) < status.parameters.min_dist_to_cross;
+    bool is_near_cross = status.parameters.dist_from_pre_cross < status.parameters.min_dist_to_cross ||
+                         status.parameters.dist_to_next_cross < status.parameters.min_dist_to_cross;
 
     // 获取GPS精度
     GPS gps;
@@ -85,7 +86,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     bool is_gps_valid = gps.IsGPSValid(&status, &gps_data);
     if (!is_gps_valid) {
         // 采用惯导更新经纬度
-        if(is_shaking || !is_compass_vaild || !is_near_cross){
+        if (is_shaking || !is_compass_vaild || !is_near_cross) {
             // 更新道路方向和方向传感器Z轴方向, 当GPS精度低或不可用一定时间后
             UpdateZaxisWithGPSAndRoad(&status, gps_data, ornt_filter, road_data);
         }
@@ -98,7 +99,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
             heading = heading_no_limit;
         }
         status.attitude.yaw = heading;
-        if(is_ins_move_not_too_far){
+        if (is_ins_move_not_too_far) {
             // 计算航向角
             Vector2d gps_new = gps.CalDestination(start_lng, start_lat, distance, heading);
             // 更新经纬度
@@ -246,7 +247,8 @@ void Location::UpdateZaxisWithGPSAndRoad(routing::Status *status, Eigen::VectorX
     if (gps_ornt_cnt < (*status).parameters.queue_gps_ornt || road_ornt_cnt < (*status).parameters.queue_gps_ornt) {
 //    if (gps_ornt_cnt < (*status).parameters.queue_gps_ornt) {
         // gps方向队列
-        if (gps_ornt_cnt < (*status).parameters.queue_gps_ornt && gps_data(4) > (*status).parameters.gps_static_speed_threshold) {
+        if (gps_ornt_cnt < (*status).parameters.queue_gps_ornt &&
+            gps_data(4) > (*status).parameters.gps_static_speed_threshold) {
             gps_queue.row(gps_ornt_cnt) = gps_data;
             ornt_queue.row(gps_ornt_cnt) = ornt_data;
             gps_ornt_cnt += 1;
@@ -309,7 +311,25 @@ void Location::UpdateZaxisWithGPSAndRoad(routing::Status *status, Eigen::VectorX
  * @param road_data, v(distance, bearing, code)
  */
 void Location::UpdateRoadType(routing::Status *status, Eigen::Vector3d &road_data) {
-    (*status).parameters.road_type = road_data(2);
+    static double jump_point = 0.0;
+
+    if(road_data(0) != 0.0 && road_data(1) != 0.0) {
+        (*status).parameters.road_type = road_data(2);
+
+        if (road_data(0) > (*status).parameters.dist_to_next_cross) {
+            jump_point = road_data(0);
+        } else {
+            if (jump_point > road_data(0)) {
+                (*status).parameters.dist_from_pre_cross = jump_point - road_data(0);
+            }
+        }
+        (*status).parameters.dist_to_next_cross = road_data(0);
+    }else{
+        (*status).parameters.road_type = 0.0;
+        (*status).parameters.dist_to_next_cross = 0.0;
+        (*status).parameters.dist_from_pre_cross = 100.0;
+    }
+
 }
 
 
