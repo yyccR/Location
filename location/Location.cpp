@@ -73,6 +73,9 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     bool is_near_cross = status.parameters.dist_from_pre_cross < status.parameters.min_dist_to_cross ||
                          status.parameters.dist_to_next_cross < status.parameters.min_dist_to_cross;
 
+//    std::cout << "is_near_cross " << is_near_cross << " pre dist " << status.parameters.dist_from_pre_cross
+//              << " next dist " << status.parameters.dist_to_next_cross << std::endl;
+
     // 获取GPS精度
     GPS gps;
     // 计算传感器运动距离
@@ -318,6 +321,7 @@ void Location::UpdateRoadType(routing::Status *status, Eigen::Vector3d &road_dat
 
         if (road_data(0) > (*status).parameters.dist_to_next_cross) {
             jump_point = road_data(0);
+            (*status).parameters.dist_from_pre_cross = 0.0;
         } else {
             if (jump_point > road_data(0)) {
                 (*status).parameters.dist_from_pre_cross = jump_point - road_data(0);
@@ -326,8 +330,8 @@ void Location::UpdateRoadType(routing::Status *status, Eigen::Vector3d &road_dat
         (*status).parameters.dist_to_next_cross = road_data(0);
     }else{
         (*status).parameters.road_type = 0.0;
-        (*status).parameters.dist_to_next_cross = 0.0;
-        (*status).parameters.dist_from_pre_cross = 100.0;
+        (*status).parameters.dist_to_next_cross = 100000.0;
+        (*status).parameters.dist_from_pre_cross = 100000.0;
     }
 
 }
