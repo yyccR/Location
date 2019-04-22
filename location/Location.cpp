@@ -68,6 +68,10 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     // 判断手机是否摆放发生变化
     Gravity gravity;
     bool is_shaking = gravity.IsShaking(&status, g_data);
+
+    // 判断是否以及行走到路口一定范围内
+    bool is_near_cross = road_data(0) < status.parameters.min_dist_to_cross;
+
     // 获取GPS精度
     GPS gps;
     // 计算传感器运动距离
@@ -81,7 +85,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     bool is_gps_valid = gps.IsGPSValid(&status, &gps_data);
     if (!is_gps_valid) {
         // 采用惯导更新经纬度
-        if(is_shaking || !is_compass_vaild){
+        if(is_shaking || !is_compass_vaild || !is_near_cross){
             // 更新道路方向和方向传感器Z轴方向, 当GPS精度低或不可用一定时间后
             UpdateZaxisWithGPSAndRoad(&status, gps_data, ornt_filter, road_data);
         }
