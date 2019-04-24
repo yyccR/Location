@@ -24,6 +24,10 @@
 
 <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/gps_compass.png" width="1000" height="300" />
 
+- Some time gps is high accuracy but still drift, using the kalman filter and establish the equation can help to fix this, below show some example that gps drift in tunnel with high accuracy.
+
+<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/tunnel_anomaly.png" width="300" height="300" /> <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/tunnel_filter.png" width="300" height="300" />
+
 ### GPS trajectory and INS trajectory.
 
 - fusion GPS and INS
