@@ -71,6 +71,7 @@ void KalmanFilter::UpdateState(Eigen::Vector4d &measure_state) {
 
     Vector4d prioriState = PredictState();
     Matrix4d prioriCov = CalcPrioriCov();
+    // TODO: 求逆方法改进
     Matrix4d k = prioriCov * this->H.transpose() * (this->H * prioriCov * this->H.transpose() + this->R).inverse();
     Vector4d posteriorState = prioriState + k * (measure_state - this->H * prioriState);
     Matrix4d posteriorCov = (MatrixXd::Identity(4, 4) - k * this->H) * prioriCov;

@@ -133,6 +133,8 @@ bool GPS::IsGPSBelongToTrack(routing::Status *status, Eigen::VectorXd &gps_data)
         }
 
         // 计算比较当前预测与实际测量的差距
+        double cur_delta_t = (gps_data(6) - gps_queue((*status).parameters.gps_track_len - 1, 6)) / 1000.0;
+        kalmanFilter.SetF(cur_delta_t);
         VectorXd predict_state = kalmanFilter.PredictState();
         double start_lng = predict_state(0);
         double start_lat = predict_state(1);
@@ -141,7 +143,10 @@ bool GPS::IsGPSBelongToTrack(routing::Status *status, Eigen::VectorXd &gps_data)
         double cur_error = CalDistance(start_lng, start_lat, end_lng, end_lat);
         double time_diff2 = (gps_data(6) - gps_queue.row((*status).parameters.gps_track_len - 1)(6)) / 1000.0;
 
-//        std::cout << "cur_error <= (*status).parameters.weak_gps " << cur_error << std::endl;
+//        std::cout << "cur_error <= (*status).parameters.weak_gps " << (cur_error <= (*status).parameters.weak_gps)
+//                  << " "
+//                  << end_lng << " " << end_lat << " " << cur_error << " "
+//                  << (*status).parameters.road_type << std::endl;
         if (cur_error <= (*status).parameters.weak_gps) {
             // 误差在可接受的范围
             for (int i = 0; i < (*status).parameters.gps_track_len - 1; i++) {
@@ -150,16 +155,16 @@ bool GPS::IsGPSBelongToTrack(routing::Status *status, Eigen::VectorXd &gps_data)
             gps_queue.row((*status).parameters.gps_track_len - 1) = gps_data;
         } else {
 
-            if ((*status).parameters.road_type == 1.0){
+            if ((*status).parameters.road_type == 1.0) {
                 // 误差不可接受, 同时处于隧道状态, 则不考虑时间间隔,同时不拿下个点作为初始了,因为下个点可能是仍在隧道,但有次数限制
-                if(ignore_in_tunnel < (*status).parameters.max_ignore_in_tunnel){
+                if (ignore_in_tunnel < (*status).parameters.max_ignore_in_tunnel) {
                     ignore_in_tunnel += 1;
-                }else{
+                } else {
                     cnt = 0;
                     ignore_in_tunnel = 0;
                 }
                 result = false;
-            }else{
+            } else {
                 // 误差不可接受,但不处于隧道状态,但是时间间隔超出了允许的间隔范围,则认为该点已超出预估能力范围
                 // 误差不可接受,但不处于隧道状态,时间间隔也没有超出了允许的间隔范围,则认为改点是误差点
                 result = time_diff2 > (*status).parameters.gps_max_gap_time;
@@ -206,11 +211,11 @@ bool GPS::IsGPSValid(Status *status, VectorXd *gps_data) {
         (*gps_data)(5) = (*status).parameters.gps_pre_bearing;
     }
 
-    // 判断GPS高精情况下是否存在漂移,利用kalman根据历史轨迹进行滤波估计
-    bool is_gps_belong_to_track = true;
-    if (is_gps_accuracy && is_gps_not_null && is_gps_not_duplicated) {
-        is_gps_belong_to_track = IsGPSBelongToTrack(status, (*gps_data));
-    }
+//    // 利用kalman根据历史轨迹进行滤波估计
+//    bool is_gps_belong_to_track = true;
+//    if (is_gps_accuracy && is_gps_not_null && is_gps_not_duplicated) {
+//        is_gps_belong_to_track = IsGPSBelongToTrack(status, (*gps_data));
+//    }
 
     // 当GPS在初始状态内时，处理为0.0的情况,gps(lng,lat,alt,accuracy,speed,bearing,t)
     if (is_gps_initializing && !is_gps_not_null) {
@@ -235,6 +240,12 @@ bool GPS::IsGPSValid(Status *status, VectorXd *gps_data) {
 //        (*status).parameters.t = 1.0 / ((*status).parameters.Hz * (*status).parameters.move_t_factor);
     }
 
+    // 利用kalman根据历史轨迹进行滤波估计
+    bool is_gps_belong_to_track = true;
+    if ((is_gps_accuracy && is_gps_not_null && is_gps_not_duplicated) || is_gps_static) {
+        is_gps_belong_to_track = IsGPSBelongToTrack(status, (*gps_data));
+    }
+
     // 当前一个GPS点速度为0,当前GPS数据又为空的的时候,采用前一点的数据,gps(lng,lat,alt,accuracy,speed,bearing,t)
     bool is_gps_still_static;
     if (!is_gps_not_null && (*status).parameters.gps_pre_speed <= (*status).parameters.gps_static_speed_threshold) {
@@ -254,7 +265,6 @@ bool GPS::IsGPSValid(Status *status, VectorXd *gps_data) {
 //        (*status).parameters.t = 1.0 / ((*status).parameters.Hz * (*status).parameters.move_t_factor);
     }
 
-    return (is_gps_accuracy && is_gps_not_null && is_gps_move_accepted && is_gps_not_duplicated &&
-            is_gps_belong_to_track)
-           || is_gps_initializing || is_gps_static || is_gps_still_static;
+    return (is_gps_accuracy && is_gps_not_null && is_gps_move_accepted && is_gps_not_duplicated && is_gps_belong_to_track)
+           || is_gps_initializing || (is_gps_static || is_gps_still_static) && is_gps_belong_to_track;
 }
