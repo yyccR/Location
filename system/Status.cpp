@@ -119,7 +119,7 @@ void Status::Init() {
     this->parameters.compass_vaild_var_thres = 0.085;
 
     this->parameters.road_type = 0.0;
-    this->parameters.max_ignore_in_tunnel = 5;
+    this->parameters.max_ignore_in_tunnel = 8;
     this->parameters.min_dist_to_cross = 30.0;
     this->parameters.dist_to_next_cross = 100000.0;
     this->parameters.dist_from_pre_cross = 100000.0;
