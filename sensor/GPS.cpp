@@ -154,6 +154,8 @@ bool GPS::IsGPSBelongToTrack(routing::Status *status, Eigen::VectorXd &gps_data)
                 gps_queue.row(i) = gps_queue.row(i + 1);
             }
             gps_queue.row((*status).parameters.gps_track_len - 1) = gps_data;
+            ignore_in_common = 0;
+            ignore_in_tunnel = 0;
         } else {
 
             if ((*status).parameters.road_type == 1.0) {
