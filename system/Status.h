@@ -109,6 +109,8 @@ namespace routing {
         int queue_gps_ornt;
         // GPS和方向传感器之间的偏差
         double diff_gps_ornt;
+        // 道路和方向传感器之间的偏差
+        double diff_road_ornt;
         // 当多长时间没GPS信号后才使用道路方向做指南针修正
         double least_gap_time_for_using_road;
 
