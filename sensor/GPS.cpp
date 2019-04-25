@@ -99,6 +99,7 @@ bool GPS::IsGPSBelongToTrack(routing::Status *status, Eigen::VectorXd &gps_data)
     static MatrixXd gps_queue((*status).parameters.gps_track_len, 7);
     static int cnt = 0;
     static int ignore_in_tunnel = 0;
+    static int ignore_in_common = 0;
 
 //    std::cout << "IsGPSBelongToTrack in " << std::endl;
     if (cnt < (*status).parameters.gps_track_len) {
@@ -165,10 +166,15 @@ bool GPS::IsGPSBelongToTrack(routing::Status *status, Eigen::VectorXd &gps_data)
                 }
                 result = false;
             } else {
-                // 误差不可接受,但不处于隧道状态,但是时间间隔超出了允许的间隔范围,则认为该点已超出预估能力范围
-                // 误差不可接受,但不处于隧道状态,时间间隔也没有超出了允许的间隔范围,则认为改点是误差点
-                result = time_diff2 > (*status).parameters.gps_max_gap_time;
-                cnt = 0;
+                // 误差不可接受,但不处于隧道状态,则不可接受点设置严格一些
+                if (ignore_in_common < (*status).parameters.max_ignore_in_common) {
+                    ignore_in_common += 1;
+                } else {
+                    cnt = 0;
+                    ignore_in_common = 0;
+                }
+                result = false;//time_diff2 > (*status).parameters.gps_max_gap_time;
+
             }
         }
     }
@@ -242,7 +248,7 @@ bool GPS::IsGPSValid(Status *status, VectorXd *gps_data) {
 
     // 利用kalman根据历史轨迹进行滤波估计
     bool is_gps_belong_to_track = true;
-    if ((is_gps_accuracy && is_gps_not_null && is_gps_not_duplicated) || is_gps_static) {
+    if (is_gps_not_null) {
         is_gps_belong_to_track = IsGPSBelongToTrack(status, (*gps_data));
     }
 
@@ -265,6 +271,7 @@ bool GPS::IsGPSValid(Status *status, VectorXd *gps_data) {
 //        (*status).parameters.t = 1.0 / ((*status).parameters.Hz * (*status).parameters.move_t_factor);
     }
 
-    return (is_gps_accuracy && is_gps_not_null && is_gps_move_accepted && is_gps_not_duplicated && is_gps_belong_to_track)
+    return (is_gps_accuracy && is_gps_not_null && is_gps_move_accepted && is_gps_not_duplicated &&
+            is_gps_belong_to_track)
            || is_gps_initializing || (is_gps_static || is_gps_still_static) && is_gps_belong_to_track;
 }
