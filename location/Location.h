@@ -43,7 +43,14 @@ public:
     void AutoAdjustTFactor(routing::Status *status, Eigen::VectorXd &gps_data, double ins_distance);
 
     // 方向传感器和GPS方向差值修正
-    void UpdateZaxisWithGPSAndRoad(routing::Status *status, Eigen::VectorXd &gps_data, Eigen::Vector3d &ornt_data, Eigen::Vector3d &road_data);
+    void UpdateZaxisWithGPSAndRoad(routing::Status *status, Eigen::VectorXd &gps_data, Eigen::Vector3d &ornt_data,
+                                   Eigen::Vector3d &road_data);
+
+    // 方向传感器和GPS方向差值修正
+    void UpdateZaxisWithGPS(routing::Status *status, Eigen::VectorXd &gps_data, Eigen::Vector3d &ornt_data);
+
+    // 方向传感器和道路方向差值修正
+    void UpdateZaxisWithRoad(routing::Status *status, Eigen::Vector3d &ornt_data, Eigen::Vector3d &road_data);
 
     // 更新道路类型
     void UpdateRoadType(routing::Status *status, Eigen::Vector3d &road_data);
