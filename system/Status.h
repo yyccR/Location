@@ -113,6 +113,12 @@ namespace routing {
         double diff_road_ornt;
         // 当多长时间没GPS信号后才使用道路方向做指南针修正
         double least_gap_time_for_using_road;
+        // 指南针与道路方向的变化幅度队列长度
+        int queue_road_ornt_len;
+        // 角度误差波动可接受范围
+        double accepted_change_range;
+        // 当道路方向发生比较大变化时, 与指南针方向变化 的可容许误差范围
+        double accepted_max_diff_change_range;
 
         // GPS初始状态计数
         int gps_count;

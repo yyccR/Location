@@ -102,6 +102,10 @@ void Status::Init() {
     this->parameters.queue_gps_ornt = 1;
     this->parameters.diff_gps_ornt = 0.0;
     this->parameters.diff_road_ornt = 0.0;
+    this->parameters.queue_road_ornt_len = 3;
+    this->parameters.accepted_change_range = 10.0;
+    this->parameters.accepted_max_diff_change_range = 20.0;
+
     this->parameters.gps_static_speed_threshold = 2.0;
     this->parameters.gps_count = 0;
     this->parameters.gps_init_threshold = 1;
