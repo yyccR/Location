@@ -517,13 +517,32 @@ bool Location::IsRoadCompassSameRange(Status *status, Vector3d &ornt_data, Vecto
 
         VectorXd road_bearing = road_queue.col(1);
         VectorXd ornt_bearing = ornt_queue.col(2);
-        VectorXd road_diff = road_bearing.tail((*status).parameters.queue_road_ornt_len - 1)
-                             - road_bearing.head((*status).parameters.queue_road_ornt_len - 1);
-        VectorXd ornt_diff = ornt_bearing.tail((*status).parameters.queue_road_ornt_len - 1)
-                             - ornt_bearing.head((*status).parameters.queue_road_ornt_len - 1);
+        VectorXd road_diff((*status).parameters.queue_road_ornt_len - 1);
+        VectorXd ornt_diff((*status).parameters.queue_road_ornt_len - 1);
+        LPF lpf;
+        for (int i = 0; i <= ((*status).parameters.queue_road_ornt_len - 2); ++i) {
+            std::string road_flag = lpf.JudgeOrientation(road_bearing(i)) + lpf.JudgeOrientation(road_bearing(i + 1));
+            std::string ornt_flag = lpf.JudgeOrientation(ornt_bearing(i)) + lpf.JudgeOrientation(ornt_bearing(i + 1));
+            // 处理0/360跳点问题
+            if (road_flag == "14") {
+                road_diff(i) = road_bearing(i) - (road_bearing(i + 1) + 360.0);
+            } else if (road_flag == "41") {
+                road_diff(i) = (road_bearing(i + 1) + 360.0) - road_bearing(i);
+            } else {
+                road_diff(i) = road_bearing(i + 1) - road_bearing(i);
+            }
+            if (ornt_flag == "14") {
+                ornt_diff(i) = ornt_bearing(i) - (ornt_bearing(i + 1) + 360.0);
+            } else if (ornt_flag == "41") {
+                ornt_diff(i) = (ornt_bearing(i + 1) + 360.0) - ornt_bearing(i);
+            } else {
+                ornt_diff(i) = ornt_bearing(i + 1) - ornt_bearing(i);
+            }
+
+        }
 
         for (int i = 0; i <= (*status).parameters.queue_road_ornt_len - 2; i++) {
-            if(abs(road_diff(i)) < (*status).parameters.accepted_change_range){
+            if (abs(road_diff(i)) < (*status).parameters.accepted_change_range) {
                 res = res && abs((road_diff(i) - ornt_diff(i))) < (*status).parameters.accepted_change_range;
             } else {
                 res = res && abs(road_diff(i) - ornt_diff(i)) < (*status).parameters.accepted_max_diff_change_range;
