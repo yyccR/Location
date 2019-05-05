@@ -158,17 +158,16 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
         status.position.x = 0.0;
         status.position.y = 0.0;
         status.position.z = 0.0;
-//        std::cout << gps_data(0) << " " << gps_data(1) << std::endl;
     }
-    std::cout << status.parameters.gps_pre_bearing << " " << ornt_filter(2) << " "
-              << status.parameters.diff_gps_ornt << " " << status.parameters.diff_road_ornt
-              << " " << status.attitude.yaw << " " << road_data(1) <<
-              " " << road_data(0) << " "
-              << status.parameters.ins_count << " " << gps_data(0) << " " << gps_data(1)
-              << " " << ((is_shaking || !is_compass_vaild) || (!is_near_cross || is_same_change)) << " "
-              << is_shaking << " " << is_same_change << " " << !is_near_cross
-              << " " << status.parameters.dist_to_next_cross << " "
-              << status.parameters.dist_from_pre_cross << std::endl;
+//    std::cout << status.parameters.gps_pre_bearing << " " << ornt_filter(2) << " "
+//              << status.parameters.diff_gps_ornt << " " << status.parameters.diff_road_ornt
+//              << " " << status.attitude.yaw << " " << road_data(1) <<
+//              " " << road_data(0) << " "
+//              << status.parameters.ins_count << " " << gps_data(0) << " " << gps_data(1)
+//              << " " << ((is_shaking || !is_compass_vaild) || (!is_near_cross || is_same_change)) << " "
+//              << is_shaking << " " << is_same_change << " " << !is_near_cross
+//              << " " << status.parameters.dist_to_next_cross << " "
+//              << status.parameters.dist_from_pre_cross << std::endl;
 
     // 更新融合定位的结果，精度沿用GPS信号好时的精度,速度由于加速计计算的是三个方位的速度，故速度还是沿用GPS的速度
     status.gnssins.lng = status.position.lng;
