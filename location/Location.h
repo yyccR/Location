@@ -9,18 +9,23 @@
 #ifndef LOCATION_LOCATION_H
 #define LOCATION_LOCATION_H
 
+using namespace std;
+
+using LOG_CALLBACK = function<void(string &)>;
 
 class Location {
 private:
     // 状态容器
     routing::Status status;
-
+    LOG_CALLBACK Log;
 public:
 
     Location();
 
     ~Location();
-
+    
+    void SetLogCallback(LOG_CALLBACK callback) { Log = callback; }
+    
     // 定位,计算当前位置
     void PredictCurrentPosition(Eigen::Vector3d &gyro_data, Eigen::Vector3d &acc_data, Eigen::Vector3d &mag_data,
                                 Eigen::VectorXd &gps_data, Eigen::Vector3d &g_data, Eigen::Vector3d &ornt_data,
