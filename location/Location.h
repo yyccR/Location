@@ -9,7 +9,7 @@
 #ifndef LOCATION_LOCATION_H
 #define LOCATION_LOCATION_H
 
-using LOG_CALLBACK = std::function<void(std::string &)>;
+using LOG_CALLBACK = std::function<void(std::string)>;
 
 class Location {
 private:
