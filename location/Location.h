@@ -11,7 +11,7 @@
 
 using namespace std;
 
-using LOG_CALLBACK = function<void(string &)>;
+using LOG_CALLBACK = function<void(string)>;
 
 class Location {
 private:
