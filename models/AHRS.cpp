@@ -86,7 +86,10 @@ Vector4d AHRS::UpdateAttitude(Vector3d *err, Vector4d &q_attitude, Vector3d &gyr
 //    euler_q(2) = euler_q(2) + (euler_q(0) * gyro(1) - euler_q(1) * gyro(2) + euler_q(3) * gyro(0)) * halfT;
 //    euler_q(3) = euler_q(3) + (euler_q(0) * gyro(2) + euler_q(1) * gyro(1) - euler_q(2) * gyro(0)) * halfT;
 
+
     newAttitude = quaternions.Normalise(euler_q);
+//    Vector3d eur = quaternions.GetEulerFromQ(newAttitude) * 180.0 / M_PI ;
+//    std::cout << eur.transpose() << std::endl;
     return newAttitude;
 
 }
