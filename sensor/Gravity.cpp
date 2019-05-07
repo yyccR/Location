@@ -14,12 +14,12 @@ bool Gravity::IsShaking(routing::Status *status, Eigen::Vector3d &g_data) {
     static int cnt = 0;
 
 
-    if(cnt <= (*status).parameters.Hz){
+    if (cnt <= (*status).parameters.Hz) {
         pre_g_data.push(g_data);
         cnt += 1;
 //        std::cout << g_data(0) << " " << g_data(1) << " " << g_data(2) << " " << 0 << " " << 0 << std::endl;
         return false;
-    }else{
+    } else {
         double diff_pre_curent = (g_data - pre_g_data.front()).squaredNorm();
         pre_g_data.pop();
         pre_g_data.push(g_data);
