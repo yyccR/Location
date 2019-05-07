@@ -15,7 +15,7 @@ using namespace Eigen;
 class DataFormat {
 public:
 
-    void readCSV(MatrixXd &gyro, MatrixXd &acc, MatrixXd &mag, MatrixXd &gps_data, MatrixXd &g_data, MatrixXd &ornt_data);
+    void readCSV(MatrixXd &gyro, MatrixXd &acc, MatrixXd &mag, MatrixXd &gps_data, MatrixXd &g_data, MatrixXd &ornt_data, MatrixXd &road_data);
 
     void split(const string &s, vector<string> &v, const string &c);
 

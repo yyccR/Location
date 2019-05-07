@@ -12,9 +12,29 @@
 using namespace std;
 using namespace Eigen;
 
-void DataFormat::readCSV(MatrixXd &gyro, MatrixXd &acc, MatrixXd &mag, MatrixXd &gps_data, MatrixXd &g_data, MatrixXd &ornt_data) {
+void DataFormat::readCSV(MatrixXd &gyro, MatrixXd &acc, MatrixXd &mag, MatrixXd &gps_data, MatrixXd &g_data, MatrixXd &ornt_data, MatrixXd &road_data) {
     ifstream infile;
-    infile.open("D:/worksheet/clion/Location/test/data/McLaneWalk.csv",
+    // D:\worksheet\clion\Location\test\data\EEWalk2.csv  McLaneWalk.csv
+    // D:\worksheet\clion\Location\test\data\sensor_log\origin_sensors_data_1553783441847.0.csv
+    // D:\worksheet\clion\Location\test\data\sensor_log\origin_sensors_data_1553783672990.0.csv
+    // D:\worksheet\clion\Location\test\data\sensor_log\origin_sensors_data_1554081875000.0.csv
+    // D:\worksheet\clion\Location\test\data\sensor_log\origin_sensors_data_1554081886000.0.csv
+    // D:\worksheet\clion\Location\test\data\sensor_log\origin_sensors_data_1554773520000.0.csv
+    // D:\worksheet\clion\Location\test\data\sensor_log\origin_sensors_data_1554989169000.0.csv
+    // D:\worksheet\clion\Location\test\data\sensor_log\origin_sensors_data_1554988196000.0.csv
+    // D:\worksheet\clion\Location\test\data\sensor_log\origin_sensors_data_1555072316000.0.csv
+    // D:\worksheet\clion\Location\test\data\sensor_log\origin_sensors_data_1555401659314.0.csv
+    // D:\worksheet\clion\Location\test\data\sensor_log\origin_sensors_data_1555461064000.0.csv
+    // D:\worksheet\clion\Location\test\data\sensor_log\origin_sensors_data_1555506970000.0.csv
+    // D:\worksheet\clion\Location\test\data\sensor_log\origin_sensors_data_1555592383547.0.csv
+    // D:\worksheet\clion\Location\test\data\sensor_log\origin_sensors_data_1556024437000.0.csv
+    // D:\worksheet\clion\Location\test\data\sensor_log\origin_sensors_data_1556026699999.0.csv
+    // D:\worksheet\clion\Location\test\data\sensor_log\origin_sensors_data_1556110776000.0.csv
+    // D:\worksheet\clion\Location\test\data\sensor_log\origin_sensors_data_1556115336000.0.csv
+    // D:\worksheet\clion\Location\test\data\sensor_log\origin_sensors_data_1557061333000.0.csv
+    // D:\worksheet\clion\Location\test\data\sensor_log\origin_sensors_data_1557127554996.0.csv
+    // D:\worksheet\clion\Location\test\data\sensor_log\origin_sensors_data_1557128036000.0.csv
+    infile.open("D:\\worksheet\\clion\\Location\\test\\data\\sensor_log\\origin_sensors_data_1557128036000.0.csv",
                 ios::in);
     assert(infile.is_open());
 
@@ -46,39 +66,51 @@ void DataFormat::readCSV(MatrixXd &gyro, MatrixXd &acc, MatrixXd &mag, MatrixXd 
         mag(i, 0) = atof(s_split[9].c_str());
         mag(i, 1) = atof(s_split[10].c_str());
         mag(i, 2) = atof(s_split[11].c_str());
-        // gps data
+        // gps data, gps(lng,lat,alt,accuracy,speed,bearing,t)
         double lng = atof(s_split[16].c_str());
         double lat = atof(s_split[15].c_str());
-        if (i != 0) {
-//        if (i != 0 && lat == gps_data(i - 1, 1) && lng == gps_data(i - 1, 0)) {
+//        if (i != 0) {
+        if (i != 0 && lat == gps_data(i - 1, 1) && lng == gps_data(i - 1, 0)) {
             gps_data(i, 0) = lng;
             gps_data(i, 1) = lat;
             gps_data(i, 2) = atof(s_split[17].c_str());
-            gps_data(i, 3) = 200.0;
-            gps_data(i, 4) = atof(s_split[19].c_str()) * 1000.0 / 3600.0;
+            gps_data(i, 3) = atof(s_split[20].c_str());
+//            gps_data(i, 3) = 200.0;
+            gps_data(i, 4) = atof(s_split[19].c_str());
+//            gps_data(i, 4) = atof(s_split[19].c_str()) * 1000.0 / 3600.0;
             gps_data(i, 5) = atof(s_split[21].c_str());
-            gps_data(i, 6) = i;
+            gps_data(i, 6) = atof(s_split[25].c_str());
         } else {
             gps_data(i, 0) = lng;
             gps_data(i, 1) = lat;
             gps_data(i, 2) = atof(s_split[17].c_str());
-            gps_data(i, 3) = 10.0;
-            gps_data(i, 4) = atof(s_split[19].c_str()) * 1000.0 / 3600.0;
+            gps_data(i, 3) = atof(s_split[20].c_str());;
+//            gps_data(i, 3) = 10.0;
+            gps_data(i, 4) = atof(s_split[19].c_str());
+//            gps_data(i, 4) = atof(s_split[19].c_str()) * 1000.0 / 3600.0;
             gps_data(i, 5) = atof(s_split[21].c_str());
-            gps_data(i, 6) = i;
+            gps_data(i, 6) = atof(s_split[25].c_str());
         }
 
-        ornt_data(i, 2) = atof(s_split[12].c_str()) / M_PI * 180.0;
-        ornt_data(i, 0) = 0.0;//atof(s_split[13].c_str());
-        ornt_data(i, 1) = 0.0;//atof(s_split[14].c_str());
+//        ornt_data(i, 2) = atof(s_split[12].c_str()) / M_PI * 180.0;
+//        ornt_data(i, 0) = atof(s_split[13].c_str()) / M_PI * 180.0;
+//        ornt_data(i, 1) = atof(s_split[14].c_str()) / M_PI * 180.0;
+
+        ornt_data(i, 2) = atof(s_split[12].c_str());
+        ornt_data(i, 0) = atof(s_split[13].c_str());
+        ornt_data(i, 1) = atof(s_split[14].c_str());
 
 //        heading(i) = atof(s_split[12].c_str());
-//        std::cout << gps_data <<
 
+        road_data(i, 0) = atof(s_split[27].c_str());
+        road_data(i, 1) = atof(s_split[26].c_str());
+        road_data(i, 2) = atof(s_split[28].c_str());
 
 
         i++;
     }
+//    std::cout << gps_data.rows() << std::endl;
+
     infile.close();
 
 }

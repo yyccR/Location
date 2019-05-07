@@ -12,7 +12,8 @@ class TestLocation {
 public:
 
     void testLocation(Eigen::MatrixXd &gyro_data, Eigen::MatrixXd &acc_data, Eigen::MatrixXd &mag_data,
-                      Eigen::MatrixXd &gps_data, Eigen::MatrixXd &g_data, Eigen::MatrixXd &ornt_data);
+                      Eigen::MatrixXd &gps_data, Eigen::MatrixXd &g_data, Eigen::MatrixXd &ornt_data,
+                      Eigen::MatrixXd &road_data);
 };
 
 
