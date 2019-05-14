@@ -152,6 +152,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
         status.parameters.gps_count += 1;
         status.parameters.ins_count = 0;
         status.parameters.ins_dist = 0;
+        status.parameters.move_t_factor = 1.0;
         // 更新融合定位结果输出
         status.gnssins.accuracy = gps_data(3);
         status.gnssins.speed = gps_speed;
@@ -161,16 +162,16 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
         status.position.z = 0.0;
     }
 
-    std::string log_msg = std::to_string(status.parameters.gps_pre_bearing) + " " + std::to_string(ornt_filter(2)) + " "
-                          + std::to_string(status.parameters.diff_gps_ornt) + " "
-                          + std::to_string(status.parameters.diff_road_ornt) + " "
-                          + std::to_string(status.attitude.yaw) + " " + std::to_string(road_data(1)) + " "
-                          + std::to_string(road_data(0)) + " " + std::to_string(status.parameters.ins_count) + " "
-                          + std::to_string(gps_data(0)) + " " + std::to_string(gps_data(1)) + " "
-                          + std::to_string(((is_shaking || !is_compass_vaild) || (!is_near_cross || is_same_change)))
-                          + " " + std::to_string(is_shaking) + " " + std::to_string(is_same_change) + " "
-                          + std::to_string(!is_near_cross) + " " + std::to_string(status.parameters.dist_to_next_cross)
-                          + " " + std::to_string(status.parameters.dist_from_pre_cross);
+//    std::string log_msg = std::to_string(status.parameters.gps_pre_bearing) + " " + std::to_string(ornt_filter(2)) + " "
+//                          + std::to_string(status.parameters.diff_gps_ornt) + " "
+//                          + std::to_string(status.parameters.diff_road_ornt) + " "
+//                          + std::to_string(status.attitude.yaw) + " " + std::to_string(road_data(1)) + " "
+//                          + std::to_string(road_data(0)) + " " + std::to_string(status.parameters.ins_count) + " "
+//                          + std::to_string(gps_data(0)) + " " + std::to_string(gps_data(1)) + " "
+//                          + std::to_string(((is_shaking || !is_compass_vaild) || (!is_near_cross || is_same_change)))
+//                          + " " + std::to_string(is_shaking) + " " + std::to_string(is_same_change) + " "
+//                          + std::to_string(!is_near_cross) + " " + std::to_string(status.parameters.dist_to_next_cross)
+//                          + " " + std::to_string(status.parameters.dist_from_pre_cross);
 //    Log(log_msg);
 //    std::cout << log_msg << std::endl;
 //    std::cout << status.parameters.gps_pre_bearing << " " << ornt_filter(2) << " "
@@ -303,9 +304,10 @@ void Location::AutoAdjustMovingFactor(routing::Status *status) {
         int ins_move_factor = (*status).parameters.ins_count % int((*status).parameters.Hz);
 
         if((*status).parameters.ins_count > gap_time &&
-                (ins_move_factor != 0 || angle_factor >= (*status).parameters.accepted_max_diff_change_range)){
+                (ins_move_factor == 0 || angle_factor >= (*status).parameters.accepted_max_diff_change_range)){
             (*status).parameters.move_t_factor *= (*status).parameters.move_decay;
         }
+//        std::cout << (*status).parameters.move_t_factor << std::endl;
     }
 }
 
