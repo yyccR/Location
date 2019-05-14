@@ -45,6 +45,9 @@ public:
     // 采样时间自适应
     void AutoAdjustTFactor(routing::Status *status, Eigen::VectorXd &gps_data, double ins_distance);
 
+    // 惯导运动衰减因子
+    void AutoAdjustMovingFactor(routing::Status *status);
+
     // 方向传感器和GPS方向差值修正
     void UpdateZaxisWithGPSAndRoad(routing::Status *status, Eigen::VectorXd &gps_data, Eigen::Vector3d &ornt_data,
                                    Eigen::Vector3d &road_data);

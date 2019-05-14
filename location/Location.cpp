@@ -59,6 +59,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     LPF lpf;
     Vector3d ornt_filter = lpf.LowPassFilter4Ornt(&status, ornt_data);
     Vector4d attitude = quaternions.GetQFromEuler(ornt_filter);
+    AutoAdjustMovingFactor(&status);
     accelerometer.StrapdownUpdateVelocityPosition(&status, acc_data, attitude, g_data);
 
     // 指南针波动情况
@@ -144,7 +145,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
         status.parameters.gps_pre_bearing = gps_bearing;
         status.parameters.gps_pre_t = gps_data(6);
         // 时间t影响因子自调整
-        AutoAdjustTFactor(&status, gps_data, status.parameters.ins_dist);
+//        AutoAdjustTFactor(&status, gps_data, status.parameters.ins_dist);
         // 更新GPS方向和方向传感器Z轴方向, 当GPS可用且精度高时
         UpdateZaxisWithGPS(&status, gps_data, ornt_filter);
         // 更新其他INS变量
@@ -170,7 +171,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
                           + " " + std::to_string(is_shaking) + " " + std::to_string(is_same_change) + " "
                           + std::to_string(!is_near_cross) + " " + std::to_string(status.parameters.dist_to_next_cross)
                           + " " + std::to_string(status.parameters.dist_from_pre_cross);
-    Log(log_msg);
+//    Log(log_msg);
 //    std::cout << log_msg << std::endl;
 //    std::cout << status.parameters.gps_pre_bearing << " " << ornt_filter(2) << " "
 //              << status.parameters.diff_gps_ornt << " " << status.parameters.diff_road_ornt
@@ -248,12 +249,20 @@ void Location::AutoAdjustTFactor(routing::Status *status, Eigen::VectorXd &gps_d
         double lat2 = gps_queue(1, 1);
         double lng3 = gps_queue(2, 0);
         double lat3 = gps_queue(2, 1);
+//        double gps_dist1 = gps_queue(0,4) * ((gps_queue(1, 6) - gps_queue(0, 6)) / 1000.0) + gps_queue(1, 4) * ((gps_queue(2, 6) - gps_queue(1, 6)) / 1000.0);
         double gps_dist = gps.CalDistance(lng1, lat1, lng2, lat2) + gps.CalDistance(lng2, lat2, lng3, lat3);
         double ins_dist = ins_move_dist(1) + ins_move_dist(2);
         double deltaT = (gps_queue(2, 6) - gps_queue(0, 6)) / 1000.0;
         if (gps_dist != 0.0 && ins_dist != 0.0 && deltaT != 0.0) {
-            (*status).parameters.move_t_factor *= sqrt(gps_dist / ins_dist);
+//            (*status).parameters.move_t_factor *= sqrt(gps_dist / ins_dist);
+            (*status).parameters.move_t_factor = sqrt(gps_dist / ins_dist);
+//            std::string log_msg = std::to_string(gps_dist) + " " + std::to_string(gps_dist1) + " "
+//                                  + std::to_string(ins_dist) + " "
+//                                  + std::to_string(deltaT) + " " + std::to_string(sqrt(gps_dist / ins_dist)) + " "
+//                                  + std::to_string((*status).parameters.move_t_factor);
+//            std::cout << log_msg << std::endl;
         }
+
         // 先进先出
         gps_queue.row(0) = gps_queue.row(1);
         gps_queue.row(1) = gps_queue.row(2);
@@ -261,6 +270,42 @@ void Location::AutoAdjustTFactor(routing::Status *status, Eigen::VectorXd &gps_d
         ins_move_dist(0) = ins_move_dist(1);
         ins_move_dist(1) = ins_move_dist(2);
         ins_move_dist(2) = ins_distance;
+    }
+}
+
+/**
+ * 惯导运动衰减因子,随时间及方位角变化而衰减
+ *
+ * @param status
+ */
+void Location::AutoAdjustMovingFactor(routing::Status *status) {
+    static Vector2d ornt_queue;
+    static int cnt = 0;
+
+    if(cnt <= 1){
+        ornt_queue(cnt) = (*status).attitude.yaw;
+        cnt += 1;
+    } else {
+        // 更新队列数据
+        ornt_queue(0) = ornt_queue(1);
+        ornt_queue(1) = (*status).attitude.yaw;
+        // 计算角度变化
+        double angle_factor;
+        if(ornt_queue(0) < 90.0 & ornt_queue(1) > 270.0){
+            angle_factor = ornt_queue(0) + 360.0 - ornt_queue(1);
+        }else if(ornt_queue(1) < 90.0 & ornt_queue(0) > 270.0){
+            angle_factor = ornt_queue(1) + 360.0 - ornt_queue(0);
+        }else{
+            angle_factor = abs(ornt_queue(1) - ornt_queue(0));
+        }
+
+        int gap_time = int((*status).parameters.Hz * (*status).parameters.least_gap_time_for_using_road);
+        int ins_move_factor = (*status).parameters.ins_count % int((*status).parameters.Hz);
+
+        if((*status).parameters.ins_count > gap_time &&
+                (ins_move_factor != 0 || angle_factor >= (*status).parameters.accepted_max_diff_change_range)){
+            (*status).parameters.move_t_factor *= (*status).parameters.move_decay;
+        }
     }
 }
 

@@ -96,6 +96,8 @@ namespace routing {
         // 采样时间放大因子,分为运动和静止两个
         double static_t_factor;
         double move_t_factor;
+        // 惯导运动衰减因子
+        double move_decay;
 
         // 等间隔时间内GPS的运动距离阈值,用于判断高精度但是漂移的点
         double move_distance_threshod;
