@@ -142,7 +142,7 @@ bool GPS::IsGPSBelongToTrack(routing::Status *status, Eigen::VectorXd &gps_data)
         double end_lng = gps_data(0);
         double end_lat = gps_data(1);
         double cur_error = CalDistance(start_lng, start_lat, end_lng, end_lat);
-        double time_diff2 = (gps_data(6) - gps_queue.row((*status).parameters.gps_track_len - 1)(6)) / 1000.0;
+//        double time_diff2 = (gps_data(6) - gps_queue.row((*status).parameters.gps_track_len - 1)(6)) / 1000.0;
 
 //        std::cout << "cur_error <= (*status).parameters.weak_gps " << (cur_error <= (*status).parameters.weak_gps)
 //                  << " "
