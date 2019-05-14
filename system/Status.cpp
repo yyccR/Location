@@ -92,7 +92,7 @@ void Status::Init() {
     this->parameters.static_t_factor = 1.0;
     this->parameters.move_t_factor = 1.0;
     this->parameters.t = 1.0 / (this->parameters.Hz * this->parameters.static_t_factor);
-    this->parameters.move_decay = 0.9;
+    this->parameters.move_decay = 0.98;
 
     this->parameters.move_distance_threshod = 500000.0;
     this->parameters.ins_count = 0;
@@ -104,8 +104,8 @@ void Status::Init() {
     this->parameters.diff_gps_ornt = 0.0;
     this->parameters.diff_road_ornt = 0.0;
     this->parameters.queue_road_ornt_len = 3;
-    this->parameters.accepted_change_range = 10.0;
-    this->parameters.accepted_max_diff_change_range = 20.0;
+    this->parameters.accepted_change_range = 8.0;
+    this->parameters.accepted_max_diff_change_range = 12.0;
 
     this->parameters.gps_static_speed_threshold = 2.0;
     this->parameters.gps_count = 0;
