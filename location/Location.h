@@ -61,6 +61,9 @@ public:
     // 判断道路方向变化幅度是否与指南针幅度一致
     bool IsRoadCompassSameRange(routing::Status *status, Eigen::Vector3d &ornt_data, Eigen::Vector3d &road_data);
 
+    // 判断是否偏离航道
+    bool IsOffCourse(routing::Status *status, Eigen::Vector3d &ornt_data, Eigen::Vector3d &road_data);
+
     // 更新道路类型
     void UpdateRoadType(routing::Status *status, Eigen::Vector3d &road_data);
 

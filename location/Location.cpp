@@ -71,11 +71,14 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     bool is_shaking = gravity.IsShaking(&status, g_data);
 
     // 判断是否以及行走到路口一定范围内
-    bool is_near_cross = status.parameters.dist_from_pre_cross < status.parameters.min_dist_to_cross ||
+    bool is_near_cross = status.parameters.dist_from_pre_cross < status.parameters.min_dist_to_cross * 2.5 ||
                          status.parameters.dist_to_next_cross < status.parameters.min_dist_to_cross;
 
     // 判断指南针跟道路的方向变化是否一直
     bool is_same_change = IsRoadCompassSameRange(&status, ornt_filter, road_data);
+
+    // 判断是否偏航
+    bool is_off_course = IsOffCourse(&status, ornt_filter, road_data);
 
     // 获取GPS精度
     GPS gps;
@@ -162,18 +165,18 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
         status.position.z = 0.0;
     }
 
-//    std::string log_msg = std::to_string(status.parameters.gps_pre_bearing) + " " + std::to_string(ornt_filter(2)) + " "
-//                          + std::to_string(status.parameters.diff_gps_ornt) + " "
-//                          + std::to_string(status.parameters.diff_road_ornt) + " "
-//                          + std::to_string(status.attitude.yaw) + " " + std::to_string(road_data(1)) + " "
-//                          + std::to_string(road_data(0)) + " " + std::to_string(status.parameters.ins_count) + " "
-//                          + std::to_string(gps_data(0)) + " " + std::to_string(gps_data(1)) + " "
-//                          + std::to_string(((is_shaking || !is_compass_vaild) || (!is_near_cross || is_same_change)))
-//                          + " " + std::to_string(is_shaking) + " " + std::to_string(is_same_change) + " "
-//                          + std::to_string(!is_near_cross) + " " + std::to_string(status.parameters.dist_to_next_cross)
-//                          + " " + std::to_string(status.parameters.dist_from_pre_cross);
+    std::string log_msg = std::to_string(status.parameters.gps_pre_bearing) + " " + std::to_string(ornt_filter(2)) + " "
+                          + std::to_string(status.parameters.diff_gps_ornt) + " "
+                          + std::to_string(status.parameters.diff_road_ornt) + " "
+                          + std::to_string(status.attitude.yaw) + " " + std::to_string(road_data(1)) + " "
+                          + std::to_string(road_data(0)) + " " + std::to_string(status.parameters.ins_count) + " "
+                          + std::to_string(gps_data(0)) + " " + std::to_string(gps_data(1)) + " "
+                          + std::to_string(((is_shaking || !is_compass_vaild) || (!is_near_cross || is_same_change)))
+                          + " " + std::to_string(is_off_course) + " " + std::to_string(is_same_change) + " "
+                          + std::to_string(!is_near_cross) + " " + std::to_string(status.parameters.dist_to_next_cross)
+                          + " " + std::to_string(status.parameters.dist_from_pre_cross);
 //    Log(log_msg);
-//    std::cout << log_msg << std::endl;
+    std::cout << log_msg << std::endl;
 //    std::cout << status.parameters.gps_pre_bearing << " " << ornt_filter(2) << " "
 //              << status.parameters.diff_gps_ornt << " " << status.parameters.diff_road_ornt
 //              << " " << status.attitude.yaw << " " << road_data(1) <<
@@ -283,7 +286,7 @@ void Location::AutoAdjustMovingFactor(routing::Status *status) {
     static Vector2d ornt_queue;
     static int cnt = 0;
 
-    if(cnt <= 1){
+    if (cnt <= 1) {
         ornt_queue(cnt) = (*status).attitude.yaw;
         cnt += 1;
     } else {
@@ -292,19 +295,19 @@ void Location::AutoAdjustMovingFactor(routing::Status *status) {
         ornt_queue(1) = (*status).attitude.yaw;
         // 计算角度变化
         double angle_factor;
-        if(ornt_queue(0) < 90.0 & ornt_queue(1) > 270.0){
+        if (ornt_queue(0) < 90.0 & ornt_queue(1) > 270.0) {
             angle_factor = ornt_queue(0) + 360.0 - ornt_queue(1);
-        }else if(ornt_queue(1) < 90.0 & ornt_queue(0) > 270.0){
+        } else if (ornt_queue(1) < 90.0 & ornt_queue(0) > 270.0) {
             angle_factor = ornt_queue(1) + 360.0 - ornt_queue(0);
-        }else{
+        } else {
             angle_factor = abs(ornt_queue(1) - ornt_queue(0));
         }
 
         int gap_time = int((*status).parameters.Hz * (*status).parameters.least_gap_time_for_using_road);
         int ins_move_factor = (*status).parameters.ins_count % int((*status).parameters.Hz);
 
-        if((*status).parameters.ins_count > gap_time &&
-                (ins_move_factor == 0 || angle_factor >= (*status).parameters.accepted_max_diff_change_range)){
+        if ((*status).parameters.ins_count > gap_time &&
+            (ins_move_factor == 0 || angle_factor >= (*status).parameters.accepted_max_diff_change_range)) {
             (*status).parameters.move_t_factor *= (*status).parameters.move_decay;
         }
 //        std::cout << (*status).parameters.move_t_factor << std::endl;
@@ -494,19 +497,6 @@ Location::UpdateZaxisWithRoad(routing::Status *status, Eigen::Vector3d &ornt_dat
             road_ornt_cnt += 1;
         }
     } else {
-        if ((*status).parameters.ins_count >
-            (*status).parameters.Hz * (*status).parameters.least_gap_time_for_using_road) {
-            // 没gps信号, 且超过一定时间后, 采用道路方向做修正
-            VectorXd road_bearing = road_queue.col(1);
-            VectorXd ornt_bearing = ornt_queue.col(2);
-            double diff_road_ornt = (road_bearing - ornt_bearing).mean();
-            // TODO: 当距下个路口一定距离同时方向差别在一定范围内,采用道路方向修正指南针方向
-            (*status).parameters.diff_road_ornt = diff_road_ornt;
-        } else {
-            // 没信号,但是没有超过一定时间间隔, 仍用当前指南针和上个GPS点修正
-            (*status).parameters.diff_road_ornt = (*status).parameters.diff_gps_ornt;
-        }
-
         // 更新道路数据
         if (road_data(0) != 0.0 || road_data(1) != 0.0) {
             for (int i = 0; i < (*status).parameters.queue_gps_ornt - 1; i++) {
@@ -520,6 +510,19 @@ Location::UpdateZaxisWithRoad(routing::Status *status, Eigen::Vector3d &ornt_dat
             ornt_queue.row(i) = ornt_queue.row(i + 1);
         }
         ornt_queue.row((*status).parameters.queue_gps_ornt - 1) = ornt_data;
+
+        if ((*status).parameters.ins_count >
+            (*status).parameters.Hz * (*status).parameters.least_gap_time_for_using_road) {
+            // 没gps信号, 且超过一定时间后, 采用道路方向做修正
+            VectorXd road_bearing = road_queue.col(1);
+            VectorXd ornt_bearing = ornt_queue.col(2);
+            double diff_road_ornt = (road_bearing - ornt_bearing).mean();
+            // TODO: 当距下个路口一定距离同时方向差别在一定范围内,采用道路方向修正指南针方向
+            (*status).parameters.diff_road_ornt = diff_road_ornt;
+        } else {
+            // 没信号,但是没有超过一定时间间隔, 仍用当前指南针和上个GPS点修正
+            (*status).parameters.diff_road_ornt = (*status).parameters.diff_gps_ornt;
+        }
 
     }
 }
@@ -613,6 +616,67 @@ bool Location::IsRoadCompassSameRange(Status *status, Vector3d &ornt_data, Vecto
         }
     }
     return res;
+}
+
+/**
+ * 判断是否偏离航线
+ *
+ * @param status
+ * @param ornt_data, v(x,y,z)
+ * @param road_data, 道路方向数据,包含距离下个路口距离,和当前点的瞬时方向,以及当前道路类型编码, v(distance, heading, code)
+ * @return
+ */
+bool Location::IsOffCourse(routing::Status *status, Eigen::Vector3d &ornt_data, Eigen::Vector3d &road_data) {
+
+    static VectorXd is_near_cross_queue((*status).parameters.off_course_data_queue);
+    static VectorXd is_same_change_queue((*status).parameters.off_course_data_queue);
+    static int cnt = 0;
+    static bool routing = false;
+
+    // 偏航标志
+    bool offCourseFlag = false;
+
+    // 判断是否以及行走到路口一定范围内
+    bool is_near_cross = (*status).parameters.dist_from_pre_cross < (*status).parameters.min_dist_to_cross ||
+                         (*status).parameters.dist_to_next_cross < (*status).parameters.min_dist_to_cross;
+
+    // 判断指南针跟道路的方向变化是否一直
+    bool is_same_change = IsRoadCompassSameRange(status, ornt_data, road_data);
+
+    if (cnt < (*status).parameters.off_course_data_queue) {
+        is_near_cross_queue(cnt) = is_near_cross;
+        is_same_change_queue(cnt) = is_same_change;
+        cnt += 1;
+    } else {
+
+        if (is_near_cross_queue(0)) {
+            // 在路口发生偏航的时候
+            bool res = true;
+            // 连续一个窗口内都判断是否偏航
+            for (int i = 0; i < (*status).parameters.off_course_data_queue; ++i) {
+                res = res && is_near_cross_queue(i) && !is_same_change_queue(i);
+            }
+            offCourseFlag = res;
+        }
+
+        // 队列先进先出
+        for (int k = 0; k < (*status).parameters.off_course_data_queue - 1; ++k) {
+            is_near_cross_queue(k) = is_near_cross_queue(k + 1);
+            is_same_change_queue(k) = is_same_change_queue(k + 1);
+        }
+        is_near_cross_queue((*status).parameters.off_course_data_queue - 1) = is_near_cross;
+        is_same_change_queue((*status).parameters.off_course_data_queue - 1) = is_same_change;
+
+    }
+
+    // 重新规划,重置flag.
+    if (road_data(0) == 0.0 && road_data(1) == 0.0) routing = true;
+    if (routing && (road_data(0) != 0.0 || road_data(1) != 0.0)) {
+        offCourseFlag = false;
+        routing = false;
+    }
+
+    return offCourseFlag;
 }
 
 /**
