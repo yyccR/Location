@@ -121,6 +121,8 @@ namespace routing {
         double accepted_change_range;
         // 当道路方向发生比较大变化时, 与指南针方向变化 的可容许误差范围
         double accepted_max_diff_change_range;
+        // 判断偏航所需保存的历史数据队列长度
+        int off_course_data_queue;
 
         // GPS初始状态计数
         int gps_count;
