@@ -71,7 +71,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     bool is_shaking = gravity.IsShaking(&status, g_data);
 
     // 判断是否以及行走到路口一定范围内
-    bool is_near_cross = status.parameters.dist_from_pre_cross < status.parameters.min_dist_to_cross * 2.5 ||
+    bool is_near_cross = status.parameters.dist_from_pre_cross < status.parameters.min_dist_to_cross * 3.0 ||
                          status.parameters.dist_to_next_cross < status.parameters.min_dist_to_cross;
 
     // 判断指南针跟道路的方向变化是否一直
@@ -95,7 +95,8 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
 
         // 采用惯导更新经纬度
         double heading_no_limit;
-        if ((is_shaking || !is_compass_vaild) || (!is_near_cross || is_same_change)) {
+//        if ((is_shaking || !is_compass_vaild) || (!is_near_cross || is_same_change)) {
+        if ((is_shaking || !is_compass_vaild) || !is_near_cross) {
             // 更新道路方向和方向传感器Z轴方向, 当GPS精度低或不可用一定时间后
             UpdateZaxisWithRoad(&status, ornt_filter, road_data);
             heading_no_limit = ornt_filter(2) + status.parameters.diff_road_ornt;
@@ -165,18 +166,18 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
         status.position.z = 0.0;
     }
 
-//    std::string log_msg = std::to_string(status.parameters.gps_pre_bearing) + " " + std::to_string(ornt_filter(2)) + " "
-//                          + std::to_string(status.parameters.diff_gps_ornt) + " "
-//                          + std::to_string(status.parameters.diff_road_ornt) + " "
-//                          + std::to_string(status.attitude.yaw) + " " + std::to_string(road_data(1)) + " "
-//                          + std::to_string(road_data(0)) + " " + std::to_string(status.parameters.ins_count) + " "
-//                          + std::to_string(gps_data(0)) + " " + std::to_string(gps_data(1)) + " "
-//                          + std::to_string(((is_shaking || !is_compass_vaild) || (!is_near_cross || is_same_change)))
-//                          + " " + std::to_string(is_off_course) + " " + std::to_string(is_same_change) + " "
-//                          + std::to_string(!is_near_cross) + " " + std::to_string(status.parameters.dist_to_next_cross)
-//                          + " " + std::to_string(status.parameters.dist_from_pre_cross);
+    std::string log_msg = std::to_string(status.parameters.gps_pre_bearing) + " " + std::to_string(ornt_filter(2)) + " "
+                          + std::to_string(status.parameters.diff_gps_ornt) + " "
+                          + std::to_string(status.parameters.diff_road_ornt) + " "
+                          + std::to_string(status.attitude.yaw) + " " + std::to_string(road_data(1)) + " "
+                          + std::to_string(road_data(0)) + " " + std::to_string(status.parameters.ins_count) + " "
+                          + std::to_string(gps_data(0)) + " " + std::to_string(gps_data(1)) + " "
+                          + std::to_string(((is_shaking || !is_compass_vaild) || (!is_near_cross || is_same_change)))
+                          + " " + std::to_string(is_shaking) + " " + std::to_string(is_same_change) + " "
+                          + std::to_string(!is_near_cross) + " " + std::to_string(status.parameters.dist_to_next_cross)
+                          + " " + std::to_string(status.parameters.dist_from_pre_cross);
 //    Log(log_msg);
-//    std::cout << log_msg << std::endl;
+    std::cout << log_msg << std::endl;
 //    std::cout << status.parameters.gps_pre_bearing << " " << ornt_filter(2) << " "
 //              << status.parameters.diff_gps_ornt << " " << status.parameters.diff_road_ornt
 //              << " " << status.attitude.yaw << " " << road_data(1) <<
