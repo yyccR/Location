@@ -71,11 +71,11 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     bool is_shaking = gravity.IsShaking(&status, g_data);
 
     // 判断是否以及行走到路口一定范围内
-    bool is_near_cross = status.parameters.dist_from_pre_cross < status.parameters.min_dist_to_cross * 3.0 ||
-                         status.parameters.dist_to_next_cross < status.parameters.min_dist_to_cross;
+    bool is_near_cross = status.parameters.dist_from_pre_cross < status.parameters.min_dist_from_pre_cross ||
+                         status.parameters.dist_to_next_cross < status.parameters.min_dist_to_next_cross;
 
     // 判断指南针跟道路的方向变化是否一直
-    bool is_same_change = IsRoadCompassSameRange(&status, ornt_filter, road_data);
+//    bool is_same_change = IsRoadCompassSameRange(&status, ornt_filter, road_data);
 
     // 判断是否偏航
 //    bool is_off_course = IsOffCourse(&status, ornt_filter, road_data);
@@ -188,11 +188,16 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
 //              << " " << status.parameters.dist_to_next_cross << " "
 //              << status.parameters.dist_from_pre_cross << std::endl;
 
+    // 约定当惯导起作用时,精度返回99.99
+    if(status.parameters.ins_count >
+       status.parameters.Hz * status.parameters.least_gap_time_for_using_road)
+        status.gnssins.accuracy = 99.99;
     // 更新融合定位的结果，精度沿用GPS信号好时的精度,速度由于加速计计算的是三个方位的速度，故速度还是沿用GPS的速度
     status.gnssins.lng = status.position.lng;
     status.gnssins.lat = status.position.lat;
     status.gnssins.altitude = status.position.altitude;
     status.gnssins.bearing = status.attitude.yaw;
+
 
 }
 
@@ -638,8 +643,8 @@ bool Location::IsOffCourse(routing::Status *status, Eigen::Vector3d &ornt_data, 
     bool offCourseFlag = false;
 
     // 判断是否以及行走到路口一定范围内
-    bool is_near_cross = (*status).parameters.dist_from_pre_cross < (*status).parameters.min_dist_to_cross ||
-                         (*status).parameters.dist_to_next_cross < (*status).parameters.min_dist_to_cross;
+    bool is_near_cross = (*status).parameters.dist_from_pre_cross < (*status).parameters.min_dist_from_pre_cross ||
+                         (*status).parameters.dist_to_next_cross < (*status).parameters.min_dist_to_next_cross;
 
     // 判断指南针跟道路的方向变化是否一直
     bool is_same_change = IsRoadCompassSameRange(status, ornt_data, road_data);
