@@ -162,7 +162,8 @@ namespace routing {
         // 隧道里判断为误差的最多次数
         int max_ignore_in_tunnel;
         // 距路口多少米时开始侧重指南针,在此之前gps可用则用,其次是道路方向
-        double min_dist_to_cross;
+        double min_dist_to_next_cross;
+        double min_dist_from_pre_cross;
         // 距下个路口距离
         double dist_to_next_cross;
         // 距离上个路口距离
