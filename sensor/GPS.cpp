@@ -100,8 +100,8 @@ bool GPS::IsGPSBelongToTrack(routing::Status *status, Eigen::VectorXd &gps_data)
     static int cnt = 0;
     static int ignore_in_tunnel = 0;
     static int ignore_in_common = 0;
+    static double pre_gps_t = 0.0;
 
-//    std::cout << "IsGPSBelongToTrack in " << std::endl;
     if (cnt < (*status).parameters.gps_track_len) {
         if (cnt >= 1) {
             // 初步判断该点是否时间在允许的范围内
@@ -158,26 +158,33 @@ bool GPS::IsGPSBelongToTrack(routing::Status *status, Eigen::VectorXd &gps_data)
             ignore_in_tunnel = 0;
         } else {
 
-            if ((*status).parameters.road_type == 1.0) {
-                // 误差不可接受, 同时处于隧道状态, 则不考虑时间间隔,同时不拿下个点作为初始了,因为下个点可能是仍在隧道,但有次数限制
-                if (ignore_in_tunnel < (*status).parameters.max_ignore_in_tunnel) {
-                    ignore_in_tunnel += 1;
-                } else {
-                    cnt = 0;
-                    ignore_in_tunnel = 0;
-                }
+            if(gps_data(6) == pre_gps_t){
+                // 由于status记录的pre gps是可用的pre gps, 故这里需记录一个无论可不可用的pre gps时间戳.
                 result = false;
-            } else {
-                // 误差不可接受,但不处于隧道状态,则不可接受点设置严格一些
-                if (ignore_in_common < (*status).parameters.max_ignore_in_common) {
-                    ignore_in_common += 1;
+            }else{
+                if ((*status).parameters.road_type == 1.0) {
+                    // 误差不可接受, 同时处于隧道状态, 则不考虑时间间隔,同时不拿下个点作为初始了,因为下个点可能是仍在隧道,但有次数限制
+                    if (ignore_in_tunnel < (*status).parameters.max_ignore_in_tunnel) {
+                        ignore_in_tunnel += 1;
+                    } else {
+                        cnt = 0;
+                        ignore_in_tunnel = 0;
+                    }
+                    result = false;
                 } else {
-                    cnt = 0;
-                    ignore_in_common = 0;
+                    // 误差不可接受,但不处于隧道状态,则不可接受点设置严格一些
+                    if (ignore_in_common < (*status).parameters.max_ignore_in_common) {
+                        ignore_in_common += 1;
+                    } else {
+                        cnt = 0;
+                        ignore_in_common = 0;
+                    }
+                    result = false;//time_diff2 > (*status).parameters.gps_max_gap_time;
                 }
-                result = false;//time_diff2 > (*status).parameters.gps_max_gap_time;
 
+                pre_gps_t = gps_data(6);
             }
+
         }
     }
     return result;
