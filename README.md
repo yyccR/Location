@@ -50,6 +50,7 @@
 
 ## TODO
 
+- [ ] improve CMake.
 - [ ] Clean the garbage code.
 - [ ] Template processing.
 - [ ] Using smart pointer instead.
