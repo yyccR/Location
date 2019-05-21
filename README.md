@@ -24,7 +24,7 @@
 
 ## GPS trajectory and INS trajectory.
 
-<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/origin location.png" width="500" height="416" /> <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/final location.png" width="500" height="416" />
+<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/origin location.png" width="400" height="333" /> <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/final location.png" width="400" height="333" />
 
 ### Real road test
 
