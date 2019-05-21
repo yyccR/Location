@@ -12,9 +12,7 @@
 
 <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/framework.png" width="1100" height="800" />
 
-## Test case
-
-### Data correction
+## Sensors data correction
 
 - orientation data filter(Using IIR low pass filter), blue line is the origin data, orange lie is the filter data
 
@@ -24,23 +22,9 @@
 
 <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/gps_compass.png" width="1000" height="300" />
 
-- Some time gps is high accuracy but still drift, using the kalman filter and establish the equation can help to fix this, below show some example that gps drift in tunnel with high accuracy.
+## GPS trajectory and INS trajectory.
 
-<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/tunnel_anomaly.png" width="350" height="300" />  <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/tunnel_filter.png" width="350" height="300" />
-
-### GPS trajectory and INS trajectory.
-
-- fusion GPS and INS
-
-<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/GPS.png" width="370" height="170" /> <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/GPS2.png" width="370" height="170" />
-
-<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/GPSandIMU.png" width="370" height="170" /> <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/GPSandIMU2.png" width="370" height="170" />
-
-- not fusion GPS and INS
-
-<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/gps5.png" width="370" height="170" /> <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/gps7.png" width="370" height="170" />
-
-<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/gps6.png" width="370" height="170" /> <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/gps8.png" width="370" height="170" />
+<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/origin location.png" width="1000" height="831" /> <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/final location.png" width="1000" height="831" />
 
 ### Real road test
 
