@@ -74,6 +74,9 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     bool is_near_cross = status.parameters.dist_from_pre_cross < status.parameters.min_dist_from_pre_cross ||
                          status.parameters.dist_to_next_cross < status.parameters.min_dist_to_next_cross;
 
+    // 判断是否处于重新规划线路的时间段内
+    bool is_routing = IsRouting(&status, ornt_filter, road_data);
+
     // 判断指南针跟道路的方向变化是否一直
 //    bool is_same_change = IsRoadCompassSameRange(&status, ornt_filter, road_data);
 
@@ -96,7 +99,8 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
         // 采用惯导更新经纬度
         double heading_no_limit;
 //        if ((is_shaking || !is_compass_vaild) || (!is_near_cross || is_same_change)) {
-        if ((is_shaking || !is_compass_vaild) || !is_near_cross) {
+        if ((is_shaking || !is_compass_vaild) || (!is_near_cross && !is_routing)) {
+//        if ((is_shaking || !is_compass_vaild) || !is_near_cross) {
             // 更新道路方向和方向传感器Z轴方向, 当GPS精度低或不可用一定时间后
             UpdateZaxisWithRoad(&status, ornt_filter, road_data);
             heading_no_limit = ornt_filter(2) + status.parameters.diff_road_ornt;
@@ -166,17 +170,17 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
         status.position.z = 0.0;
     }
 //
-    std::string log_msg = std::to_string(status.parameters.gps_pre_bearing) + " " + std::to_string(ornt_filter(2)) + " "
-                          + std::to_string(status.parameters.diff_gps_ornt) + " "
-                          + std::to_string(status.parameters.diff_road_ornt) + " "
-                          + std::to_string(status.attitude.yaw) + " " + std::to_string(road_data(1)) + " "
-                          + std::to_string(road_data(0)) + " " + std::to_string(status.parameters.ins_count) + " "
-                          + std::to_string(gps_data(0)) + " " + std::to_string(gps_data(1)) + " "
-                          + std::to_string(((is_shaking || !is_compass_vaild) || (!is_near_cross)))
-                          + " " + std::to_string(is_shaking) + " " + std::to_string(is_compass_vaild) + " "
-                          + std::to_string(!is_near_cross) + " " + std::to_string(status.parameters.dist_to_next_cross)
-                          + " " + std::to_string(status.parameters.dist_from_pre_cross);
-    Log(log_msg);
+//    std::string log_msg = std::to_string(status.parameters.gps_pre_bearing) + " " + std::to_string(ornt_filter(2)) + " "
+//                          + std::to_string(status.parameters.diff_gps_ornt) + " "
+//                          + std::to_string(status.parameters.diff_road_ornt) + " "
+//                          + std::to_string(status.attitude.yaw) + " " + std::to_string(road_data(1)) + " "
+//                          + std::to_string(road_data(0)) + " " + std::to_string(status.parameters.ins_count) + " "
+//                          + std::to_string(gps_data(0)) + " " + std::to_string(gps_data(1)) + " "
+//                          + std::to_string(((is_shaking || !is_compass_vaild) || (!is_near_cross)))
+//                          + " " + std::to_string(is_shaking) + " " + std::to_string(is_compass_vaild) + " "
+//                          + std::to_string(!is_near_cross) + " " + std::to_string(status.parameters.dist_to_next_cross)
+//                          + " " + std::to_string(status.parameters.dist_from_pre_cross);
+//    Log(log_msg);
 //    std::cout << log_msg << std::endl;
 //    std::cout << status.parameters.gps_pre_bearing << " " << ornt_filter(2) << " "
 //              << status.parameters.diff_gps_ornt << " " << status.parameters.diff_road_ornt
@@ -189,8 +193,8 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
 //              << status.parameters.dist_from_pre_cross << std::endl;
 
     // 约定当惯导起作用时,精度返回99.99
-    if(status.parameters.ins_count >
-       status.parameters.Hz * status.parameters.least_gap_time_for_using_road)
+    if (status.parameters.ins_count >
+        status.parameters.Hz * status.parameters.least_gap_time_for_using_road)
         status.gnssins.accuracy = 99.99;
     // 更新融合定位的结果，精度沿用GPS信号好时的精度,速度由于加速计计算的是三个方位的速度，故速度还是沿用GPS的速度
     status.gnssins.lng = status.position.lng;
@@ -622,6 +626,29 @@ bool Location::IsRoadCompassSameRange(Status *status, Vector3d &ornt_data, Vecto
         }
     }
     return res;
+}
+
+/**
+ * 判断当前是否正处于重新规划中
+ *
+ * @param status
+ * @param ornt_data, v(x,y,z)
+ * @param road_data, 道路方向数据,包含距离下个路口距离,和当前点的瞬时方向,以及当前道路类型编码, v(distance, heading, code)
+ * @return
+ */
+bool Location::IsRouting(routing::Status *status, Eigen::Vector3d &ornt_data, Eigen::Vector3d &road_data) {
+    static bool routing = false;
+    static int cnt = 0;
+
+    if (road_data(0) == 0.0 && road_data(1) == 0.0) routing = true;
+    if (routing) cnt += 1;
+
+    if (cnt > ((*status).parameters.routing_time * (*status).parameters.Hz)) {
+        cnt = 0;
+        routing = false;
+    }
+    return routing;
+
 }
 
 /**
