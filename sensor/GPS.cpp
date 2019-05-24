@@ -222,8 +222,13 @@ bool GPS::IsGPSValid(Status *status, VectorXd *gps_data) {
     bool is_gps_not_duplicated = (*gps_data)(6) != (*status).parameters.gps_pre_t;
 
     // 当GPS速度为0时,方向沿用上个GPS点方向
-    if ((*gps_data)(4) == 0.0) {
-        (*gps_data)(5) = (*status).parameters.gps_pre_bearing;
+//    if ((*gps_data)(4) == 0.0) {
+//        (*gps_data)(5) = (*status).parameters.gps_pre_bearing;
+//    }
+
+    // 低速时GPS方向改用为融合后的方向
+    if((*gps_data)(4) <= (*status).parameters.gps_static_speed_threshold && !is_gps_initializing){
+        (*gps_data)(5) = (*status).gnssins.bearing;
     }
 
 //    // 利用kalman根据历史轨迹进行滤波估计
