@@ -92,7 +92,7 @@ void Status::Init() {
     this->parameters.static_t_factor = 1.0;
     this->parameters.move_t_factor = 1.0;
     this->parameters.t = 1.0 / (this->parameters.Hz * this->parameters.static_t_factor);
-    this->parameters.move_decay = 0.99;
+    this->parameters.move_decay = 0.995;
 
     this->parameters.move_distance_threshod = 500000.0;
     this->parameters.ins_count = 0;
@@ -107,10 +107,11 @@ void Status::Init() {
     this->parameters.accepted_change_range = 8.0;
     this->parameters.accepted_max_diff_change_range = 12.0;
     this->parameters.off_course_data_queue = 30;
+    this->parameters.routing_time = 5;
 
     this->parameters.gps_static_speed_threshold = 2.0;
     this->parameters.gps_count = 0;
-    this->parameters.gps_init_threshold = 1;
+    this->parameters.gps_init_threshold = 10;
     this->parameters.gps_pre_lng = 0.0;
     this->parameters.gps_pre_lat = 0.0;
     this->parameters.gps_pre_t = 0.0;

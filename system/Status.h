@@ -123,6 +123,8 @@ namespace routing {
         double accepted_max_diff_change_range;
         // 判断偏航所需保存的历史数据队列长度
         int off_course_data_queue;
+        // 重新规划线路后沿用指南针方向的时间
+        int routing_time;
 
         // GPS初始状态计数
         int gps_count;
