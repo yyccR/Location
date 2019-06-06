@@ -37,7 +37,7 @@ First need to initial the Location class.
 
 ```
 #include <Eigen/Dense>
-include "location/Location.h"
+#include "location/Location.h"
 using namespace routing;
 
 Location location;
@@ -91,3 +91,8 @@ struct GNSSINS {
 
 ## Input data frequency
 
+- The frequency of `PredictCurrentPosition` calls should be the same or not very different from the frequency set by the `location.SetHz()` method.
+
+- When GPS is in gap period, all data of GPS should be sent 0, v(0, 0, 0, 0, 0, 0, 0)
+
+- When `road info` in gap period, the data should be the same as before, and should be set to zero during rerouting or no such server.
