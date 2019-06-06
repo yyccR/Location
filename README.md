@@ -118,7 +118,9 @@ This data is from map data, and if you couldn't search map server data, just fil
   - bearing, double, unit degree
   - t, timestampe, unit millisecond
 
-Note that gps
+## More detail tutorial.
+
+see docs/apiCallDetails.md
 
 ## TODO
 
