@@ -2,56 +2,139 @@
 
 > 定位是驾驶导航过程中是最基础的一步，也是十分关键的一步，一个准确的定位可以有效提高绑路的精度，也能更加精准感知驾驶形态的变化，由于本项目主要基于手机做导航定位，目前采用的是手机内置的传感器数据（陀螺仪，加速计，地磁计）以及GPS数据融合定位。
 
-手机传感器数据如下：
+## 项目所需的传感器.
 
-<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/Location/sensordata1.png" width="300" height="600" />
+- [X] 陀螺仪(x, y, z).
+- [X] 加速计(x, y, z).
+- [X] 地磁计(x, y, z).
+- [X] 重力感应器(x, y, z).
+- [X] 方向传感器(roll, pitch, yaw).
+- [X] 指南针(degree).
+- [X] 道路信息(距下个路口的距离, 道路方向, 道路类型).
+- [X] GPS(经度, 纬度, 海拔, 精度, 速度, 方向, 时间戳).
 
 
+## 一些实现细节
 
-## 流程
-
-<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/framework.png" width="1100" height="800" />
-
-## Test case
-
-### 数据修正
-
-- 方向传感器数据平滑(二阶IIR滤波),蓝线为原始数据,橙色线为修正后数据
+- 传感器噪声过滤与修正.
 
 <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/ornt_filter.png" width="1000" height="800" />
 
-- 指南针数据与GPS方向数据对比, 蓝线为GPS方向, 橙色线为指南针方向, 由于指南针数据受环境影响较大, 且指南针为地磁北, GPS方向为地理北, 存在磁偏角, 故需用GPS方向修正指南针方向
+- 基于非耦合的GPS融合INS.
 
-<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/gps_compass.png" width="1000" height="300" />
+<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/origin location.png" width="430" height="350" /> <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/final location.png" width="430" height="350" />
 
-### GPS轨迹与INS轨迹对比
+## 快速开始
+确保安装了gcc和cmake, 下载本项目到你的项目下
 
-- 融合
+```
+git clone https://github.com/yyccR/Location.git
+```
 
-<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/GPS.png" width="370" height="170" /> <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/GPS2.png" width="370" height="170" />
+在项目根目录下新建`CMakeLists.txt`, 同时添加如下:
 
-<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/GPSandIMU.png" width="370" height="170" /> <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/GPSandIMU2.png" width="370" height="170" />
+```
+include_directories(${PROJECT_SOURCE_DIR}/Location/include/eigen3)
 
-- 未融合
+include_directories(${PROJECT_SOURCE_DIR}/Location/math)
+add_subdirectory(Location/math)
 
-<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/gps5.png" width="370" height="170" /> <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/gps7.png" width="370" height="170" />
+include_directories(${PROJECT_SOURCE_DIR}/Location/models)
+add_subdirectory(Location/models)
 
-<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/gps6.png" width="370" height="170" /> <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/gps8.png" width="370" height="170" />
+include_directories(${PROJECT_SOURCE_DIR}/Location/location)
+add_subdirectory(Location/location)
 
-### 真实路测
+include_directories(${PROJECT_SOURCE_DIR}/Location/sensor)
+add_subdirectory(Location/sensor)
 
-- 运动过程不绑路, 且屏蔽GPS后恢复GPS
+include_directories(${PROJECT_SOURCE_DIR}/Location/system)
+add_subdirectory(Location/system)
 
-<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/ins_gps_test_case1.gif" width="300" height="600" />
+target_link_libraries(${PROJECT_NAME} Location_math)
+target_link_libraries(${PROJECT_NAME} Location_models)
+target_link_libraries(${PROJECT_NAME} Location_location)
+target_link_libraries(${PROJECT_NAME} Location_sensor)
+target_link_libraries(${PROJECT_NAME} Location_system)
+target_link_libraries(${PROJECT_NAME} Location_test)
+```
+
+在main文件里添加如下测试代码.
+
+```
+#include <iomanip>
+#include <Eigen/Dense>
+#include "sensor/GPS.h"
+#include "location/Location.h"
+
+using namespace Eigen;
+using namespace std;
+
+int main() {
+
+    Location location;
+    Vector3d gyro_data_v(0.004263,0.019169,-0.001014);
+    Vector3d mag_data_v(-2.313675,-82.446960,-366.183838);
+    Vector3d acc_data_v(0.105081,0.108075,9.774973);
+    VectorXd gps_data_v(7);
+    gps_data_v << 114.174118,22.283789,0.0,0.0,24.0,0.0,1554348968704.665039;
+    Vector3d g_data_v(0.094139, 0.107857,9.808955);
+    Vector3d ornt_data_v(-0.549866,0.629957,-0.069398);
+    Vector3d road_data(1000.0, 0.0, 0);
+    location.PredictCurrentPosition(gyro_data_v,acc_data_v,mag_data_v,gps_data_v,g_data_v,ornt_data_v, road_data);
+    cout << location.GetGNSSINS().lng << " " << location.GetGNSSINS().lat << endl;
+    return 0;
+}
+```
+
+如果输出 `114.174 22.2838` 表示已经成功内嵌了本项目.
+
+## 数据格式.
+
+- 陀螺仪(x, y, z), 单位 rad/s
+
+- 加速计(x, y, z), 单位 m/s²
+
+- 地磁计(x, y, z), 单位 μt
+
+- 重力感应器(x, y, z), 单位 m/s²
+
+- 方向传感器(roll, pitch, yaw), 单位 角度(degree)
+
+手机并没有方向传感器, 这个所谓的传感器数据是手机底层算法计算得到的。
+
+- 指南针(degree), 单位 角度(degree)
+
+- 道路信息(距离下个路口距离, 当前位置道路方向, 道路类型编码)
+
+如果拿不到道路数据, 则全部填0即可, `(0.0, 0.0, 0.0)`
+
+- GPS(lng, lat, alt, accuracy, speed, bearing, t)
+  - lng, 经度, double
+  - lat, 纬度, double
+  - alt, 海拔, double
+  - accuracy, 精度, double
+  - speed, 速度, double
+  - bearing, 方向, double, 单位 角度(degree)
+  - t, 时间戳, 单位 毫秒(millisecond)
+
+## 更加详细的调用细节
+
+详见 docs/apiCallDetails.md
 
 ## TODO
 
-- [ ] 各类接口模板化
-- [ ] 改用智能指针替换里面的普通指针
-- [ ] 完善各类文档,包括quick start和英文文档, readme改为英文文档
-- [ ] 完善测试用例
+- [X] CMakeLists 优化.
+- [ ] 清理垃圾代码.
+- [ ] 模板化.
+- [ ] 替换普通指针为智能指针.
+- [ ] 完善文档.
+- [x] 添加快速开始.
+- [ ] 增加更多测试案例.
+- [ ] 使用合适的设计模式.
 
-## reference:
+
+## 参考:
 
 1. 《惯性导航》秦永元
 2. 《捷联惯性导航技术(第2版 译本)》译者:张天光/王秀萍/王丽霞 作者:DavidH.Titte
