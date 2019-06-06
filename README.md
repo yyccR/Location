@@ -24,7 +24,7 @@
 
 <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/origin location.png" width="430" height="350" /> <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/final location.png" width="430" height="350" />
 
-## quick start
+## Quick start
 First make sure gcc and cmake was installed, and include this library into your project.
 
 ```
@@ -91,6 +91,34 @@ if you see the output `114.174 22.2838` that means this library was embedded to 
 
 ## Input data format.
 
+- gyroscope(x, y, z), origin gyroscope data, unit rad/s
+
+- accelerometer(x, y, z), origin accelerometer data, unit m/s²
+
+- geomagnetic meter(x, y, z), origin geomagnetic data, unit μt
+
+- gravity sensor(x, y, z), origin gravity data, unit m/s²
+
+- direction sensor(roll, pitch, yaw), origin sensor data, unit degree
+
+Note that direction sensor doesn't exit actually , the 'sensor data' is computation result from system underlying algorithm.
+
+- compass(degree), origin sensor data, unit degree
+
+- road info(distance to next cross, bearing, road type)
+
+This data is from map data, and if you couldn't search map server data, just fill in all zero `(0.0, 0.0, 0.0)`
+
+- GPS(lng, lat, alt, accuracy, speed, bearing, t)
+  -- lng, longitude, double
+  -- lat, latitude, double
+  -- alt, altitude, double
+  -- accuracy, double
+  -- speed, double
+  -- bearing, double, unit degree
+  -- t, timestampe, unit millisecond
+
+Note that gps
 
 ## TODO
 
