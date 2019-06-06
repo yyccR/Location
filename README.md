@@ -65,7 +65,7 @@ final open your main file, and add the test code.
 #include <iomanip>
 #include <Eigen/Dense>
 #include "sensor/GPS.h"
-#include ""
+#include "location/Location.h"
 
 using namespace Eigen;
 using namespace std;
