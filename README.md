@@ -110,13 +110,13 @@ Note that direction sensor doesn't exit actually , the 'sensor data' is computat
 This data is from map data, and if you couldn't search map server data, just fill in all zero `(0.0, 0.0, 0.0)`
 
 - GPS(lng, lat, alt, accuracy, speed, bearing, t)
-  -- lng, longitude, double
-  -- lat, latitude, double
-  -- alt, altitude, double
-  -- accuracy, double
-  -- speed, double
-  -- bearing, double, unit degree
-  -- t, timestampe, unit millisecond
+  - lng, longitude, double
+  - lat, latitude, double
+  - alt, altitude, double
+  - accuracy, double
+  - speed, double
+  - bearing, double, unit degree
+  - t, timestampe, unit millisecond
 
 Note that gps
 
