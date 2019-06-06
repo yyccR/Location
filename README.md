@@ -2,35 +2,95 @@
 
 > Positioning is the most basic and crucial step in the driving navigation. An accurate positioning can effectively improve the accuracy of the road-binding, and can also sense the change of the driving pattern more accurately. Since the project is mainly based on mobile phones for navigation and positioning, Currently used is the built-in sensor data (gyroscope, accelerometer, geomagnetic meter, direction sensor, gravity sensor) and GPS data fusion positioning.
 
-## Smartphone sensor data：
+## Sensor data required.
 
-<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/Location/sensordata1.png" width="300" height="600" />
+- [X] gyroscope(x, y, z).
+- [X] accelerometer(x, y, z).
+- [X] geomagnetic meter(x, y, z).
+- [X] gravity sensor(x, y, z).
+- [X] direction sensor(roll, pitch, yaw).
+- [X] compass(degree).
+- [X] road info(distance to next cross, bearing, road type).
+- [X] GPS(lng, lat, alt, accuracy, speed, bearing, t).
 
 
+## Some implement details
 
-## Workflow:
-
-<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/framework.png" width="1100" height="800" />
-
-## Sensors data correction
-
-- orientation data filter(Using IIR low pass filter), blue line is the origin data, orange lie is the filter data
+- sensor data filter.
 
 <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/ornt_filter.png" width="1000" height="800" />
 
-- Because the posture of the smartphone could be arbitrary, so we need the gps bearing and road heading to correct the compass, below show some difference between compass and gps bearing.
-
-<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/gps_compass.png" width="1000" height="300" />
-
-## GPS trajectory and INS trajectory.
+- GPS fusion INS under uncoupling system.
 
 <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/origin location.png" width="430" height="350" /> <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/final location.png" width="430" height="350" />
 
-### Real road test
+## quick start
+First make sure gcc and cmake was installed, and include this library into your project.
 
-- During the movement, the road is not tied, and GPS is restored after GPS is shielded
+```
+git clone https://github.com/yyccR/Location.git
+```
 
-<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/ins_gps_test_case1.gif" width="300" height="600" />
+Second open your `CMakeLists.txt` and add these:
+
+```
+include_directories(${PROJECT_SOURCE_DIR}/Location/include/eigen3)
+
+include_directories(${PROJECT_SOURCE_DIR}/Location/math)
+add_subdirectory(Location/math)
+
+include_directories(${PROJECT_SOURCE_DIR}/Location/models)
+add_subdirectory(Location/models)
+
+include_directories(${PROJECT_SOURCE_DIR}/Location/location)
+add_subdirectory(Location/location)
+
+include_directories(${PROJECT_SOURCE_DIR}/Location/sensor)
+add_subdirectory(Location/sensor)
+
+include_directories(${PROJECT_SOURCE_DIR}/Location/system)
+add_subdirectory(Location/system)
+
+target_link_libraries(${PROJECT_NAME} Location_math)
+target_link_libraries(${PROJECT_NAME} Location_models)
+target_link_libraries(${PROJECT_NAME} Location_location)
+target_link_libraries(${PROJECT_NAME} Location_sensor)
+target_link_libraries(${PROJECT_NAME} Location_system)
+target_link_libraries(${PROJECT_NAME} Location_test)
+```
+
+final open your main file, and add the test code.
+
+```
+#include <iomanip>
+#include <Eigen/Dense>
+#include "sensor/GPS.h"
+#include ""
+
+using namespace Eigen;
+using namespace std;
+
+int main() {
+
+    Location location;
+    Vector3d gyro_data_v(0.004263,0.019169,-0.001014);
+    Vector3d mag_data_v(-2.313675,-82.446960,-366.183838);
+    Vector3d acc_data_v(0.105081,0.108075,9.774973);
+    VectorXd gps_data_v(7);
+    gps_data_v << 114.174118,22.283789,0.0,0.0,24.0,0.0,1554348968704.665039;
+    Vector3d g_data_v(0.094139, 0.107857,9.808955);
+    Vector3d ornt_data_v(-0.549866,0.629957,-0.069398);
+    Vector3d road_data(1000.0, 0.0, 0);
+    location.PredictCurrentPosition(gyro_data_v,acc_data_v,mag_data_v,gps_data_v,g_data_v,ornt_data_v, road_data);
+    cout << location.GetGNSSINS().lng << " " << location.GetGNSSINS().lat << endl;
+    return 0;
+}
+```
+
+if you see the output `114.174 22.2838` that means this library was embedded to your project successfully.
+
+## Input data format.
+
 
 ## TODO
 
@@ -39,6 +99,7 @@
 - [ ] Template processing.
 - [ ] Using smart pointer instead.
 - [ ] Complete all kinds of documents.
+- [x] Add quick start.
 - [ ] Add more test case.
 - [ ] Design a suitable pattern.
 
