@@ -120,7 +120,6 @@ This data is from map data, and if you couldn't search map server data, just fil
 
 ## More detail tutorial.
 
-see:
 - [Api calls details](https://github.com/yyccR/Location/blob/master/docs/apiCallDetails.md)
 - [Sensor data checking](https://github.com/yyccR/Location/blob/master/docs/SensorDataChecking.md)
 - [Impelement details](https://github.com/yyccR/Location/blob/master/docs/implementDetails.md)
