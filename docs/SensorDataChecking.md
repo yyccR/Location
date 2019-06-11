@@ -30,8 +30,8 @@ cout << gn.transpose() << endl;
   Because the gravity in navigation frame should always similar to  `(0,0,g)`, so we can say that the orientation data is available if it can rotate the origin gravity data into `(0,0,g)`.
 
 
-- [] checking magnetometer sensor data
+- [ ] checking magnetometer sensor data
 
-- [] checking accelerometer sensor data
+- [ ] checking accelerometer sensor data
 
-- [] checking gyroscope sensor data
+- [ ] checking gyroscope sensor data

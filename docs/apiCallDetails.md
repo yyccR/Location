@@ -1,4 +1,4 @@
-# Api call details.
+# Api call details
 
 ## Input data format
 
@@ -114,4 +114,4 @@ struct GNSSINS {
 | 1.9768157  | 6.7945433 | 6.9858017 | 1.9095    | 6.5825    | 7.0137997 | 0.059236474  | 0.13137093  | -0.16161749 | 54.375  | -53.125  | -17.6875 | 236.70316 | 42.16233  | 15.22961  | 0           | 0           | 0        | 0               | 0           | 0            | 0           | 0              | 0          | 0           | 0             | 47.3517091              | 257.9223308  | 0         |
 
 
-- Note that in gps gap time, all the gps data should be fill zero, and the road into should be the same as before.
+- Note that in gps gap time, all the gps data should be fill zero, and the road info should be the same as before.
