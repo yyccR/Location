@@ -120,7 +120,11 @@ This data is from map data, and if you couldn't search map server data, just fil
 
 ## More detail tutorial.
 
-see docs/apiCallDetails.md
+see:
+- [Api calls details](https://github.com/yyccR/Location/blob/master/docs/apiCallDetails.md)
+- [Sensor data checking](https://github.com/yyccR/Location/blob/master/docs/SensorDataChecking.md)
+- [Impelement details](https://github.com/yyccR/Location/blob/master/docs/implementDetails.md)
+- [Sensor calibration](https://github.com/yyccR/Location/blob/master/docs/SensorCalibration.md)
 
 ## TODO
 
@@ -128,7 +132,7 @@ see docs/apiCallDetails.md
 - [ ] Clean the garbage code.
 - [ ] Template processing.
 - [ ] Using smart pointer instead.
-- [ ] Complete all kinds of documents.
+- [x] Complete all kinds of documents.
 - [x] Add quick start.
 - [ ] Add more test case.
 - [ ] Design a suitable pattern.
