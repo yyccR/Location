@@ -1,4 +1,4 @@
-# Location <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/logo.png" width="100" height="45" />
+# <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/logo.png" width="150" height="67.5" />
 
 > Positioning is the most basic and crucial step in the driving navigation. An accurate positioning can effectively improve the accuracy of the road-binding, and can also sense the change of the driving pattern more accurately. Since the project is mainly based on mobile phones for navigation and positioning, Currently used is the built-in sensor data (gyroscope, accelerometer, geomagnetic meter, direction sensor, gravity sensor) and GPS data fusion positioning.
 
