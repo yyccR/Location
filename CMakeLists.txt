@@ -20,6 +20,9 @@ add_subdirectory(sensor)
 include_directories(${PROJECT_SOURCE_DIR}/system)
 add_subdirectory(system)
 
+include_directories(${PROJECT_SOURCE_DIR}/utils)
+add_subdirectory(utils)
+
 include_directories(${PROJECT_SOURCE_DIR}/test)
 add_subdirectory(test)
 
@@ -33,4 +36,5 @@ target_link_libraries(Location Location_models)
 target_link_libraries(Location Location_location)
 target_link_libraries(Location Location_sensor)
 target_link_libraries(Location Location_system)
+target_link_libraries(Location Location_utils)
 target_link_libraries(Location Location_test)
