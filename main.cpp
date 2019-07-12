@@ -1,15 +1,7 @@
-//#define CATCH_CONFIG_MAIN
-//#include "catch.h"
-//#include <iostream>
 #include <Eigen/Dense>
 #include "sensor/GPS.h"
 #include <iomanip>
-//#include "math/Quaternions.cpp"
-#include "sensor/Gyroscope.cpp"
-#include "models/AHRS.cpp"
 #include "math/Optimizer.h"
-
-
 #include <iostream>
 #include <fstream>
 #include <cassert>
@@ -19,10 +11,10 @@
 #include "test/TestCalibration.h"
 #include "config/Config.h"
 #include "Location.h"
-#include "models/XgboostDetector.h"
-#include <ctime>
+#include "XgboostDetector.h"
+#include "math/Quaternions.h"
 #include <chrono>
-#include "test/TestXgboostDetector.h"
+#include "TestXgboostDetector.h"
 
 using namespace Eigen;
 using namespace std;
