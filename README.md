@@ -1,5 +1,7 @@
 # LOCATION
 
+[![Build Status](https://travis-ci.org/yyccR/Location.svg?branch=master)](https://travis-ci.org/yyccR/Location)
+
 > Positioning is the most basic and crucial step in the driving navigation. An accurate positioning can effectively improve the accuracy of the road-binding, and can also sense the change of the driving pattern more accurately. Since the project is mainly based on mobile phones for navigation and positioning, Currently used is the built-in sensor data (gyroscope, accelerometer, geomagnetic meter, direction sensor, gravity sensor) and GPS data fusion positioning.
 
 ## Sensor data required.
@@ -120,10 +122,10 @@ This data is from map data, and if you couldn't search map server data, just fil
 
 ## More detail tutorial.
 
-- [Api calls details](https://github.com/yyccR/Location/blob/master/docs/apiCallDetails.md)
-- [Sensor data checking](https://github.com/yyccR/Location/blob/master/docs/SensorDataChecking.md)
-- [Impelement details](https://github.com/yyccR/Location/blob/master/docs/implementDetails.md)
-- [Sensor calibration](https://github.com/yyccR/Location/blob/master/docs/SensorCalibration.md)
+- [Api calls details](docs/apiCallDetails.md)
+- [Sensor data checking](docs/SensorDataChecking.md)
+- [Impelement details](docs/implementDetails.md)
+- [Sensor calibration](docs/SensorCalibration.md)
 
 ## TODO
 
@@ -131,8 +133,8 @@ This data is from map data, and if you couldn't search map server data, just fil
 - [ ] Clean the garbage code.
 - [ ] Template processing.
 - [ ] Using smart pointer instead.
-- [x] Complete all kinds of documents.
-- [x] Add quick start.
+- [X] Complete all kinds of documents.
+- [X] Add quick start.
 - [ ] Add more test case.
 - [ ] Design a suitable pattern.
 
