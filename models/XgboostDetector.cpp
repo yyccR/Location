@@ -7,9 +7,10 @@
 #include <fstream>
 #include <iostream>
 
+XgboostDetector::~XgboostDetector() {};
 
 /**
- * xgboost 模型读取, 解压, 解析成shared_ptr<XTree>.
+ * xgboost read model and decompress into shared_ptr<XTree>.
  * @param model_path
  */
 XgboostDetector::XgboostDetector(std::string &model_path) {
@@ -47,6 +48,12 @@ XgboostDetector::XgboostDetector(std::string &model_path) {
 
 }
 
+/**
+ * detect tree node and convert it into XTree structure.
+ *
+ * @param model_line: file read line.
+ * @return XTree
+ */
 XTree XgboostDetector::detectTrees(std::string &model_line) {
 
     Tools tools;
@@ -126,6 +133,13 @@ std::vector<double> XgboostDetector::predictTrees(std::vector<double> &current_i
     return res;
 }
 
+
+/**
+ * predict current data using the xgboost model.
+ *
+ * @param data, input vector.
+ * @return preidct probability vector for each class according to input training class order.
+ */
 bool XgboostDetector::IsStopping(Eigen::VectorXd &data) const {
     std::vector<double> inputs;
     size_t nums = data.rows();
@@ -141,4 +155,3 @@ bool XgboostDetector::IsStopping(Eigen::VectorXd &data) const {
     return stop_prob > move_prob;
 }
 
-XgboostDetector::~XgboostDetector() {};
