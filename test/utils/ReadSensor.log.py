@@ -40,7 +40,7 @@ def writeCsv(origin_sensors_data, outputs):
         write.writerows(outputs)
 
 
-with open("C:\\Users\\yangcheng\\Desktop\\Log\\sensor_1557128035465.log") as f:
+with open("C:\\Users\\yangcheng\\Desktop\\Log\\sensor_1558684326000.log") as f:
     data = f.readlines()
     for i in range(len(data)):
         if data[i].find("Go") != -1 or i == len(data) - 1:
