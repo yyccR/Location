@@ -106,4 +106,5 @@ print(classification_report(y, vali_best_preds, target_names=["停车", "运动"
 std::string model_path = "raw_model.txt";
 XgboostDetector xgboostDetector = XgboostDetector(model_path);
 StopDetection &stopDetection = xgboostDetector;
+bool is_stop = stopDetection.IsStopping(input_data);
 ```
