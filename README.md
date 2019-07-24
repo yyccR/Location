@@ -126,6 +126,7 @@ This data is from map data, and if you couldn't search map server data, just fil
 - [Sensor data checking](docs/SensorDataChecking.md)
 - [Impelement details](docs/implementDetails.md)
 - [Sensor calibration](docs/SensorCalibration.md)
+- [Training Stop detection model](docs/trainingStopDetectModel.md)
 
 ## TODO
 
