@@ -3,15 +3,17 @@
 //
 
 #include <cmath>
+#include "Location.h"
+#include <iostream>
+#include <fstream>
 #include "../sensor/GPS.h"
 #include "../sensor/Accelerometer.h"
 #include "../sensor/Gravity.h"
 #include "../sensor/Compass.h"
 #include "../models/AHRS.h"
 #include "../models/StrapdownAHRS.h"
-#include "Location.h"
 #include "../math/LPF.h"
-#include "iostream"
+#include "../models/XgboostDetector.h"
 
 using namespace Eigen;
 using namespace routing;
@@ -24,9 +26,12 @@ Location::Location() {
     this->status.Init();
     LPF lpf;
     lpf.LowPassFilter2ndFactorCal(&status);
+    LoadStopDetectModel();
 }
 
-Location::~Location() {}
+Location::~Location() {
+
+}
 
 /**
  * 定位,计算当前位置
@@ -205,6 +210,10 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
 
 }
 
+/**
+ * 设置传感器频率
+ * @param f
+ */
 void Location::SetHz(double f) {
     this->status.parameters.Hz = f;
     this->status.parameters.acc_hz = f / 2.0;
@@ -212,6 +221,124 @@ void Location::SetHz(double f) {
     this->status.parameters.t = 1.0 / (f * (this->status.parameters.static_t_factor));
 }
 
+/**
+ * 设置模型路径
+ * @param model_path
+ */
+void Location::SetModelPath(std::string model_path) {
+    this->status.parameters.stop_detector_model_path = model_path;
+}
+
+/**
+ * 判断文件是否有效
+ * @param model_path
+ * @return
+ */
+bool Location::IsFileVaild(std::string &model_path) {
+    std::ifstream inFile;
+    inFile.open(model_path);
+    if (inFile) {
+        inFile.close();
+        return true;
+    } else {
+        inFile.close();
+        return false;
+    }
+}
+
+/**
+ * 加载模型
+ */
+void Location::LoadStopDetectModel() {
+    std::string model_path = this->status.parameters.stop_detector_model_path;
+    std::string model_name = "stopDetector.model";
+    if (model_path.find(model_name) != std::string::npos) {
+        bool is_file_vaild = IsFileVaild(model_path);
+        if (is_file_vaild) {
+            this->stopDetection = std::make_shared<XgboostDetector>(model_path);
+        }
+    } else {
+        std::string model_full_path = model_path + "/stopDetector.model";
+        bool is_file_vaild = IsFileVaild(model_full_path);
+        if (is_file_vaild) {
+            this->stopDetection = std::make_shared<XgboostDetector>(model_path);
+        }
+    }
+}
+
+/**
+ * 预测行车状态
+ *
+ * @param gyro_data
+ * @param acc_data
+ * @param mag_data
+ * @param g_data
+ * @param ornt_data
+ */
+void Location::PredictStopStatus(Eigen::Vector3d &gyro_data, Eigen::Vector3d &acc_data, Eigen::Vector3d &mag_data,
+                                 Eigen::Vector3d &g_data, Eigen::Vector3d &ornt_data) {
+
+    static Vector3d pre_ornt_data(-999.0, -999.0, -999.0);
+    static Vector3d pre_mag_data(-999.0, -999.0, -999.0);
+    int total_detect_size = (int) (this->status.parameters.stop_status_window * this->status.parameters.Hz);
+    static int cnt = 0;
+    static VectorXd stop_status_v(total_detect_size);
+
+    Quaternions quaternions;
+    Accelerometer accelerometer;
+
+    if (pre_ornt_data(0) != -999.0 && pre_ornt_data(1) != -999.0 && pre_ornt_data(2) != -999.0) {
+
+        Vector3d ornt_diff = ornt_data - pre_ornt_data;
+        Vector4d q = quaternions.GetQFromEuler(ornt_data);
+        Matrix3d dcm = quaternions.GetDCMFromQ(q);
+
+        Vector3d acc_v = acc_data;
+        Vector3d acc_n = dcm * acc_v;
+        Vector3d acc_v_norm = accelerometer.Normalise(acc_v);
+        Vector3d acc_n_norm = accelerometer.Normalise(acc_n);
+
+        Vector3d g_v = g_data;
+        Vector3d g_n = dcm * g_v;
+        Vector3d g_v_norm = accelerometer.Normalise(g_v);
+        Vector3d g_n_norm = accelerometer.Normalise(g_n);
+        Vector3d a_diff = acc_n - g_n;
+
+        Vector3d gyro_v = gyro_data;
+        Vector3d gyro_v_norm = accelerometer.Normalise(gyro_v);
+
+        Vector3d mag_v_diff = (dcm * mag_data) - (dcm * pre_mag_data);
+        Vector3d mag_v_norm = accelerometer.Normalise(mag_v_diff);
+
+        VectorXd input_data(27);
+        input_data << acc_v_norm(0), acc_v_norm(1), acc_v_norm(2), acc_n_norm(0), acc_n_norm(1), acc_n_norm(2),
+                g_v_norm(0), g_v_norm(1), g_v_norm(2), g_n_norm(0), g_n_norm(1), g_n_norm(2),
+                gyro_v_norm(0), gyro_v_norm(1), gyro_v_norm(2), mag_v_norm(0), mag_v_norm(1), mag_v_norm(2),
+                mag_v_diff(0), mag_v_diff(1), mag_v_diff(2), a_diff(0), a_diff(1), a_diff(2),
+                ornt_diff(0), ornt_diff(1), ornt_diff(2);
+
+        if (this->stopDetection) {
+            bool detect_res = this->stopDetection->IsStopping(input_data);
+            if (cnt < total_detect_size) {
+                stop_status_v(cnt) = detect_res;
+                cnt += 1;
+            } else {
+                // 队列先进先出
+                for (int i = 0; i < total_detect_size - 1; ++i) {
+                    stop_status_v(i) = stop_status_v(i + 1);
+                    stop_status_v(i) = stop_status_v(i + 1);
+                }
+                stop_status_v(total_detect_size - 1) = detect_res;
+                if(stop_status_v.sum() /  total_detect_size > 0.5) this->status.parameters.stop_status = 0;
+            }
+
+        }
+
+    } else {
+        pre_ornt_data = ornt_data;
+        pre_mag_data = mag_data;
+    }
+}
 
 /**
  * 获取当前融合定位结果作为输出
@@ -305,9 +432,9 @@ void Location::AutoAdjustMovingFactor(routing::Status *status) {
         ornt_queue(1) = (*status).attitude.yaw;
         // 计算角度变化
         double angle_factor;
-        if (ornt_queue(0) < 90.0 & ornt_queue(1) > 270.0) {
+        if (ornt_queue(0) < 90.0 && ornt_queue(1) > 270.0) {
             angle_factor = ornt_queue(0) + 360.0 - ornt_queue(1);
-        } else if (ornt_queue(1) < 90.0 & ornt_queue(0) > 270.0) {
+        } else if (ornt_queue(1) < 90.0 && ornt_queue(0) > 270.0) {
             angle_factor = ornt_queue(1) + 360.0 - ornt_queue(0);
         } else {
             angle_factor = abs(ornt_queue(1) - ornt_queue(0));
