@@ -131,9 +131,9 @@ This data is from map data, and if you couldn't search map server data, just fil
 ## TODO
 
 - [X] improve CMake.
-- [ ] Clean the garbage code.
+- [X] Clean the garbage code.
 - [ ] Template processing.
-- [ ] Using smart pointer instead.
+- [X] Using smart pointer instead.
 - [X] Complete all kinds of documents.
 - [X] Add quick start.
 - [ ] Add more test case.
