@@ -38,32 +38,32 @@ private:
     double GetCurrentBearing();
 
     // 采样时间自适应
-    void AutoAdjustTFactor(routing::Status *status, Eigen::VectorXd &gps_data, double ins_distance);
+    void AutoAdjustTFactor(Eigen::VectorXd &gps_data, double ins_distance);
 
     // 惯导运动衰减因子
-    void AutoAdjustMovingFactor(routing::Status *status);
+    void AutoAdjustMovingFactor();
 
     // 方向传感器和GPS方向差值修正
-    void UpdateZaxisWithGPSAndRoad(routing::Status *status, Eigen::VectorXd &gps_data, Eigen::Vector3d &ornt_data,
+    void UpdateZaxisWithGPSAndRoad(Eigen::VectorXd &gps_data, Eigen::Vector3d &ornt_data,
                                    Eigen::Vector3d &road_data);
 
     // 方向传感器和GPS方向差值修正
-    void UpdateZaxisWithGPS(routing::Status *status, Eigen::VectorXd &gps_data, Eigen::Vector3d &ornt_data);
+    void UpdateZaxisWithGPS(Eigen::VectorXd &gps_data, Eigen::Vector3d &ornt_data);
 
     // 方向传感器和道路方向差值修正
-    void UpdateZaxisWithRoad(routing::Status *status, Eigen::Vector3d &ornt_data, Eigen::Vector3d &road_data);
+    void UpdateZaxisWithRoad(Eigen::Vector3d &ornt_data, Eigen::Vector3d &road_data);
 
     // 判断道路方向变化幅度是否与指南针幅度一致
-    bool IsRoadCompassSameRange(routing::Status *status, Eigen::Vector3d &ornt_data, Eigen::Vector3d &road_data);
+    bool IsRoadCompassSameRange(Eigen::Vector3d &ornt_data, Eigen::Vector3d &road_data);
 
     // 判断当前是否正处于重新规划中
-    bool IsRouting(routing::Status *status, Eigen::Vector3d &ornt_data, Eigen::Vector3d &road_data);
+    bool IsRouting(Eigen::Vector3d &ornt_data, Eigen::Vector3d &road_data);
 
     // 判断是否偏离航道
-    bool IsOffCourse(routing::Status *status, Eigen::Vector3d &ornt_data, Eigen::Vector3d &road_data);
+    bool IsOffCourse(Eigen::Vector3d &ornt_data, Eigen::Vector3d &road_data);
 
     // 更新道路类型
-    void UpdateRoadType(routing::Status *status, Eigen::Vector3d &road_data);
+    void UpdateRoadType(Eigen::Vector3d &road_data);
 
 public:
 
