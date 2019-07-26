@@ -50,6 +50,14 @@ namespace routing {
 
     struct Parameters{
 
+        // 用于无信号时检测行车状态的模型
+        std::string stop_detector_model_path;
+
+        // 停车状态,0停车,1运动
+        int stop_status;
+        // 停车检测窗口
+        int stop_status_window;
+
         // 弱GPS精度阈值
         double weak_gps;
 

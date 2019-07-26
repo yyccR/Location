@@ -52,6 +52,9 @@ void Status::Init() {
     this->attitude.pitch = 0.0;
     this->attitude.yaw = 0.0;
 
+    this->parameters.stop_detector_model_path = "";
+    this->parameters.stop_status = 1;
+    this->parameters.stop_status_window = 3;
 
     Quaternions quaternions;
     Vector3d init_euler_angle(this->attitude.roll, this->attitude.pitch, this->attitude.yaw);
