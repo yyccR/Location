@@ -51,7 +51,7 @@ int main() {
 //    TestLocation testLocation;
 //    testLocation.testLocation(gyro2, acc2, mag2, gps2, g2, ornt2, road_data);
 
-     checking sensor.
+//     checking sensor.
     Vector3d e(57.221,-0.543, 143.2);
     Quaternions quaternions;
     Vector4d q = quaternions.GetQFromEuler(e);
@@ -63,7 +63,7 @@ int main() {
          << "] to n frame, result is: [" << gn.transpose() << "]." << endl;
 
 
-     testing work flow.
+//     testing work flow.
     Location location;
     Vector3d gyro_data_v(0.004263,0.019169,-0.001014);
     Vector3d mag_data_v(-2.313675,-82.446960,-366.183838);
