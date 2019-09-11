@@ -112,6 +112,7 @@ void Status::Init() {
     this->parameters.off_course_data_queue = 30;
     this->parameters.routing_time = 5;
 
+    this->parameters.is_current_gps_valid = true;
     this->parameters.gps_static_speed_threshold = 2.0;
     this->parameters.gps_count = 0;
     this->parameters.gps_init_threshold = 10;

@@ -134,6 +134,8 @@ namespace routing {
         // 重新规划线路后沿用指南针方向的时间
         int routing_time;
 
+        // 当前输入GPS点是否可用
+        bool is_current_gps_valid;
         // GPS初始状态计数
         int gps_count;
         // 导航GPS初始化后，记录多久后接入ins
