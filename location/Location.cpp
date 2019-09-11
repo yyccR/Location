@@ -869,7 +869,7 @@ void Location::UpdateRoadType(Eigen::Vector3d &road_data) {
  * @return true 为可用, false 不可用
  */
 bool Location::GetCurentGPSStatus() {
-    status.parameters.is_current_gps_valid
+    return status.parameters.is_current_gps_valid;
 }
 
 //Eigen::VectorXd Location::GPSJumpPointCompensate(routing::Status *status, Eigen::VectorXd &gps_bearing_queue) {
