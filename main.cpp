@@ -45,13 +45,13 @@ int main() {
 //    MatrixXd gyro2(data_size,3),acc2(data_size,3),mag2(data_size,3), gps2(data_size,7),
 //            g2(data_size,3), ornt2(data_size,3), road_data(data_size,3);
 //    DataFormat dataFormat;
-////    dataFormat.writeCSVs();
+//    dataFormat.writeCSVs();
 //    std::string file = "D:\\worksheet\\clion\\Location\\test\\data\\sensor_log\\origin_sensors_data_1558592729003.9297.csv";
 //    dataFormat.readCSV(file, gyro2,acc2,mag2, gps2, g2, ornt2, road_data);
 //    TestLocation testLocation;
 //    testLocation.testLocation(gyro2, acc2, mag2, gps2, g2, ornt2, road_data);
 
-    // checking sensor.
+     checking sensor.
     Vector3d e(57.221,-0.543, 143.2);
     Quaternions quaternions;
     Vector4d q = quaternions.GetQFromEuler(e);
@@ -61,9 +61,9 @@ int main() {
     Vector3d gn = dcm * gb;
     cout << "Using euler rotate the gravity from b frame: [" << gb.transpose()
          << "] to n frame, result is: [" << gn.transpose() << "]." << endl;
-//
 
-    // testing work flow.
+
+     testing work flow.
     Location location;
     Vector3d gyro_data_v(0.004263,0.019169,-0.001014);
     Vector3d mag_data_v(-2.313675,-82.446960,-366.183838);
