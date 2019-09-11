@@ -26,7 +26,7 @@ Location::Location() {
     this->status.Init();
     LPF lpf;
     lpf.LowPassFilter2ndFactorCal(&status);
-    LoadStopDetectModel();
+//    LoadStopDetectModel();
 }
 
 Location::~Location() {
@@ -54,6 +54,8 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     double start_lng = status.position.lng;
     double start_lat = status.position.lat;
 
+    // 行车状态预测
+//    PredictStopStatus(gyro_data, acc_data, mag_data, g_data, ornt_data);
     // 更新道路状态
     UpdateRoadType(road_data);
     // 更新惯性位置,速度
@@ -99,6 +101,7 @@ void Location::PredictCurrentPosition(Vector3d &gyro_data, Vector3d &acc_data, V
     bool is_ins_move_not_too_far = status.parameters.ins_dist < status.parameters.max_ins_dist;
     // 判断是否采用GPS数据
     bool is_gps_valid = gps.IsGPSValid(&status, &gps_data);
+    status.parameters.is_current_gps_valid = is_gps_valid;
     if (!is_gps_valid) {
 
         // 采用惯导更新经纬度
@@ -861,6 +864,13 @@ void Location::UpdateRoadType(Eigen::Vector3d &road_data) {
 
 }
 
+/**
+ * 获取当前输入GPS点状态, 需在调用`PredictCurrentPosition`方法后调用.
+ * @return true 为可用, false 不可用
+ */
+bool Location::GetCurentGPSStatus() {
+    status.parameters.is_current_gps_valid
+}
 
 //Eigen::VectorXd Location::GPSJumpPointCompensate(routing::Status *status, Eigen::VectorXd &gps_bearing_queue) {
 //

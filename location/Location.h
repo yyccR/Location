@@ -79,6 +79,9 @@ public:
                                 Eigen::Vector3d &road_data
     );
 
+    // 获取当前GPS是否可用
+    bool GetCurentGPSStatus();
+
     // 获取当前融合定位的输出
     routing::GNSSINS GetGNSSINS();
 
