@@ -22,7 +22,7 @@
 
 - 基于非耦合的GPS融合INS.
 
-<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/origin location.png" width="430" height="350" /> <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/final location.png" width="430" height="350" />
+<img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/origin location.png" width="400" height="320" /> <img src="https://raw.githubusercontent.com/yyccR/Pictures/master/INS/final location.png" width="400" height="320" />
 
 ## 快速开始
 确保安装了gcc和cmake, 下载本项目到你的项目下
